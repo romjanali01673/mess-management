@@ -28,7 +28,6 @@ class _SignInScreenState extends State<SignInScreen> {
     if(FormKey.currentState!.validate()){
       FormKey.currentState!.save();
       final AuthenticationProvider authProvaider = context.read<AuthenticationProvider>();
-      print(authProvaider.userModel!.sessionKey);
       authProvaider.setLoading(val: true);
       UserCredential? userCredential = await authProvaider.signInWithEmailAndPassword(
         email: email, 

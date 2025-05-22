@@ -60,8 +60,8 @@ class AuthenticationProvider extends ChangeNotifier {
       UserModel userM = UserModel.fromMap(jsonDecode(StringUserModel));
 
       onSuccess(userM.sessionKey == userModel!.sessionKey);
-      print(userModel!.sessionKey);
-      print(userM.sessionKey);
+      print(userModel!.sessionKey+"firestore");
+      print(userM.sessionKey+"shared pref");
     } catch (e) {
       onFail(e.toString()+"0002");
     }

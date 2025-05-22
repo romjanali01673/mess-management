@@ -24,6 +24,7 @@ class Constants {
   static const String number = "number";
   static const String createdAt = "createdAt";
   static const String sessionKey = "sessionKey";
+  static const String currentMessId = "currentMessId";
 
   //
   static const String userImages = "userImages";
@@ -44,6 +45,7 @@ class Constants {
   static const String messAuthorityName2nd="messAuthorityName2nd";
   static const String messAuthorityNumber="messAuthorityNumber";
   static const String messAuthorityEmail="messAuthorityEmail";
+  static const String messMemberList="messMemberList";
 
   //
 

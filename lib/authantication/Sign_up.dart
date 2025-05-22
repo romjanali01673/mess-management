@@ -59,7 +59,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           uId: userCredential.user!.uid, 
           image: '', 
           createdAt: '',
-          sessionKey:" ",
+          sessionKey:"",
+          currentMessId:"",
         );
         await authProvaider.saveUserDataToFireStore(
           currentUser: userModel, 

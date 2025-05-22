@@ -54,16 +54,38 @@ class _MessCreateState extends State<MessCreate> {
   }
   
 
-  void _createMess(){
+  void _createMess()async{
     final serviceProvaider = context.read<ServiceProvaider>();
     final authProvaider = context.read<AuthenticationProvider>();
     if(formKey.currentState!.validate()){
       formKey.currentState!.save();
+      serviceProvaider.setIsloading(true);
 
-      // store mess info to firestore
-      serviceProvaider.storeMessDataToFirestore(
+      // stop process and show an dialog if user offline
+      // if offline stop creations.
+      if(!serviceProvaider.isOnline) {
+        showSnackber(context: context, content: "No Internet");
+        serviceProvaider.setIsloading(false);
+        return;
+      }
+
+      // check are the member already connected to a mess.
+      // if connected stop creations.
+      if(authProvaider.userModel!.currentMessId!=""){
+        showSnackber(
+          context: context, 
+          content: "Already you are connected With a mess. \nTo create a new mess \nAt first you have to leave from current mess."
+        );
+        serviceProvaider.setIsloading(false);
+        return;
+      }
+    
+
+      // store mess created info to firestore
+      await serviceProvaider.storeMessDataToFirestore(
         onFail: (message){
           showSnackber(context: context, content: message);
+          serviceProvaider.setIsloading(false);
         }, 
         messModel: MessModel(
           messId: "", 
@@ -75,7 +97,27 @@ class _MessCreateState extends State<MessCreate> {
           messAuthorityName2nd: "", // secondary owner name will be published leter
           messAuthorityNumber: authorityPhoneController.text.toString(), 
           messAuthorityEmail: authorityEmailController.text.toString(),
-        )
+          messMemberList: [
+            authProvaider.userModel!.uId.toString(),
+          ]
+        ),
+        onSuccess: ()async{
+          // mess has created so,
+          // assign mess id to to mess owner profile
+          await serviceProvaider.assignMessIdToMemberProfile(
+            onFail: (message) {
+              serviceProvaider.setIsloading(false);
+              showSnackber(context: context, content: message);
+            },
+            onSuccess: (){
+              // assign mess id to user model
+              authProvaider.userModel!.currentMessId = serviceProvaider.getMessModel!.messId; 
+              showSnackber(context: context, content: "Mess Has Created");
+            },
+            memberUid: authProvaider.userModel!.uId,
+          );
+          serviceProvaider.setIsloading(false);
+        }
       );
 
     }
@@ -174,9 +216,9 @@ class _MessCreateState extends State<MessCreate> {
                     ),
                     child: TextFormField(
                       controller: messOwnerNameController,
-                      onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                      },
+                      // onTapOutside: (event) {// close keyboard
+                      // FocusScope.of(context).unfocus();
+                      // },
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
@@ -199,18 +241,18 @@ class _MessCreateState extends State<MessCreate> {
                     ),
                     child: TextFormField(
                       controller: messOwnerIdController,
-                      onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                    },
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      enabled: false,
-                      label: Text("Mess Owner Id"),
-                      border: InputBorder.none,
+                      //   onTapOutside: (event) {// close keyboard
+                      //   FocusScope.of(context).unfocus();
+                      // },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        enabled: false,
+                        label: Text("Mess Owner Id"),
+                        border: InputBorder.none,
                                     
+                      ),
                     ),
-                  ),
                   ),
                 ),
             

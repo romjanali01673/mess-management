@@ -4,21 +4,19 @@ import 'package:meal_hisab/provaiders/authantication_provaider.dart';
 import 'package:meal_hisab/provaiders/service_provaider.dart';
 import 'package:provider/provider.dart';
 
-class MessDelete extends StatefulWidget {
-  const MessDelete({super.key});
+class JoinOrLeave extends StatefulWidget {
+  const JoinOrLeave({super.key});
 
   @override
-  State<MessDelete> createState() => _MessDeleteState();
+  State<JoinOrLeave> createState() => _JoinOrLeaveState();
 }
 
+class _JoinOrLeaveState extends State<JoinOrLeave> {
 
-
-class _MessDeleteState extends State<MessDelete> {
-
-  void _deleteMess()async{
+  void _LeaveMess()async{
     final authProvaider = context.read<AuthenticationProvider>();
     final serviceProvaider = context.read<ServiceProvaider>();
-    if(authProvaider.userModel!.currentMessId != "" && serviceProvaider.getMessModel != null && serviceProvaider.getMessModel!.messAuthorityId==authProvaider.userModel!.uId){
+    if(authProvaider.userModel!.currentMessId!=""){
 
       // if offline stop leave process .
       if(!serviceProvaider.isOnline) {
@@ -29,10 +27,9 @@ class _MessDeleteState extends State<MessDelete> {
 
       serviceProvaider.setIsloading(true);
 
-      // // remove assign mess id from user profile data.
-      // await Future.delayed(Duration(seconds: 2));
+      // remove assign mess id from user profile data.
+      await Future.delayed(Duration(seconds: 2));
 
-      // delete mess collection/table
       await serviceProvaider.removeMessIdToMemberProfile(
         onFail: (message) 
         {  
@@ -55,40 +52,34 @@ class _MessDeleteState extends State<MessDelete> {
       serviceProvaider.setIsloading(false);
     }
     else{
-      showSnackber(context: context, content: "May you don't have own Mess! \n only primary Mess owner can delete Mess!");
+      showSnackber(context: context, content: "you not in any mess!");
     }
-  }
 
+  }
+  
+  
   @override
   Widget build(BuildContext context) {
-        final serviceProvaider = context.watch<ServiceProvaider>();
-
-    return Container(
+    return Expanded(
       child: Column(
         children: [
-          Card(
-            color: Colors.red.shade500,
-            child: ListTile(
-              title: Text("Higher Socity"),
-              subtitle: Text("madhubpur, habiganj"),
-            ),
-          ),
-          SizedBox(
-            height: 100,
-          ),
-          serviceProvaider.isLoading?
-          SizedBox.square(
-            dimension: 50,
-            child: CircularProgressIndicator(),
-          )
-          :
-          getMaterialButton(label: "Delete", 
-            ontap: (){
-              _deleteMess();
-            }
-          )
+          Text("Mess Join Invitations :"),
+          ...List.generate(10, (index){
+            return Container(
+              padding: EdgeInsets.all(10),
+              height: 100,
+            );
+          }),
+          Text("Ownership Proposal :"),
+          ...List.generate(10, (index){
+            return Container(
+              padding: EdgeInsets.all(10),
+              height: 100,
+            );
+          }),
+          
         ],
-      ),
+      )
     );
   }
 }

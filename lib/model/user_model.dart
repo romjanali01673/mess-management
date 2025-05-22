@@ -8,6 +8,7 @@ class UserModel {
   String number;
   String createdAt;
   String sessionKey;
+  String currentMessId;
 
   UserModel({
     required this.uId,
@@ -17,6 +18,7 @@ class UserModel {
     required this.number,
     required this.createdAt,
     required this.sessionKey,
+    required this.currentMessId,
 
   });
 
@@ -29,6 +31,7 @@ class UserModel {
       Constants.number  : number,
       Constants.createdAt  : createdAt,
       Constants.sessionKey  : sessionKey,
+      Constants.currentMessId  : currentMessId,
     };
   }
 
@@ -41,6 +44,7 @@ class UserModel {
       number: data[Constants.number]??"",
       createdAt: data[Constants.createdAt]??"",
       sessionKey: data[Constants.sessionKey]??"",
+      currentMessId: data[Constants.currentMessId]??"",
     );
   }
 }

@@ -10,6 +10,7 @@ class MessModel {
   String messAuthorityName2nd;
   String messAuthorityNumber;
   String messAuthorityEmail;
+  List messMemberList;
 
   MessModel({
     required this.messId,
@@ -21,6 +22,7 @@ class MessModel {
     required this.messAuthorityName2nd,
     required this.messAuthorityNumber,
     required this.messAuthorityEmail,
+    required this.messMemberList,
   });
 
   Map<String, dynamic> toMap(){
@@ -34,6 +36,7 @@ class MessModel {
       Constants.messAuthorityName2nd: messAuthorityName2nd,
       Constants.messAuthorityNumber: messAuthorityNumber,
       Constants.messAuthorityEmail: messAuthorityEmail,
+      Constants.messMemberList: messMemberList,
     };
   }
 
@@ -48,6 +51,7 @@ class MessModel {
       messAuthorityName2nd: data[Constants.messAuthorityName2nd]?? "", 
       messAuthorityNumber: data[Constants.messAuthorityNumber]?? "", 
       messAuthorityEmail: data[Constants.messAuthorityEmail]?? "",
+      messMemberList: data[Constants.messMemberList]?? "",
     );
   }
 }

@@ -35,15 +35,15 @@ class _LandingScreenState extends State<LandingScreen> {
         await authProvider.sessionValid(
           onSuccess:(res)async{
             if(res){
-               // set user data to shared preference
-            print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-            await authProvider.saveUserDataToSharedPref();
+                // set user data to shared preference
+              print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+              await authProvider.saveUserDataToSharedPref();
 
-            //navigate to home screen
-            // await Future.delayed(Duration(seconds: 5));
-            print("ccccccccccccccccccccccccccccc");
-            print(authProvider.userModel!.email);
-            navigate(isSignedIn: true);
+              //navigate to home screen
+              // await Future.delayed(Duration(seconds: 5));
+              print("ccccccccccccccccccccccccccccc");
+              print(authProvider.userModel!.email);
+              navigate(isSignedIn: true);
             }
             else{
               // perform an opration from here for clear cache 
@@ -75,10 +75,14 @@ class _LandingScreenState extends State<LandingScreen> {
 
   void navigate({required bool isSignedIn}){
     if(isSignedIn){
-      Navigator.pushReplacementNamed(context, Constants.HomeScreen);
+      // remove all previous page 
+      // and navigate to home screen
+      Navigator.pushNamedAndRemoveUntil(context, Constants.HomeScreen,(route)=>false);
     }
     else{
-      Navigator.pushReplacementNamed(context, Constants.logInScreen);
+      // remove all previous page 
+      // and navigate to login screen
+      Navigator.pushNamedAndRemoveUntil(context, Constants.logInScreen,(route)=>false);
     }
   }
 
