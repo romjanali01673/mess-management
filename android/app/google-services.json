@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414026155088",
+    "project_id": "meal-hisab",
+    "storage_bucket": "meal-hisab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414026155088:android:fadc4380e57351aac33d55",
+        "android_client_info": {
+          "package_name": "com.example.meal_hisab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7qa4WK1YPFy1EVsWm_2FxBDZCk-2x2OU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
