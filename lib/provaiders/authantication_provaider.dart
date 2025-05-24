@@ -26,11 +26,12 @@ class AuthenticationProvider extends ChangeNotifier {
   // get ---------------------
 
   bool get isLoading => _isLoading;
-  String? get uid => _uId;
+  String? get uid {
+    return _uId?? firebaseAuth.currentUser!.uid;
+  }
   UserModel? get userModel=> _userModel;
 
   // set -------------------
-
 
 
   Future<void> setSignedIn ({required bool val, })async{
@@ -47,12 +48,35 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setUserModel({   
+    String ? uId,
+    String ? fname,
+    String ? email,
+    String ? image,
+    String ? number,
+    String ? sessionKey,
+    String ? currentMessId,
+  }){
+
+    _userModel!.uId = uId?? _userModel!.uId;
+    _userModel!.fname = fname?? _userModel!.fname;
+    _userModel!.email = email?? _userModel!.email;
+    _userModel!.image = image?? _userModel!.image;
+    _userModel!.number = number?? _userModel!.number;
+    _userModel!.sessionKey = sessionKey??  _userModel!.sessionKey;
+    _userModel!.currentMessId = currentMessId??  _userModel!.currentMessId;
+    
+    notifyListeners();
+  }
+
 
 
   // function here ---------------------------------------
   
+  Future<void> storeUid ()async{
+    firebaseFirestore.collection(Constants.uId).doc(userModel!.createdAt).set({Constants.createdAt:userModel!.uId});
+  }
 
-  //
   Future<void> sessionValid({required Function(bool) onSuccess,required Function(String) onFail})async{
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

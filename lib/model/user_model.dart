@@ -6,9 +6,9 @@ class UserModel {
   String email;
   String image;
   String number;
-  String createdAt;
   String sessionKey;
   String currentMessId;
+  String fullAddress;
 
   UserModel({
     required this.uId,
@@ -16,9 +16,9 @@ class UserModel {
     required this.email,
     required this.image,
     required this.number,
-    required this.createdAt,
     required this.sessionKey,
     required this.currentMessId,
+    required this.fullAddress,
 
   });
 
@@ -29,9 +29,9 @@ class UserModel {
       Constants.email  : email,
       Constants.image  : image,
       Constants.number  : number,
-      Constants.createdAt  : createdAt,
       Constants.sessionKey  : sessionKey,
       Constants.currentMessId  : currentMessId,
+      Constants.fullAddress  : fullAddress,
     };
   }
 
@@ -42,9 +42,9 @@ class UserModel {
       email: data[Constants.email]??"", 
       image: data[Constants.image]??"", 
       number: data[Constants.number]??"",
-      createdAt: data[Constants.createdAt]??"",
       sessionKey: data[Constants.sessionKey]??"",
       currentMessId: data[Constants.currentMessId]??"",
+      fullAddress: data[Constants.fullAddress]??"",
     );
   }
 }

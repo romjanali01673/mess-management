@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/user_model.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:provider/provider.dart';
 
 class AddMemberScreen extends StatefulWidget{
   const AddMemberScreen({super.key});
@@ -13,6 +17,7 @@ class AddMemberScreen extends StatefulWidget{
 class _AddMemberScreenState extends State<AddMemberScreen>{
   var searchController = TextEditingController();
   bool found = false;
+  UserModel? userModel;
 
   @override
   void dispose() {
@@ -22,6 +27,8 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
   }
   @override
   Widget build(BuildContext context){
+    final messProvaider = context.watch<MessProvaider>();
+    final authProvaider = context.watch<AuthenticationProvider>();
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -74,17 +81,38 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                     
                         ),
                   ),
+                  messProvaider.isLoading? CircularProgressIndicator() 
+                  : 
                   ElevatedButton(
                     onPressed: ()async{
-                      found = false;
-                      found = await showConfirmDialog(context: context, title: "xyz");
+                      // clear pre data
                       setState(() {
-                        
+                        found = false;
+                        userModel = null;
                       });
+
+                      if(searchController.text.toString().trim().length != authProvaider.userModel!.uId.length){
+                        showSnackber(context: context, content: "Invalid Argument!");
+                        return;
+                      }
+                      messProvaider.setIsloading(true);
+                      UserModel? memberData =  await messProvaider.getMemberData(uId: searchController.text.toString().trim());
+                      messProvaider.setIsloading(false);
+                      if(memberData==null){
+                        showSnackber(context: context, content: "No Data Found!");
+                        return;
+                      }
+                      else{
+                        // data found
+                        setState(() {
+                          userModel = memberData;
+                          found = true;
+                        });
+                      }
                     }, 
                     child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: Text("search"),
+                    child:Text("search"),
                   ),)
                 ],
               ),
@@ -97,9 +125,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("name :"),
+                    Text("Name :"),
                     Expanded(
-                      child: Text("md romjan\n\n\n\n\n\n\na ali")
+                      child: Text(userModel!.fname)
                     )
                   ],
                 ),
@@ -109,7 +137,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   children: [
                     Text("Id :"),
                     Expanded(
-                      child: Text("md romjana ali")
+                      child: Text(userModel!.uId)
                     )
                   ],
                 ),
@@ -119,7 +147,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   children: [
                     Text("Phone :"),
                     Expanded(
-                      child: Text("md romjana ali")
+                      child: Text(userModel!.number)
                     )
                   ],
                 ),
@@ -129,27 +157,18 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   children: [
                     Text("Email :"),
                     Expanded(
-                      child: Text("md romjana ali")
+                      child: Text(userModel!.email)
                     )
                   ],
                 ),
-                Row(
-                  spacing: 20,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Email :"),
-                    Expanded(
-                      child: Text("md romjana ali")
-                    )
-                  ],
-                ),
+                
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 20,
                   children: [
                     Text("Address :"),
                     Expanded(
-                      child: Text("md romjana ali")
+                      child: Text(userModel!.fullAddress)
                     )
                   ],
                 ),SizedBox(

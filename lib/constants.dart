@@ -25,6 +25,12 @@ class Constants {
   static const String createdAt = "createdAt";
   static const String sessionKey = "sessionKey";
   static const String currentMessId = "currentMessId";
+  static const String fullAddress = "fullAddress";
+
+  static const String memberType = Constants.member;
+  static const String member = "member";
+  static const String menager = "menager";
+  static const String actMenager = "Act Menager";
 
   //
   static const String userImages = "userImages";
@@ -46,8 +52,16 @@ class Constants {
   static const String messAuthorityNumber="messAuthorityNumber";
   static const String messAuthorityEmail="messAuthorityEmail";
   static const String messMemberList="messMemberList";
+  static const String disabledMemberList="disabledMemberList";
 
   //
+  static const String invaitations = "invaitations";
+  static const String invaitationId = "invaitationId";
+  static const String status="status";
+  static const String description="description";
+  static const String invaitedTime="invaitedTime";
+
+
 
 }
 
@@ -111,8 +125,15 @@ enum Mess{
   messCreate,
   messDelete,
   messUpdate,
-  messInvitations,
+  joinOrleave,
 
+}
+
+class JoiningStatus{
+  static const String joined = "joined"; 
+  static const String declain = "declain"; 
+  static const String panding = "panding"; 
+  static const String expaired = "expaired"; 
 }
 
 

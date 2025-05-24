@@ -41,7 +41,7 @@ Widget getMenuItems({required String label, required Function() ontap, IconData 
   );
 }
 
-Widget getMaterialButton({required String label, required Function() ontap, IconData ? icon, selected = false}){
+Widget getMaterialButton({required BuildContext context, required String label, required Function() ontap, IconData ? icon, selected = false}){
   return Container(
     margin: EdgeInsets.all(2),
     child: MaterialButton(

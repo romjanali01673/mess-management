@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/mess/join_or_leave.dart';
 import 'package:meal_hisab/mess/mess_create.dart';
 import 'package:meal_hisab/mess/mess_delete.dart';
 import 'package:meal_hisab/mess/mess_update.dart';
@@ -21,7 +22,7 @@ class _MessScreenState extends State<MessScreen>{
   @override
   Widget build(BuildContext context){
     return Container(
-      
+      color: Colors.green.shade50,
       child: Column(
         children: [
           SingleChildScrollView(
@@ -47,7 +48,7 @@ class _MessScreenState extends State<MessScreen>{
                       });
                     },
                     selected: messScreemItemGrpup==Mess.messCreate,
-                    icon: Icons.group
+                    icon: Icons.create
                   ),
                   getMenuItems(
                     label: "Delete Mess", 
@@ -57,7 +58,7 @@ class _MessScreenState extends State<MessScreen>{
                       });
                     },
                     selected: messScreemItemGrpup==Mess.messDelete,
-                    icon: Icons.group
+                    icon: Icons.delete
                   ),
                   getMenuItems(
                     label: "Update Mess", 
@@ -67,18 +68,18 @@ class _MessScreenState extends State<MessScreen>{
                       });
                     },
                     selected: messScreemItemGrpup==Mess.messUpdate,
-                    icon: Icons.group
+                    icon: Icons.update_sharp
                   ),
                   getMenuItems(
-                    label: "Invaitations", 
+                    label: "Join/leave", 
                     ontap: (){
                       setState(() {
-                        messScreemItemGrpup = Mess.messInvitations;
+                        messScreemItemGrpup = Mess.joinOrleave;
                         
                       });
                     },
-                    selected: messScreemItemGrpup==Mess.messInvitations,
-                    icon: (Icons.add_circle_outline_outlined),
+                    selected: messScreemItemGrpup==Mess.joinOrleave,
+                    icon: (Icons.library_add),
                   ),
                 ],
               ),
@@ -88,6 +89,8 @@ class _MessScreenState extends State<MessScreen>{
           messScreemItemGrpup==Mess.messDelete? MessDelete()
           :
           messScreemItemGrpup==Mess.messUpdate? MessUpdate()
+          :
+          messScreemItemGrpup==Mess.joinOrleave? JoinOrLeave()
           :
           getMessRolusAndRagilations()
         ],

@@ -6,7 +6,7 @@ import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/mess_model.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/service_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
 import 'package:provider/provider.dart';
 
 class MessCreate extends StatefulWidget {
@@ -55,17 +55,17 @@ class _MessCreateState extends State<MessCreate> {
   
 
   void _createMess()async{
-    final serviceProvaider = context.read<ServiceProvaider>();
+    final messProvaider = context.read<MessProvaider>();
     final authProvaider = context.read<AuthenticationProvider>();
     if(formKey.currentState!.validate()){
       formKey.currentState!.save();
-      serviceProvaider.setIsloading(true);
+      messProvaider.setIsloading(true);
 
       // stop process and show an dialog if user offline
       // if offline stop creations.
-      if(!serviceProvaider.isOnline) {
+      if(!messProvaider.isOnline) {
         showSnackber(context: context, content: "No Internet");
-        serviceProvaider.setIsloading(false);
+        messProvaider.setIsloading(false);
         return;
       }
 
@@ -76,16 +76,16 @@ class _MessCreateState extends State<MessCreate> {
           context: context, 
           content: "Already you are connected With a mess. \nTo create a new mess \nAt first you have to leave from current mess."
         );
-        serviceProvaider.setIsloading(false);
+        messProvaider.setIsloading(false);
         return;
       }
     
 
       // store mess created info to firestore
-      await serviceProvaider.storeMessDataToFirestore(
+      await messProvaider.storeMessDataToFirestore(
         onFail: (message){
           showSnackber(context: context, content: message);
-          serviceProvaider.setIsloading(false);
+          messProvaider.setIsloading(false);
         }, 
         messModel: MessModel(
           messId: "", 
@@ -99,24 +99,27 @@ class _MessCreateState extends State<MessCreate> {
           messAuthorityEmail: authorityEmailController.text.toString(),
           messMemberList: [
             authProvaider.userModel!.uId.toString(),
-          ]
+          ],
+          disabledMemberList:[]
         ),
         onSuccess: ()async{
           // mess has created so,
           // assign mess id to to mess owner profile
-          await serviceProvaider.assignMessIdToMemberProfile(
+          await messProvaider.assignMessIdToMemberProfile(
             onFail: (message) {
-              serviceProvaider.setIsloading(false);
+              messProvaider.setIsloading(false);
               showSnackber(context: context, content: message);
             },
             onSuccess: (){
               // assign mess id to user model
-              authProvaider.userModel!.currentMessId = serviceProvaider.getMessModel!.messId; 
+              authProvaider.userModel!.currentMessId = messProvaider.getMessModel!.messId; 
               showSnackber(context: context, content: "Mess Has Created");
+              formKey.currentState!.reset();
             },
             memberUid: authProvaider.userModel!.uId,
+            messId: messProvaider.getMessModel!.messId,
           );
-          serviceProvaider.setIsloading(false);
+          messProvaider.setIsloading(false);
         }
       );
 
@@ -128,7 +131,7 @@ class _MessCreateState extends State<MessCreate> {
   Widget build(BuildContext context) {
 
     final authProvaider = context.watch<AuthenticationProvider>();
-    final serviceProvaider = context.watch<ServiceProvaider>();
+    final messProvaider = context.watch<MessProvaider>();
 
 
     return Expanded(
@@ -318,13 +321,14 @@ class _MessCreateState extends State<MessCreate> {
                   ),
                 ),
           
-                serviceProvaider.isLoading?
+                messProvaider.isLoading?
                 SizedBox.square(
                   dimension: 50,
                   child: CircularProgressIndicator()
                 )
                 : 
                 getMaterialButton(
+                  context: context,
                   label: "Create", 
                   ontap:(){
                     _createMess();

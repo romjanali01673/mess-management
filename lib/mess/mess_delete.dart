@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/service_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
 import 'package:provider/provider.dart';
 
 class MessDelete extends StatefulWidget {
@@ -15,44 +15,74 @@ class MessDelete extends StatefulWidget {
 
 class _MessDeleteState extends State<MessDelete> {
 
+  @override
+  void initState() {
+    super.initState();  
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      getMessData();
+    });
+  }
+
+  void getMessData()async{
+    final messProvaider = context.read<MessProvaider>();
+    final authProvaider = context.read<AuthenticationProvider>();
+    if(authProvaider.userModel!.currentMessId==""){
+      // because the member are not included to a mess
+      return;
+    }
+    await messProvaider.getMessData(
+      onFail: (message){
+        showSnackber(context: context, content: message);
+        print(message);
+      }, 
+      messId:authProvaider.userModel!.currentMessId ,
+    );
+  }
+
   void _deleteMess()async{
     final authProvaider = context.read<AuthenticationProvider>();
-    final serviceProvaider = context.read<ServiceProvaider>();
-    if(authProvaider.userModel!.currentMessId != "" && serviceProvaider.getMessModel != null && serviceProvaider.getMessModel!.messAuthorityId==authProvaider.userModel!.uId){
+    final messProvaider = context.read<MessProvaider>();
+    if(authProvaider.userModel!.currentMessId != "" && messProvaider.getMessModel != null && messProvaider.getMessModel!.messAuthorityId==authProvaider.userModel!.uId){
 
       // if offline stop leave process .
-      if(!serviceProvaider.isOnline) {
+      if(!messProvaider.isOnline) {
         showSnackber(context: context, content: "No Internet");
-        serviceProvaider.setIsloading(false);
+        messProvaider.setIsloading(false);
         return;
       }
 
-      serviceProvaider.setIsloading(true);
-
-      // // remove assign mess id from user profile data.
-      // await Future.delayed(Duration(seconds: 2));
+      messProvaider.setIsloading(true);
 
       // delete mess collection/table
-      await serviceProvaider.removeMessIdToMemberProfile(
+      await messProvaider.deleteMess(
         onFail: (message) 
         {  
           // on failed show a "failed message"
-          serviceProvaider.setIsloading(false);
+          messProvaider.setIsloading(false);
           showSnackber(context: context, content: message);
         }, 
-        memberUid: authProvaider.userModel!.uId,
+        MessId: messProvaider.getMessModel!.messId,
         onSuccess: (){
           //remove current mess id from your user id.
           // because auth provaider hold current mess id in user model. it will not replace until you relunch/login the app. 
           // clear manually
-          authProvaider.userModel!.currentMessId = "";
+          authProvaider.setUserModel(currentMessId: "");
+          messProvaider.removeMessIdFromMemberProfile(
+            memberUid: authProvaider.userModel!.uId, 
+            onFail: (p0) {
+              showSnackber(context: context, content: "somthing wrong!");
+            },
+          );
 
           // on success show a "success message"
-          showSnackber(context: context, content: "Leaved from the Mess");
+          showSnackber(context: context, content: "Mess Has Deleted");
+          setState(() {
+            
+          });
         },
       );
       // al done. stop loading
-      serviceProvaider.setIsloading(false);
+      messProvaider.setIsloading(false);
     }
     else{
       showSnackber(context: context, content: "May you don't have own Mess! \n only primary Mess owner can delete Mess!");
@@ -61,30 +91,46 @@ class _MessDeleteState extends State<MessDelete> {
 
   @override
   Widget build(BuildContext context) {
-        final serviceProvaider = context.watch<ServiceProvaider>();
+    final messProvaider = context.watch<MessProvaider>();
 
     return Container(
       child: Column(
         children: [
+          messProvaider.getMessModel!=null?
           Card(
             color: Colors.red.shade500,
             child: ListTile(
-              title: Text("Higher Socity"),
-              subtitle: Text("madhubpur, habiganj"),
-            ),
+              title: Text(messProvaider.getMessModel!.messName),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Id :${messProvaider.getMessModel!.messId} "),
+                  Text("Address :${messProvaider.getMessModel!.messAddress} "),
+                ],
+              ),
+            )
+          )
+          :
+          SizedBox(
+            child: Text("No Mess Found!", style: TextStyle(color: Colors.red),),
           ),
           SizedBox(
             height: 100,
           ),
-          serviceProvaider.isLoading?
+          messProvaider.isLoading?
           SizedBox.square(
             dimension: 50,
             child: CircularProgressIndicator(),
           )
           :
-          getMaterialButton(label: "Delete", 
-            ontap: (){
-              _deleteMess();
+          getMaterialButton(
+            context: context,
+            label: "Delete", 
+            ontap: ()async{
+              bool? res = await showConfirmDialog(context: context, title: "Do You Want to Delete This Mess");
+              if(res??false){
+                _deleteMess();
+              }
             }
           )
         ],

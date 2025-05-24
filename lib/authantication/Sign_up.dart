@@ -65,7 +65,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         await authProvaider.saveUserDataToFireStore(
           currentUser: userModel, 
           fileImage: null, 
-          onSuccess: (){
+          onSuccess: ()async{
+            await authProvaider.storeUid();
             showSnackber(context: context, content: "Account Creation Success.");
             Navigator.pushReplacementNamed(context, Constants.logInScreen);
           }, 
@@ -73,6 +74,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             showSnackber(context: context, content: "$message");
           }
         );
+        
       }
       authProvaider.setLoading(val: false);
     }
