@@ -41,6 +41,9 @@ class _SignInScreenState extends State<SignInScreen> {
         //user valid, now try to fatch user data
         bool isSuccess = false;
         // get
+        await authProvaider.getUidFromFiretore(onFail: (message){
+
+        });
         await authProvaider.setSessionKey(
           onSuccess: (){
             isSuccess = true;

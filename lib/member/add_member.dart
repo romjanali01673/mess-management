@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/joining_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
 import 'package:meal_hisab/provaiders/mess_provaider.dart';
@@ -15,6 +19,7 @@ class AddMemberScreen extends StatefulWidget{
 }
 
 class _AddMemberScreenState extends State<AddMemberScreen>{
+  final GlobalKey<FormState> fromKey = GlobalKey<FormState>();
   var searchController = TextEditingController();
   bool found = false;
   UserModel? userModel;
@@ -44,42 +49,45 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                 spacing: 10,
                 children: [
                   Expanded(
-                    child: TextField(
-                          autofocus: false,
-                          controller: searchController,
-                          enabled: true,
-                          obscureText: false,
-                          obscuringCharacter: '*',
-                          keyboardType: TextInputType.number,
-                          onTapOutside: (event) {// close keyboard
-                            FocusScope.of(context).unfocus();
+
+                    child: Form(
+                      key: fromKey,
+                      child: TextFormField(
+                            validator: (value) {
+                          return validateUid(value.toString());
                           },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly, // Only allows digits
-                          ],
-                          decoration: InputDecoration(
-                            label: Text("Id No:"),
-                            // helperText: "helper Text 1",
-                            prefix: Icon(Icons.man),
-                            // suffix: InkWell(child: Icon(Icons.abc), onTap:() => print("hi ${text1.text.toString()}"),),
-                            hintText: "Search Member by Id!",
-                            // filled: true,÷\
-                            fillColor: Colors.red.shade100,
-                            // errorText: "you must have to Enter your Name",
-                            border: OutlineInputBorder(// if we use enable/disable/focused border we can ignore normal order
-                                borderSide: BorderSide(
-                                color:Colors.red,
-                                width: 5,
+                            controller: searchController,
+                            keyboardType: TextInputType.number,
+                            onTapOutside: (event) {// close keyboard
+                              FocusScope.of(context).unfocus();
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly, // Only allows digits
+                            ],
+                            decoration: InputDecoration(
+                              label: Text("Id No:"),
+                              // helperText: "helper Text 1",
+                              prefix: Icon(Icons.man),
+                              // suffix: InkWell(child: Icon(Icons.abc), onTap:() => print("hi ${text1.text.toString()}"),),
+                              hintText: "Search Member by Id!",
+                              // filled: true,
+                              fillColor: Colors.red.shade100,
+                              // errorText: "you must have to Enter your Name",
+                              border: OutlineInputBorder(// if we use enable/disable/focused border we can ignore normal order
+                                  borderSide: BorderSide(
+                                  color:Colors.red,
+                                  width: 5,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              borderRadius: BorderRadius.circular(10),
+                              
+                              errorBorder: OutlineInputBorder(
+                      
+                              )
                             ),
-                            
-                            errorBorder: OutlineInputBorder(
-                    
-                            )
+                      
                           ),
-                    
-                        ),
+                    ),
                   ),
                   messProvaider.isLoading? CircularProgressIndicator() 
                   : 
@@ -91,24 +99,28 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                         userModel = null;
                       });
 
-                      if(searchController.text.toString().trim().length != authProvaider.userModel!.uId.length){
-                        showSnackber(context: context, content: "Invalid Argument!");
-                        return;
-                      }
-                      messProvaider.setIsloading(true);
-                      UserModel? memberData =  await messProvaider.getMemberData(uId: searchController.text.toString().trim());
-                      messProvaider.setIsloading(false);
-                      if(memberData==null){
-                        showSnackber(context: context, content: "No Data Found!");
-                        return;
+                      if(amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider)){
+                        if(fromKey.currentState!.validate()){
+                          messProvaider.setIsloading(true);
+                          UserModel? memberData =  await messProvaider.getMemberData(uId: searchController.text.toString().trim());
+                          messProvaider.setIsloading(false);
+
+                          if(memberData==null){
+                          showSnackber(context: context, content: "No Data Found!");
+                          }
+                          else{
+                            setState(() {
+                              userModel = memberData;
+                              found = true;
+                            });
+                          }
+                        }
+                        
                       }
                       else{
-                        // data found
-                        setState(() {
-                          userModel = memberData;
-                          found = true;
-                        });
+                        showSnackber(context: context, content: "You are not mess menager");
                       }
+                      
                     }, 
                     child: Padding(
                     padding: const EdgeInsets.all(18.0),
@@ -174,24 +186,45 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                 ),SizedBox(
                   height: 40,
                 ),
+                if(messProvaider.isLoading) SizedBox.square(dimension: 50 ,child: CircularProgressIndicator()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 20,
                   children: [
                     getMenuItems(label: "Clear", ontap: (){
-                      searchController.clear();
-                      found=false;
+                      setState(() {
+                        searchController.clear();
+                        userModel = null;
+                        found=false;
+                      });
                       //clear all variable or data
                     }),
                     getMenuItems(label: "Invite", ontap: ()async{
                       bool confirm = await showConfirmDialog(context: context, title: "Are your Sure to About this invitation");
-                      searchController.clear();
-                      found=false;
                       if(confirm){
-                        //clear all variable or data and show a snack message
+                        searchController.clear();
+                        messProvaider.setIsloading(true);
+                        await messProvaider.sendMessInvaitaionCard(
+                          memberUid: userModel!.uId, 
+                          joiningModel:JoiningModel(
+                            invaitationId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                            messName: messProvaider.getMessModel!.messName, 
+                            messId: messProvaider.getMessModel!.messId, 
+                            status: JoiningStatus.panding, 
+                            description: "Hello ${userModel!.fname}! \nWe’re inviting you to become a member of our mess. We work together to manage meals, expenses, and a smooth daily routine. Hope you’ll join us!", 
+                            messAddress: messProvaider.getMessModel!.messAddress, 
+                          ),
+                          onSuccess:(){
+                            messProvaider.setIsloading(false);
+                            userModel = null;
+                            found=false;
 
-                        // show the message has send success/fail message
+                            showSnackber(context: context, content: "Invaitations Message has send Successfully");
+                          }
+                        );
+                        messProvaider.setIsloading(false);
                       }
+                      found=false;
                     }),
                   ],
                 ),

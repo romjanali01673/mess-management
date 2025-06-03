@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
 import 'package:meal_hisab/services/asset_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -24,10 +25,15 @@ class _LandingScreenState extends State<LandingScreen> {
 
   void checkAuthenticationState()async{
     final authProvider = context.read<AuthenticationProvider>();
+    final messProvaider = context.read<MessProvaider>();
     if(await authProvider.checkIsSignedIn()){
       try{
         // get user data from fireStore
         print("Aaaaaaaaaaaaaaaaaaaaaaa");
+        await authProvider.getUidFromFiretore(onFail: (message){
+          showSnackber(context: context, content: "somthing Wrong\n uid fatch error");
+          return;
+        });
         await authProvider.getUserProfileData(onFail: (message) {  
           showSnackber(context: context, content: message.toString());
         });
@@ -42,8 +48,10 @@ class _LandingScreenState extends State<LandingScreen> {
               //navigate to home screen
               // await Future.delayed(Duration(seconds: 5));
               print("ccccccccccccccccccccccccccccc");
-              print(authProvider.userModel!.email);
+              print(authProvider.getUserModel!.email);
               navigate(isSignedIn: true);
+
+              await messProvaider.getMessData(onFail: (_){}, messId: authProvider.getUserModel!.currentMessId);
             }
             else{
               // perform an opration from here for clear cache 

@@ -69,7 +69,9 @@ Widget getMaterialButton({required BuildContext context, required String label, 
 }
 
 void showSnackber({required BuildContext context, required String content}){
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(content)));
+
+  if(context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(content)));
+  else debugPrint("Snack message : "+content);
 }
 
 
@@ -139,5 +141,12 @@ Widget getButton({required String label, required Function() ontap, Icon? icon})
          ],
       ],
     ),);
+}
+
+Widget showCircularProgressIndicator(){
+  return SizedBox.square(
+    dimension: 50,
+    child: CircularProgressIndicator(),
+  );
 }
    

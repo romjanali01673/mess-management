@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/fand/add_cost.dart';
 import 'package:meal_hisab/fand/add_diposite.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/fand_provaider.dart';
+import 'package:provider/provider.dart';
 
 class FandScreen extends StatefulWidget {
   const FandScreen({super.key});
@@ -13,7 +19,6 @@ class FandScreen extends StatefulWidget {
 }
 
 class _FandScreenState extends State<FandScreen> {
-  int blance = 999999;
   Fand fandItemGroup = Fand.fand;
 
   @override
@@ -90,83 +95,138 @@ class FandHome extends StatefulWidget {
 }
 
 class _FandHomeState extends State<FandHome> {
-  int blance  = 9090;
-  
+
+  bool showBlance = false;
+
+
   @override
   Widget build(BuildContext context) {
+    FandProvaider fandProvaider = context.watch<FandProvaider>();
+    AuthenticationProvider authProvaider = context.watch<AuthenticationProvider>();
+
     return Expanded(
       child: Column(
         children: [
           Card(
             color: Colors.green.shade500,
             child: ListTile(
-              title: Text("Current Blance: $blance", style: TextStyle(fontSize: 20),),
+              trailing: IconButton(
+                onPressed: (){
+                  setState(() {
+                  showBlance = !showBlance;
+                    
+                  });
+                }, 
+                icon: showBlance? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+              ),
+              title: 
+              showBlance? Text("Current Blance: ${fandProvaider.getBlance}",)
+              :
+              Text("tap to see blance"),
             ),
           ),
           Expanded(
             child: Container(
-              child: ListView.builder(itemBuilder: (context , index){
-                return ListTile(
-                  contentPadding: EdgeInsets.only(left: 10),
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.red,
-                    child: Text("$index"),
-                  ),
-                  title: Text("Md Romjan Ali"),
-                  subtitle: Text("${DateTime.now()}"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("121212", style: TextStyle(fontSize: 18),),
-                      PopupMenuButton(
-                        icon: Icon(Icons.more_vert),
-                        itemBuilder: (context) =>[
+              child: FutureBuilder(
+                future: fandProvaider.getFandTransactions(
+                  messId: authProvaider.getUserModel!.currentMessId, 
+                  onFail: (message) { 
+                    showSnackber(context: context, content: "");
+                  }, 
+                  onSuccess: () {
+                    
+                  }
+                ),
+                builder: (BuildContext context, AsyncSnapshot<List<FandModel>?> snapshot) { 
+                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                    return Center(child: showCircularProgressIndicator());
+                  }
+                  else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } 
+                  else if (!snapshot.hasData || snapshot.data == null) {
+                    return Center(child: Text('No Transaction found.'));
+                  }
+                  return ListView.builder(
+                    itemCount:snapshot.data!.length,
+                    itemBuilder: (context , index){
+                    
+                    final fandmodel = snapshot.data![index]; 
+                    
+                    return Card(
+                      color: fandmodel.type==Constants.add? Colors.green.shade50:Colors.red.shade50,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.only(left: 10),
+                            leading: Text("${index+1}",),
+                            title: Text(fandmodel.title),// title
+                            subtitle: Column(
+                              children: [
+                                Text("${fandmodel.type}"), // type
+                                Text("${DateFormat("hh:mm a dd-MM-yyyy").format(fandmodel.CreatedAt!.toDate().toLocal())}"),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("${fandmodel.amount%1==0? fandmodel.amount.toInt().toString() : fandmodel.amount.toString()}", style: TextStyle(fontSize: 18),),// amount
+                                PopupMenuButton(
+                                  icon: Icon(Icons.more_vert),
+                                  itemBuilder: (context) =>[
+                                    
+                                    PopupMenuItem(
+                                      value: 0,
+                                      child: ListTile(
+                                        title: Text("Edit"),
+                                        leading: Icon(Icons.edit),
+                                        ), 
+                                    ),
                           
-                          PopupMenuItem(
-                            value: 0,
-                            child: ListTile(
-                              title: Text("Edit"),
-                              leading: Icon(Icons.edit),
-                              ), 
+                                    PopupMenuItem(
+                                      value: 1,
+                                      // onTap: (){
+                                      //   // if i use this function. we don't need to Navigator.pop()
+                                      // },
+                                      child: ListTile(
+                                        title: Text("Delete"),
+                                        leading: Icon(Icons.delete),
+                                        onTap: ()async{
+                                          Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
+                                          bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
+                                            title: Text("Do you want to delete?"),
+                                            actionsAlignment: MainAxisAlignment.start,
+                                            actions: [
+                                              TextButton(child: Text("No"), onPressed: (){
+                                                Navigator.pop(context, false);
+                                              },),
+                                              TextButton(child: Text("Yes") , onPressed: (){
+                                              Navigator.pop(context, true);
+                                              },),
+                                            ],
+                                          ));
+                                          if(confirm!=null && confirm){
+                                            debugPrint("Confirmed ------------");
+                                          }
+                                          else{
+                                              debugPrint("Confirmed false ------------");
+                                          }
+                                        },
+                                      ), 
+                                    ),
+                                  ]
+                                )
+                              ],
+                            ),
                           ),
-  
-                          PopupMenuItem(
-                            value: 1,
-                            // onTap: (){
-                            //   // if i use this function. we don't need to Navigator.pop()
-                            // },
-                            child: ListTile(
-                              title: Text("Delete"),
-                              leading: Icon(Icons.delete),
-                              onTap: ()async{
-                                Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
-                                bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
-                                  title: Text("Do you want to delete?"),
-                                  actionsAlignment: MainAxisAlignment.start,
-                                  actions: [
-                                    TextButton(child: Text("No"), onPressed: (){
-                                      Navigator.pop(context, false);
-                                    },),
-                                    TextButton(child: Text("Yes") , onPressed: (){
-                                    Navigator.pop(context, true);
-                                    },),
-                                  ],
-                                ));
-                                if(confirm!=null && confirm){
-                                  debugPrint("Confirmed ------------");
-                                }
-                                else{
-                                    debugPrint("Confirmed false ------------");
-                                }
-                              },
-                            ), 
-                          ),
-                        ]
-                      )
-                    ],
-                  ),
-                );
-              }),
+                          fandmodel.description==""? SizedBox.shrink():Text("${fandmodel.description}"),
+
+                        ],
+                      ),
+                    );
+                  });
+                },
+              ),
             ),
           ),
         ],

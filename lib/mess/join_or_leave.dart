@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/joining_model.dart';
@@ -15,17 +17,6 @@ class JoinOrLeave extends StatefulWidget {
 
 class _JoinOrLeaveState extends State<JoinOrLeave> {
 
-
-
-  Future<List<JoiningModel>> getInvaitationsList()async{
-    List<JoiningModel> list=[
-      JoiningModel(
-        invaitationId: 'invaitation id', messName: "mess name", messId: "mess id", status: "Panding", description: "description", messAddress: "address", invaitedTime: "12:12:12 am"
-      ),
-    ];
-    return list;
-  }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -33,12 +24,12 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
     WidgetsBinding.instance.addPostFrameCallback((_){
       final messProvaider = context.read<MessProvaider>();
       final authProvaider = context.read<AuthenticationProvider>();
-      if(authProvaider.userModel!.currentMessId=="") return;
+      if(authProvaider.getUserModel!.currentMessId=="") return;
       messProvaider.getMessData(
         onFail:(message){
           showSnackber(context: context, content: "$message");
         } , 
-        messId:authProvaider.userModel!.currentMessId,
+        messId:authProvaider.getUserModel!.currentMessId,
         onSuccess: (){
           debugPrint("success");
         }
@@ -49,7 +40,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
   void _LeaveMess()async{
     final authProvaider = context.read<AuthenticationProvider>();
     final messProvaider = context.read<MessProvaider>();
-    if(authProvaider.userModel!.currentMessId!=""){
+    if(authProvaider.getUserModel!.currentMessId!=""){
 
       // if offline stop leave process .
       if(!messProvaider.isOnline) {
@@ -68,7 +59,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
           messProvaider.setIsloading(false);
           showSnackber(context: context, content: message);
         }, 
-        memberUid: authProvaider.userModel!.uId,
+        memberUid: authProvaider.getUserModel!.uId,
         onSuccess: (){
           //remove current mess id from your user id.
           // because auth provaider hold current mess id in user model. it will not replace until you relunch/login the app. 
@@ -116,16 +107,16 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
           
           Expanded(
             child: FutureBuilder(
-              future:getInvaitationsList() ,
+              future:messProvaider.getInvaitationsList(uId: authProvaider.uid!, onFail: (message) {showSnackber(context: context, content: "invaitations list found Error!\n$message");}) ,
               
-              builder: (context, AsyncSnapshot<List<JoiningModel>> snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's save 
+              builder: (context, AsyncSnapshot<List<JoiningModel?>?> snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
                   return Center(child: CircularProgressIndicator());
                 }
                 else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } 
-                else if (!snapshot.hasData || snapshot.data == null) {
+                else if (!snapshot.hasData || snapshot.data == null ||snapshot.data!.isEmpty) {
                   return Center(child: Text('No invitations found.'));
                 }
                 else{
@@ -133,7 +124,8 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index){
-                      JoiningModel joiningModel = snapshot.data![index];
+                      if(snapshot.data![index]==null) return SizedBox.shrink();
+                      JoiningModel joiningModel = snapshot.data![index]!;
                       print(joiningModel.messAddress);
                     
                       return Card(
@@ -146,11 +138,9 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                               title: Text(joiningModel.messName),
                               subtitle: Row(
                                 children: [
-                                  Text("Time: "+joiningModel.invaitedTime),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Text("Status: (${joiningModel.status})"),
+                                  Expanded(child: Text("Time: "+ DateFormat("yyyy-MM-dd hh:mm a").format(joiningModel.invaitedTime!.toDate().toLocal()))),
+                                 SizedBox(width: 20,),
+                                  Text("Status: (${joiningModel.status})", textAlign: TextAlign.end,),
                                 ],
                               ),
                               trailing: PopupMenuButton(
@@ -159,7 +149,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                   PopupMenuItem(
                                     child: Text("Join"),
                                     onTap: ()async{
-                                      if(authProvaider.userModel!.currentMessId==""){
+                                      if(authProvaider.getUserModel!.currentMessId==""){
                                         bool? res = await showConfirmDialog(
                                           context: context, 
                                           title: "Do you Want to join?",
@@ -170,34 +160,38 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                             //   // you are valid join to the mess
                                             messProvaider.joiningToInvaitatedMess(
                                               messId: joiningModel.messId, 
-                                              uId: authProvaider.userModel!.uId,
+                                              uId: authProvaider.getUserModel!.uId,
                                               onFail: (message){
                                                 showSnackber(context: context, content: "Mess Joining Failed\n$message");
                                               }, 
                                               onSuccess: ()async{
+                                                
                                                 // change invaitation ststus
                                                 await messProvaider.changeJoiningInvaitationStatus(
                                                   status: JoiningStatus.joined,
                                                   invaitationsId: joiningModel.invaitationId,
                                                   onFail: (message){
-                                                    showSnackber(context: context, content: "somthing Wrong\n$message");
+                                                    showSnackber(context: context, content: "somthing Wrong-1\n$message");
                                                   },
+                                                  uId: authProvaider.getUserModel!.uId,
                                                 );
                                                 
                                                 // update current mess id
-                                                authProvaider.setUserModel(currentMessId: joiningModel.messId);
-                                                messProvaider.assignMessIdToMemberProfile(
-                                                  memberUid: authProvaider.userModel!.uId, 
+                                                debugPrint("assign mess id to member profile");
+                                                await messProvaider.assignMessIdToMemberProfile(
+                                                  memberUid: authProvaider.getUserModel!.uId, 
                                                   messId: joiningModel.messId,
                                                   onFail: (message){
-                                                    showSnackber(context: context, content: "somthing Wrong\n$message");
+                                                    showSnackber(context: context, content: "somthing Wrong-2\n$message");
+                                                    debugPrint("assign");
                                                   }, 
                                                 );
-                                                //
+                                                authProvaider.setUserModel(currentMessId: joiningModel.messId);
+                                                showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
                                                 setState(() {
-                                                  // we get new data 
-                                                  // by fatching new data we get new/updated status of this card.
+                                                  
                                                 });
+
                                               }
                                             );  
                                           }
@@ -227,7 +221,8 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                           },
                                           onSuccess: (){
                                             showSnackber(context: context, content: "Declained");
-                                          }
+                                          }, 
+                                          uId: authProvaider.getUserModel!.uId,
                                         );
                                       }
                                     },
@@ -239,9 +234,9 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(joiningModel.description),
-                                Text(joiningModel.messId),
-                                Text(joiningModel.messAddress),
+                                Text("Message: "+joiningModel.description),
+                                Text("Mess Id: "+joiningModel.messId),
+                                Text("Mess Address: "+joiningModel.messAddress),
 
                               ],
                             )

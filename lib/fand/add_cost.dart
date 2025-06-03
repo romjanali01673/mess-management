@@ -1,6 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/home.dart';
+import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/fand_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:provider/provider.dart';
 
 class AddCost extends StatefulWidget {
   const AddCost({super.key});
@@ -12,33 +19,43 @@ class AddCost extends StatefulWidget {
 class _AddCostState extends State<AddCost> {
   final formKey = GlobalKey<FormState>();
 
+  FocusNode focusTitle = FocusNode();
   FocusNode focusDiscreption = FocusNode();
   FocusNode focusAmount = FocusNode();
 
-  String discreption = ""; 
-  String amount = ""; 
+  String title = "";
+  String description = ""; 
+  double amount = 0; 
 
 
   @override
   Widget build(BuildContext context) {
+
+    FandProvaider fandProvaider = context.watch<FandProvaider>();
+    AuthenticationProvider authProvaider = context.read<AuthenticationProvider>();
+
     return Expanded(
       child: Container(
         color: Colors.red.shade50,
-        child: Form(
+        child:  Form(
           key: formKey,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
+
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    maxLines: 5,
-                    textInputAction: TextInputAction.newline,
+                    onTapOutside: (event) {// close keyboard
+                      FocusScope.of(context).unfocus();
+                    },
+                    
+                    textInputAction: TextInputAction.next,
                     autofocus: true,
-                    focusNode: focusDiscreption,
+                    focusNode: focusTitle,
                     onFieldSubmitted: (value){
-                      FocusScope.of(context).requestFocus(focusAmount);
+                      FocusScope.of(context).requestFocus(focusDiscreption);
                     },
                     validator: (value) {
                       if(value.toString().trim()==""){
@@ -47,11 +64,36 @@ class _AddCostState extends State<AddCost> {
                       return null;
                     },
                     onChanged: (value) {
-                      amount = value.trim();
+                      title = value.trim();
                     },
                     decoration: FromFieldDecoration(
-                      hintText: "Write About The Diposite",
-                      label: "Discreption",
+                      hintText: "Title",
+                      label: "Title",
+                    )
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    onTapOutside: (event) {// close keyboard
+                      FocusScope.of(context).unfocus();
+                    },
+                    maxLines: 5,
+                    textInputAction: TextInputAction.newline,
+                    focusNode: focusDiscreption,
+                    onFieldSubmitted: (value){
+                      FocusScope.of(context).requestFocus(focusAmount);
+                    },
+                    validator: (value) {
+                      return null;
+                    },
+                    onChanged: (value) {
+                      description = value.trim();
+                    },
+                    decoration: FromFieldDecoration(
+                      hintText: "Write Details about",
+                      label: "Description",
                     )
                   ),
                 ),
@@ -59,7 +101,9 @@ class _AddCostState extends State<AddCost> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    maxLines: 1,
+                    onTapOutside: (event) {// close keyboard
+                      FocusScope.of(context).unfocus();
+                    },
                     textAlign: TextAlign.center,
                     textInputAction: TextInputAction.done,
                     keyboardType: TextInputType.number,
@@ -71,10 +115,19 @@ class _AddCostState extends State<AddCost> {
                       if(value.toString().trim()==""){
                         return "";
                       }
+                      try {
+                        amount = double.parse(value.toString().trim());
+                      } catch (e) {
+                        return e.toString();
+                      }
                       return null;
                     },
                     onChanged: (value) {
-                      amount = value.trim();
+                      try {
+                        amount = double.parse(value.toString().trim());
+                      } catch (e) {
+                        //
+                      }
                     },
                     decoration: FromFieldDecoration(
                       hintText: "How Much?",
@@ -87,13 +140,49 @@ class _AddCostState extends State<AddCost> {
                   height: 50,
                 ),
             
+                fandProvaider.isLoading? 
+                SizedBox.square(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                )
+                :
                 getButton(
                   label: "Submit", 
-                  ontap: (){
-            
+                  ontap: ()async{
+                    bool valided  = formKey.currentState!.validate();
+                    if(valided){
+                      if(amIAdmin(messProvaider: context.read<MessProvaider>(), authProvaider:context.read<AuthenticationProvider>(),)){
+                        // add a transaction to datebase 
+                        await fandProvaider.addAFandTransaction(
+                          fandModel: FandModel(
+                            transactionId: DateTime.now().millisecondsSinceEpoch.toString(),
+                            amount: amount,
+                            title: title,
+                            description: description, 
+                            // CreatedAt: DateTime.now().millisecondsSinceEpoch.toString(), 
+                            type: Constants.sub
+                          ), 
+                          messId: authProvaider.getUserModel!.currentMessId,
+                          onSuccess: (){
+                            fandProvaider.setIsLoading(value: false);
+                            showSnackber(context: context, content: "Entry Successed");
+                          }, 
+                          onFail: (message){
+                            fandProvaider.setIsLoading(value: false);
+                            showSnackber(context: context, content: "Entry Failed!\n$message");
+                          },
+                        );
+                      }
+                      else{
+                        showSnackber(context: context, content: "required meneger power");
+                      }
+                    }
+                    else{
+                      showSnackber(context: context, content: "please, fill add required field!");
+                    }
                   },
                 ),
-            
                 
               ],
             ),

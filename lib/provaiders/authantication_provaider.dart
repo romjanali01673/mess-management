@@ -27,9 +27,9 @@ class AuthenticationProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get uid {
-    return _uId?? firebaseAuth.currentUser!.uid;
+    return _uId;
   }
-  UserModel? get userModel=> _userModel;
+  UserModel? get getUserModel=> _userModel;
 
   // set -------------------
 
@@ -73,8 +73,33 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // function here ---------------------------------------
   
-  Future<void> storeUid ()async{
-    firebaseFirestore.collection(Constants.uId).doc(userModel!.createdAt).set({Constants.createdAt:userModel!.uId});
+
+
+  // store uid to firestore
+  // authToken we will get from userCurdential.user!.uid
+  Future<void> storeUid ({required String authToken, required String uid,required Function(String) onFail})async{
+    try {
+      await firebaseFirestore.collection(Constants.uId).doc(authToken).set({Constants.uId:uid});
+      _uId = uid;
+      notifyListeners();
+    } catch (e) {
+      onFail(e.toString());
+    }
+  }
+
+  Future<void> getUidFromFiretore ({ required Function(String) onFail})async{
+    try {
+      // after successfully login we can access "firebaseAuth.currentUser!.uid"
+      DocumentSnapshot snapshot = await firebaseFirestore
+        .collection(Constants.uId)
+        .doc(firebaseAuth.currentUser!.uid)//"firebaseAuth.currentUser" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout.
+        .get();
+      _uId = snapshot[Constants.uId];
+      debugPrint(snapshot[Constants.uId].toString()+ "get uid from firestore");
+      notifyListeners();
+    } catch (e) {
+      onFail(e.toString());
+    }
   }
 
   Future<void> sessionValid({required Function(bool) onSuccess,required Function(String) onFail})async{
@@ -83,8 +108,8 @@ class AuthenticationProvider extends ChangeNotifier {
       String StringUserModel =  await sharedPreferences.getString(Constants.userModel).toString();
       UserModel userM = UserModel.fromMap(jsonDecode(StringUserModel));
 
-      onSuccess(userM.sessionKey == userModel!.sessionKey);
-      print(userModel!.sessionKey+"firestore");
+      onSuccess(userM.sessionKey == getUserModel!.sessionKey);
+      print(getUserModel!.sessionKey+"firestore");
       print(userM.sessionKey+"shared pref");
     } catch (e) {
       onFail(e.toString()+"0002");
@@ -96,7 +121,7 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       firebaseFirestore 
         .collection(Constants.users)
-        .doc(firebaseAuth.currentUser!.uid)
+        .doc(uid)
         .set(
           {
             Constants.sessionKey : DateTime.now().millisecondsSinceEpoch.toString()
@@ -123,7 +148,7 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<bool> saveUserDataToSharedPref()async{
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      await sharedPreferences.setString(Constants.userModel, jsonEncode(userModel!.toMap()));
+      await sharedPreferences.setString(Constants.userModel, jsonEncode(getUserModel!.toMap()));
     } catch (e) {
       return false;
     }
@@ -142,7 +167,7 @@ class AuthenticationProvider extends ChangeNotifier {
     try{
       documentSnapshot = await firebaseFirestore
         .collection(Constants.users)
-        .doc(firebaseAuth.currentUser!.uid) //"firebaseAuth.currentUser" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout.
+        .doc(uid) 
         .get(const GetOptions( source: Source.serverAndCache)); 
     }catch (e){
       onFail(e.toString()+"getUserProfileData");
@@ -174,9 +199,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }catch (e) {
       onFail(e.toString());
     }
-    if(userCredential!=null){
-      _uId = userCredential.user!.uid;
-    }
     return userCredential;
   }
 
@@ -190,13 +212,11 @@ class AuthenticationProvider extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _uId = userCredential.user!.uid;
     } catch (e) {
       setLoading(val: false);
       onFail(e.toString());
       notifyListeners();
     }
-
     return userCredential;
   }
 
@@ -207,7 +227,6 @@ class AuthenticationProvider extends ChangeNotifier {
     required Function() onSuccess,
     required Function(String) onFail,
   })async{
-    String createdAt = DateTime.now().millisecondsSinceEpoch.toString();
     try{
       if(fileImage!=null){
         // upload image to firestore storage and  assign the given link in currentUser
@@ -220,14 +239,12 @@ class AuthenticationProvider extends ChangeNotifier {
         );
         currentUser.image = imageUrl;
       } 
-
-      currentUser.createdAt = createdAt;
       _userModel = currentUser;
 
       // save data to firestore
       await firebaseFirestore
         .collection(Constants.users)
-        .doc(firebaseAuth.currentUser!.uid)
+        .doc(uid)
         .set(currentUser.toMap());
 
       onSuccess();

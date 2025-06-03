@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class JoiningModel{
@@ -9,7 +10,7 @@ class JoiningModel{
   String status;
   String description;
   String messAddress;
-  String invaitedTime;
+  Timestamp? invaitedTime;
 
   JoiningModel({
     required this.invaitationId,
@@ -18,7 +19,7 @@ class JoiningModel{
     required this.status,
     required this.description,
     required this.messAddress,
-    required this.invaitedTime,
+    this.invaitedTime,
   });
 
   factory JoiningModel.fromMap(Map<String,dynamic> data){
@@ -29,7 +30,7 @@ class JoiningModel{
       status: data[Constants.status] ?? JoiningStatus.panding, 
       description: data[Constants.description] ?? "", 
       messAddress: data[Constants.messAddress] ?? "", 
-      invaitedTime: data[Constants.invaitedTime] ?? "",
+      invaitedTime: data[Constants.invaitedTime],
     );
   }
   
@@ -41,7 +42,7 @@ class JoiningModel{
       Constants.status : status,
       Constants.description : description,
       Constants.messAddress : messAddress,
-      Constants.invaitedTime : invaitedTime,
+      Constants.invaitedTime : FieldValue.serverTimestamp(),
     };
   }
 

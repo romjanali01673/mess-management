@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
 
 // pick an image 
 Future<File?> pickedImage({ required bool fromCamera, required BuildContext context, required Function(String) onFail })async{
@@ -146,3 +150,51 @@ String? addressValidator(String value) {
 
   return null; // valid
 }
+
+String? validateUid(String value){
+  value = value.trim();
+  final regex = RegExp(r'[^0-9]');
+  return !regex.hasMatch(value)? null : "invalid uid";
+}
+
+String? validatePrice(String value){
+  if(value.toString().trim()==""){
+    return "Enter price";
+  }
+  int pr=0;
+    try{
+      pr = int.parse(value.toString().trim());
+    }catch (e){
+      return "Invalid Price";
+    }
+  return null;
+}
+
+bool amIAdmin({required MessProvaider messProvaider,required AuthenticationProvider authProvaider}){
+  if(messProvaider.getMessModel!=null){
+    if(messProvaider.getMessModel!.messAuthorityId == authProvaider.getUserModel!.uId){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  else{
+    return false;
+  }
+} 
+
+bool amIactmenager({required MessProvaider messProvaider,required AuthenticationProvider authProvaider}){
+  if(messProvaider.getMessModel!=null){
+    if(messProvaider.getMessModel!.messAuthorityId2nd == authProvaider.getUserModel!.uId){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  else{
+    return false;
+  }
+} 
+

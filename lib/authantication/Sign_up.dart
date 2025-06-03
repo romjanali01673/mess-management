@@ -52,21 +52,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
         debugPrint("account has created");
         // account has created successfully
         // now save user data to firestore
+        String futureUid = DateTime.now().millisecondsSinceEpoch.toString();
         UserModel userModel = UserModel(
           number: phone,
           email: email,
           fname: Fname, 
-          uId: userCredential.user!.uid, 
+          uId: futureUid, 
           image: '', 
-          createdAt: '',
           sessionKey:"",
-          currentMessId:"",
+          currentMessId:"", 
+          fullAddress: '',
         );
+        await authProvaider.storeUid(authToken:userCredential.user!.uid, uid: futureUid, onFail: (message){});
         await authProvaider.saveUserDataToFireStore(
           currentUser: userModel, 
           fileImage: null, 
           onSuccess: ()async{
-            await authProvaider.storeUid();
             showSnackber(context: context, content: "Account Creation Success.");
             Navigator.pushReplacementNamed(context, Constants.logInScreen);
           }, 

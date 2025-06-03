@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/model/joining_model.dart';
 import 'package:meal_hisab/model/mess_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
 
@@ -159,8 +160,7 @@ class MessProvaider extends ChangeNotifier {
   // assign Mess- Id To Member Profile
   Future<void> assignMessIdToMemberProfile({required Function(String) onFail, Function()? onSuccess,required String memberUid, required String messId})async{
     try{
-
-      firebaseFirestore
+      await firebaseFirestore
       .collection(Constants.users)
       .doc(memberUid)
       .set(
@@ -215,7 +215,7 @@ class MessProvaider extends ChangeNotifier {
   }
 
   // get mess data 
-  Future<void> getMessData({required Function(String) onFail, Function()? onSuccess, required String messId})async{
+  Future<void> getMessData({required Function(String) onFail, Function()? onSuccess, required String messId,bool Function()? isDisposed})async{
     DocumentSnapshot? documentSnapshot ;
     try{
       documentSnapshot = await 
@@ -223,62 +223,70 @@ class MessProvaider extends ChangeNotifier {
           .collection(Constants.mess)
           .doc(messId)
           .get();
+      
+      if(!(isDisposed==null || !isDisposed())) return;
+      
+
     }catch (e){
-      onFail(e.toString());
+        onFail(e.toString()+"get mess data");
     }
     // for any kind of error we gat null.
     // if everything is okk check has found or not 
     if(documentSnapshot!=null && documentSnapshot.exists){
       _messModel = MessModel.fromMap(documentSnapshot!.data() as Map<String,dynamic>);
       notifyListeners();
-      onSuccess!=null?onSuccess():(){};
+        onSuccess!=null?onSuccess():(){};
+      
     }
     else{
       // we fatch data successfully but there has no data
-      onFail("No Data found");
+        onFail("No Data found");
+      
     }
-    
   }
 
   // change mess ownership 
   Future<void> transferMessOwnership({required String adimnName,required String adminId,required  Function(String) onFail, required Function()? onSuccess})async{
     try {
-      setMessModel(
-        messAuthorityName: adimnName,
-        messAuthorityId: adminId,
-      );
       await firebaseFirestore
       .collection(Constants.mess)
       .doc(getMessModel!.messId)
       .update(
         {
-          Constants.messAuthorityId : getMessModel!.messAuthorityId,
-          Constants.messAuthorityName : getMessModel!.messAuthorityName,
+          Constants.messAuthorityId : adminId,
+          Constants.messAuthorityName : adimnName,
         }
       );
 
       onSuccess!=null?onSuccess():(){};
+      setMessModel(
+        messAuthorityName: adimnName,
+        messAuthorityId: adminId,
+      );
     } catch (e) {
       onFail(e.toString());
+      debugPrint("failed ownership");
    }
   }
 
   // change 2nd mess ownership 
   Future<void> change2ndMessOwnership({required String secondAdimnName,required String secondAdminId,required  Function(String) onFail, required Function()? onSuccess})async{
     try {
-      setMessModel(
-        messAuthorityName: secondAdimnName,
-        messAuthorityId: secondAdminId,
-      );
       await firebaseFirestore
       .collection(Constants.mess)
       .doc(getMessModel!.messId)
       .set(
-        getMessModel!.toMap(),
+        {
+        Constants.messAuthorityId2nd: secondAdminId,
+        Constants.messAuthorityName2nd: secondAdimnName,
+        },
         SetOptions(mergeFields: [Constants.messAuthorityId2nd, Constants.messAuthorityName2nd]),
       );
-
       onSuccess!=null?onSuccess():(){};
+      setMessModel(
+        messAuthorityName2nd: secondAdimnName,
+        messAuthorityId2nd: secondAdminId,
+      );
     } catch (e) {
       onFail(e.toString());
    }
@@ -287,44 +295,130 @@ class MessProvaider extends ChangeNotifier {
   // join mess 
   Future<void> joiningToInvaitatedMess({required Function(String) onFail, Function()? onSuccess, required String messId, required String uId})async{
     try{
-      await firebaseFirestore.collection(Constants.mess).doc(messId).set({Constants.messMemberList : FieldValue.arrayUnion([uId])});
+      await firebaseFirestore.collection(Constants.mess).doc(messId).update({Constants.messMemberList : FieldValue.arrayUnion([uId])});
       onSuccess!=null? onSuccess():(){};
     }catch (e){
       onFail(e.toString());
     }
   }
 
-
-  // change joining invaitation status 
-  Future<void> changeJoiningInvaitationStatus({required Function(String) onFail, required String invaitationsId, Function()? onSuccess,required String status})async{
-    try{
-      await firebaseFirestore.collection(Constants.invaitationId).doc(invaitationsId).update({Constants.status : status});
-      onSuccess!=null? onSuccess():(){};
-    }catch (e){
-      onFail(e.toString());
-    }
-  }
 
   // get list of mess member data.
-  Future<List<UserModel>> getListOfMessMemberData({required List<String> listOfMember, })async{
-    List<UserModel> list=[];
+  Future<List<UserModel>?> getListOfMessMemberData({required List<String> listOfMember, })async{
+    List<UserModel> ?list=[];
 
-    for(String uid in listOfMember){
-      DocumentSnapshot documentSnapshot =  await firebaseFirestore.collection(Constants.users).doc(uid).get();
-      if(documentSnapshot.exists){
-        list.add(UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>));
+    try{
+      for(String uid in listOfMember){
+        DocumentSnapshot documentSnapshot =  await firebaseFirestore.collection(Constants.users).doc(uid).get();
+     
+        if(documentSnapshot.exists){
+          list.add(UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>));
+        }
       }
+    }catch(e){
+        debugPrint(e.toString());
+    }
+    return list.isEmpty?null:list;
+  }
+
+  Future<UserModel?> getMemberData({required String uId})async{
+    try {
+        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
+      if(snapshot.exists){
+        return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+      }
+    } catch (e) {
+      e.toString();
+    }
+    return null;
+  }
+
+  // change joining invaitation status 
+  Future<void> changeJoiningInvaitationStatus({required Function(String) onFail,required String uId, required String invaitationsId, Function()? onSuccess,required String status})async{
+    try{
+      await firebaseFirestore.collection(Constants.invaitations).doc(uId).collection(Constants.myInvaitationList).doc(invaitationsId).update({Constants.status:status});
+      onSuccess!=null? onSuccess():(){};
+    }catch (e){
+      onFail(e.toString());
+    }
+  }
+
+  // get mess invaitations list
+  Future<List<JoiningModel?>?> getInvaitationsList({required String uId,required Function(String) onFail})async{
+    List<JoiningModel?>? list;
+    try {
+      QuerySnapshot snapshot = await firebaseFirestore.collection(Constants.invaitations).doc(uId).collection(Constants.myInvaitationList).get();
+      
+      list = snapshot.docs.map((doc){
+        if(doc.exists){
+          return JoiningModel.fromMap(doc.data() as Map<String, dynamic>);
+        }
+      }).toList();
+
+      // if(snapshot.exist){
+      //   // final map = snapshot.data() as Map<String,dynamic>;
+      //   // final objlist = map[Constants.myInvaitationList] as List<dynamic>;
+      //   // list = objlist.map((x)=>JoiningModel.fromMap(x as Map<String,dynamic>)).toList();
+      //   list = (((snapshot.data() as Map<String,dynamic>)[Constants.myInvaitationList]) as List<dynamic>).map((x)=> JoiningModel.fromMap(x as Map<String, dynamic>)).toList();
+      // }
+    } catch (e) {
+      onFail(e.toString());
     }
     return list;
   }
 
-  Future<UserModel?> getMemberData({required String uId})async{
-    DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
-    if(snapshot.exists){
-      return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+  // send mess invaitation card
+  Future<void> sendMessInvaitaionCard({required String memberUid, required JoiningModel joiningModel,Function()? onSuccess})async{
+    try {
+      await firebaseFirestore 
+      .collection(Constants.invaitations)
+      .doc(memberUid)
+      .collection(Constants.myInvaitationList)
+      .doc(joiningModel.invaitationId)
+      .set(joiningModel.toMap());
+      onSuccess!=null?onSuccess():(){};
+    } catch (e) {
+      debugPrint(e.toString());
     }
-    return null;
   }
+
+  // add disible member
+  Future<void> addDisabledMemberData({required String memberUid})async{
+    try {
+      
+      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.disabledMemberList:FieldValue.arrayUnion([memberUid])});
+    } catch (e) {
+      
+      debugPrint(e.toString());
+    }
+  }
+
+  // remove disible member
+  Future<void> removeDisabledMemberData({required String memberUid})async{
+    try {
+      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.disabledMemberList:FieldValue.arrayRemove([memberUid])});
+      
+    } catch (e) {
+      
+      debugPrint(e.toString());
+    }
+  }
+
+  // cick member
+  Future<void> cickMemberFromMess({required String memberUid})async{
+    try {
+      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.messMemberList:FieldValue.arrayRemove([memberUid])});
+      
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+
+
+
+
+
 
 
 }

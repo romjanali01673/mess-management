@@ -1,9 +1,14 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:provider/provider.dart';
 
 class BazerEntryScreen extends StatefulWidget {
   const BazerEntryScreen({super.key});
@@ -13,93 +18,49 @@ class BazerEntryScreen extends StatefulWidget {
 }
 
 class _BazerEntryScreenState extends State<BazerEntryScreen> {
-  final formKey = GlobalKey<FormState>();
 
-  FocusNode focusProduct = FocusNode();
-  FocusNode focusPrice = FocusNode();
+  TimeOfDay? time;
+  DateTime? date;
 
-
-  List<Map<String, dynamic>> row = [
-
-    {
-      "${BazerEntry.description}" : "fish",
-      "${BazerEntry.price}" : "200"
-    },
-
-    {
-      "${BazerEntry.description}" : "fish",
-      "${BazerEntry.price}" : "200"
-    },
-
-    {
-      "${BazerEntry.description}" : "fish",
-      "${BazerEntry.price}" : "200"
-    },
-
-  ];
+  List<Map<String, dynamic>> bazerList = [];
 
   final dropdownKey = GlobalKey<DropdownSearchState>();
 
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
 
-  List<String> items = ["romjan", "siam", "sayed"];
+  List<String > list =["1","2","demo"];
+  // member uid|name
+  Map<String,(String,String)> memberUidList={};
   String selectedItem = "Select Member";
-  Set<String> disabledItems ={"sayed"};
+  Set<String> disabledItems ={};
 
-  String dropDownValue = "Select Person";
-  List <DropdownMenuItem> list = [
-    DropdownMenuItem(
-      value: "Select Person", 
-      child: Text("Select Person"),
-    ),
-    DropdownMenuItem(
-      value: "nazmul", 
-      child: Text("nazmul"),
-    ),
-    DropdownMenuItem(
-      value: "farhan", 
-      child: Text("farhan"),
-    ),
-    DropdownMenuItem(
-      value: "kapil", 
-      child: Text("kapil"),
-    ),
-    DropdownMenuItem(
-      value: "adil", 
-      child: Text("adil"),
-    ),
-    DropdownMenuItem(
-      value: 'raihan', 
-      child: Text("raihan"),
-    ),
-    DropdownMenuItem(
-      value: "al amin", 
-      child: Text("al amin"),
-    ),
-    DropdownMenuItem(
-      value: "saydur", 
-      child: Text("saydur"),
-    ),
-    DropdownMenuItem(
-      value: "sabbir", 
-      child: Text("sabbir"),
-    ),
-    DropdownMenuItem(
-      value: "saidul", 
-      child: Text("saidul"),
-    ),
-    DropdownMenuItem(
-      value: "siam", 
-      child: Text("siam"),
-    ),
-  ];
-  List<Text> t = [
-    Text(" "),
-    Text(" "),
-    Text(" "),
-    Text(" fgfds"),
-  ];
+  Future<List<String>> _getAllMemberData()async{
+    list.clear();
+    disabledItems.clear();
+    final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    final messProvaider = context.read<MessProvaider>();
+    
+    if(messProvaider.getMessModel==null) return list;
+    for(String uid in messProvaider.getMessModel!.messMemberList){
+      try {
+        DocumentSnapshot documentSnapshot = await firebaseFirestore
+          .collection(Constants.users)
+          .doc(uid)
+          .get();
+        if(documentSnapshot.exists){
+          list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
+          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
+          if(messProvaider.getMessModel!.disabledMemberList.contains(uid)){
+            disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
+          }
+        }
+      } catch (e) {
+        showSnackber(context: context, content: e.toString());
+      }
+    }
+    return list;
+  }
 
 
   @override
@@ -113,6 +74,10 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final messProvaider = context.read<MessProvaider>();
+    final authprovaider = context.read<AuthenticationProvider>();
+
+
     return Expanded(
       child: Container(
         // color: Colors.amber,
@@ -122,9 +87,13 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
           children: [
             Container(
               margin: EdgeInsets.all(10),
+              // child: FutureBuilder(
+              //   future: future, 
+              //   builder: builder,
+              // ),
               child: DropdownSearch<String>(
                 key: dropdownKey, // Needed for reset
-                items: items,
+                asyncItems: (String filter) => _getAllMemberData(),
                 selectedItem: selectedItem,
                 dropdownDecoratorProps: const DropDownDecoratorProps(
                   dropdownSearchDecoration: InputDecoration(
@@ -151,21 +120,25 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     );
                   },
                 ),
+                // always use this function it's tested
+                // otherwise we get error because there are few bug here
                 onChanged: (value) {
                   if (value != null && disabledItems.contains(value)) {
                   // Reset visually and logically
                     dropdownKey.currentState?.clear(); // clears the selection
-                    debugPrint("Selected disable: $selectedItem");
-                    
+                    debugPrint("Selected disable: $selectedItem");                    
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("This item is disabled.")),
+                      const SnackBar(content: Text("This Member is disabled.")),
                     );
                   } 
                   else {
-                    setState(() {
-                      selectedItem = value.toString();
-                    });
-                    debugPrint("Selected enable: $value");
+                    if(value!=null){
+                      // here we receive only enabled value.
+                      setState(() {
+                        selectedItem = value.toString();
+                      });
+                      debugPrint("Selected enable: $value");
+                    }
                   }
                 },
               ),
@@ -178,7 +151,8 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                   Expanded(
                     child: TextField(
                       onTap: () async{
-                        DateTime? date = await showDatePicker(
+
+                        date = await showDatePicker(
                           // fieldHintText: "mm/dd/YYYY",
                           fieldLabelText: "Enter Date (MM/DD/YYYY)", // defalut "Enter Date"
                           context: context,
@@ -190,7 +164,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                           // helpText: "Set Date", // default "Select date"
                         );
                         if(date!=null){
-                          dateController.text = DateFormat("dd/MM/yyyy").format(date);
+                          dateController.text = DateFormat("dd/MM/yyyy").format(date!);
                         }
                       },
                       controller: dateController,
@@ -199,7 +173,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                         border: OutlineInputBorder(
                           
                         ),
-                        label: Text("Date(dd/MM/yyyy)"),
+                        label: FittedBox(child: Text("Date(dd/MM/yyyy)")),
                         hintText: "Select date",
         
                       ),
@@ -211,14 +185,14 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                   Expanded(
                     child: TextField(
                       onTap: () async{
-                        TimeOfDay? time = await showTimePicker(
+                        time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
                           initialEntryMode: TimePickerEntryMode.dial,
                           helpText: "Set Time",
                         );
                         if(time!=null){
-                          timeController.text = formatTimeOfDay(time);
+                          timeController.text = formatTimeOfDay(time!);
                         }
                       },
                       readOnly: true,
@@ -227,7 +201,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                         border: OutlineInputBorder(
                     
                         ),
-                        label: Text("Time(HH:MM AM)"),
+                        label: FittedBox(child: Text("Time(HH:MM A/P)")),
                         hintText: "Select Time",
                       ),
                     ),
@@ -258,8 +232,8 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text("SL NO", style: TextStyle(fontSize: 18),),
-                              Text("Description", style: TextStyle(fontSize: 18),),
-                              Text("Cost TK", style: TextStyle(fontSize: 18),),
+                              Text("Product", style: TextStyle(fontSize: 18),),
+                              Text("Price", style: TextStyle(fontSize: 18),),
                             ],
                           ),
                         ),
@@ -276,7 +250,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                               // "row.asMap" make it a map where key is index and value is the map
                               // "entries" store list of pair<key, value>
                               // "entries.map((entry){})" entry is a pair
-                              children: row.asMap().entries.map((entry){
+                              children: bazerList.asMap().entries.map((entry){
                                 int index = entry.key;
                                 Map value = entry.value;
                                 return ListTile(
@@ -285,14 +259,14 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                     backgroundColor: Colors.grey.shade500,
                                     child: Text("${index}", style: TextStyle(fontSize: 20)),
                                   ),
-                                  title: Text(value["${BazerEntry.description}"], style: TextStyle(fontSize: 16)),
+                                  title: Text(value[BazerEntry.product.name], style: TextStyle(fontSize: 16)),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(value["${BazerEntry.price}"], style: TextStyle(fontSize: 16),),
+                                      Text(value[BazerEntry.price.name], style: TextStyle(fontSize: 16),),
                                       IconButton(
                                         onPressed: (){
-                                          row.removeAt(index);
+                                          bazerList.removeAt(index);
                                           setState(() {
                                             
                                           });
@@ -325,8 +299,13 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
               
                     child: GestureDetector(
                       onTap: () async{
+                        final formKey = GlobalKey<FormState>();
+                        FocusNode focusProduct = FocusNode();
+                        FocusNode focusPrice = FocusNode();
+
                         String product = "";
                         String price = "";
+                        
                         Map<String,dynamic>? map = await showDialog(
                           context: context, 
                           builder: (context) =>AlertDialog(
@@ -368,6 +347,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                     onFieldSubmitted: (value){
                                       FocusScope.of(context).unfocus();
                                     },
+                                    keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
                                     textInputAction: TextInputAction.done,
                                     validator: (value) {
                                       if(value.toString().trim()==""){
@@ -395,7 +375,6 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                 ],
                               ),
                             ),
-                          
                             actions: [
                               TextButton(
                                 onPressed: (){
@@ -405,7 +384,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                               ),
                               TextButton(
                                 onPressed: (){
-                                  Navigator.pop(context, {"${BazerEntry.description}" : "A", "${BazerEntry.price}": "B"});
+                                  Navigator.pop(context, {BazerEntry.product.name : product, BazerEntry.price.name: price});
                                 }, 
                                 child: Text("Add"),
                               ),
@@ -413,18 +392,19 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                           ),
                         );
                         if(map!=null){
-                          bool valided  = formKey.currentState!.validate();
-                          if(valided){
-                            add_in_bazer_List(
-                              row, 
+                          if(validatePrice(map[BazerEntry.price.name])==null){
+                            bazerList.add(
                               {
-                                "${BazerEntry.description}" : product, 
-                                "${BazerEntry.price}" : price,
-                              },
+                                BazerEntry.product.name : product, 
+                                BazerEntry.price.name : price,
+                              }
                             );
                             setState(() {
                             
                             });
+                          }
+                          else{
+                            showSnackber(context: context, content: validatePrice(map[BazerEntry.price.name])!);
                           }
                         }
                       },
@@ -437,8 +417,45 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                   ),                  
                 ],
               ),
-            )
+            ),
+
+            SizedBox(
+              height: 50,
+            ),
           
+            getButton(
+              label: "save", 
+              ontap: (){
+                if(amIAdmin(messProvaider:messProvaider , authProvaider: authprovaider) || amIactmenager(messProvaider:messProvaider , authProvaider: authprovaider)){
+                  if(selectedItem=="Select Member"){
+                    showSnackber(context: context, content: "Member Was Not Slelcted.");
+                    return;
+                  }
+                  if(date==null){
+                    showSnackber(context: context, content: "Date Was Not Slelcted.");
+                    return;
+                  }
+                  if(time==null){
+                    showSnackber(context: context, content: "Time Was Not Slelcted.");
+                    return;
+                  }
+                  if(bazerList.isEmpty){
+                    showSnackber(context: context, content: "The list of bazer are empty");
+                    return;
+                  }
+                  else{
+                    // all valid 
+
+
+                    // success 
+                    bazerList.clear();
+                  }
+                }
+                else{
+                  showSnackber(context: context, content: "Required Menager/Act Menager power");
+                }
+              }
+            ),
         
           ],
         ),

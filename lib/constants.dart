@@ -54,12 +54,26 @@ class Constants {
   static const String messMemberList="messMemberList";
   static const String disabledMemberList="disabledMemberList";
 
+
+  // fand
+  static const String listOfFandTransaction = "listOfFandTransaction";
+  static const String fand = "fand";
+  static const String transactionId = "transactionId";
+  static const String amount = "amount";
+  static const String title = "title";
+  static const String type = "type";
+  static const String add = "add";
+  static const String sub = "sub";
+  static const String blance = "blance";
+
+
   //
   static const String invaitations = "invaitations";
   static const String invaitationId = "invaitationId";
   static const String status="status";
   static const String description="description";
   static const String invaitedTime="invaitedTime";
+  static const String myInvaitationList="myInvaitationList";
 
 
 
@@ -71,7 +85,7 @@ enum BazerScreenMenu{
 }
 
 enum BazerEntry{
-  description,
+  product,
   price,
   member,
   slNo,

@@ -28,6 +28,8 @@ class _MessUpdateState extends State<MessUpdate> {
   TextEditingController authorityEmailController = TextEditingController();
 
   final dropdownKey = GlobalKey<DropdownSearchState>();
+  bool _disposed = false;
+
   List<String > list =["wqer","qwe"];
   // member uid|name
   Map<String,(String,String)> memberUidList={};
@@ -42,21 +44,32 @@ class _MessUpdateState extends State<MessUpdate> {
     // instance create a instance of the class
     // addPostFrameCallback, the function will be called after fully building the screen.
     // (_) here will be given a duration but we dont't need the duration that's why we are ignoring using  underscore.
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_)async{
       final messProvaider = context.read<MessProvaider>();
       final authProvaider = context.read<AuthenticationProvider>();
-      messProvaider.getMessData(
-        messId: authProvaider.userModel!.currentMessId,
+      if(authProvaider.getUserModel!.currentMessId==""){
+        debugPrint("you are not mess owner, update page");
+        return;
+      }
+      await messProvaider.getMessData(
+        isDisposed: ()=>_disposed,
+        messId: authProvaider.getUserModel!.currentMessId,
         onFail: (message){
+          if(!context.mounted) return;
+          
           showSnackber(context: context, content: message);
+          
         }, 
         onSuccess: (){
-          messOwnerIdController.text = authProvaider.userModel!.createdAt;
+          if(!context.mounted) return;
+
+          messOwnerIdController.text = messProvaider.getMessModel!.messAuthorityId;
           messOwnerNameController.text = messProvaider.getMessModel!.messAuthorityName;
           messNameController.text = messProvaider.getMessModel!.messName;
           messAddressController.text = messProvaider.getMessModel!.messAddress;
           authorityPhoneController.text = messProvaider.getMessModel!.messAuthorityNumber;
           authorityEmailController.text = messProvaider.getMessModel!.messAuthorityEmail;
+        
         }
       );
     });
@@ -64,6 +77,7 @@ class _MessUpdateState extends State<MessUpdate> {
   
   @override
   void dispose() {
+    _disposed = true;
     messNameController.dispose();
     messAddressController.dispose();
     messOwnerNameController.dispose();
@@ -74,23 +88,7 @@ class _MessUpdateState extends State<MessUpdate> {
     super.dispose();
   }
 
-  bool amIAdmin(){
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
-    if(messProvaider.getMessModel!=null){
-      if(messProvaider.getMessModel!.messAuthorityId == authProvaider.userModel!.uId){
-        return true;
-      }
-      else{
-        showSnackber(context: context, content:"required Authority power");
-        return false;
-      }
-    }
-    else{
-      showSnackber(context: context, content: "you are not in any mess");
-      return false;
-    }
-  } 
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,22 +130,24 @@ class _MessUpdateState extends State<MessUpdate> {
                 context:context,
                 label: "Update", 
                 ontap:()async{
-                  if(amIAdmin()){
+                  if(amIAdmin(messProvaider: messProvaider, authProvaider: context.read<AuthenticationProvider>())){
                     if(transferOwnership){
                       bool? res =await showConfirmDialog(context: context, title: "you are going to transfer \nyour administrator power. \nAre you sure about this Update.");
                       if(res ?? false){
                         // transfer ownership
                         if(selectedItem!="Select Member"){
-                          messProvaider.transferMessOwnership(
+                          debugPrint("ownership transfer requesting");
+                          await messProvaider.transferMessOwnership(
                             adminId: memberUidList[selectedItem]!.$1, 
                             adimnName: memberUidList[selectedItem]!.$2, 
                             onFail: (message){
-                              showSnackber(context: context, content: "Updatation Failed \n$message");
+                              if(context.mounted) showSnackber(context: context, content: "Updatation Failed \n$message");
                             },
                             onSuccess: (){
-                              showSnackber(context: context, content: "Updatation Successfully.");
+                               showSnackber(context: context, content: "Updatation Successfully.");
                             },
                           );
+                          debugPrint("ownership transfer requesting opration done");
                         }
                         else{
                           showSnackber(context: context, content: "At First Select Member");
@@ -159,7 +159,7 @@ class _MessUpdateState extends State<MessUpdate> {
                         bool? res =await showConfirmDialog(context: context, title: "Are you sure about this Update.");
                         if(res?? false){
                           // update mess data
-                          messProvaider.updateMessDataToFirestore(
+                          await messProvaider.updateMessDataToFirestore(
                             onFail: (message){
                               showSnackber(context: context, content: message);
                             }, 
@@ -177,15 +177,20 @@ class _MessUpdateState extends State<MessUpdate> {
                               disabledMemberList: [],
                             ),
                             onSuccess: (){
-                              showSnackber(context: context, content: "Updatation Success.");
+                              if(context.mounted){
+                                showSnackber(context: context, content: "Updatation Success.");
+                              }
                             }
                           );
                         }
                       }
                       else{
-                        showSnackber(context: context, content: "fill all required field");
+                        if(context.mounted) showSnackber(context: context, content: "fill all required field");
                       }
                     }
+                  }
+                  else{
+                    showSnackber(context: context, content: "you are not mess meneger");
                   }
                 }
               ),
@@ -210,8 +215,8 @@ class _MessUpdateState extends State<MessUpdate> {
           .doc(uid)
           .get();
         if(documentSnapshot.exists){
-          list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
-          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
+          list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
+          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
           if(messProvaider.getMessModel!.disabledMemberList.contains(uid)){
             disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
           }

@@ -24,25 +24,32 @@ class _MessDeleteState extends State<MessDelete> {
   }
 
   void getMessData()async{
+    
     final messProvaider = context.read<MessProvaider>();
     final authProvaider = context.read<AuthenticationProvider>();
-    if(authProvaider.userModel!.currentMessId==""){
+    
+    if(authProvaider.getUserModel!.currentMessId==""){
       // because the member are not included to a mess
       return;
     }
-    await messProvaider.getMessData(
+
+    messProvaider.setIsloading(true);
+    await messProvaider.getMessData(  
       onFail: (message){
-        showSnackber(context: context, content: message);
-        print(message);
+        if(context.mounted){
+          showSnackber(context: context, content: message);
+          print(message);
+        }
       }, 
-      messId:authProvaider.userModel!.currentMessId ,
+      messId:authProvaider.getUserModel!.currentMessId ,
     );
+    messProvaider.setIsloading(false);
   }
 
   void _deleteMess()async{
     final authProvaider = context.read<AuthenticationProvider>();
     final messProvaider = context.read<MessProvaider>();
-    if(authProvaider.userModel!.currentMessId != "" && messProvaider.getMessModel != null && messProvaider.getMessModel!.messAuthorityId==authProvaider.userModel!.uId){
+    if(authProvaider.getUserModel!.currentMessId != "" && messProvaider.getMessModel != null && messProvaider.getMessModel!.messAuthorityId==authProvaider.getUserModel!.uId){
 
       // if offline stop leave process .
       if(!messProvaider.isOnline) {
@@ -62,13 +69,13 @@ class _MessDeleteState extends State<MessDelete> {
           showSnackber(context: context, content: message);
         }, 
         MessId: messProvaider.getMessModel!.messId,
-        onSuccess: (){
+        onSuccess: ()async{
           //remove current mess id from your user id.
           // because auth provaider hold current mess id in user model. it will not replace until you relunch/login the app. 
           // clear manually
           authProvaider.setUserModel(currentMessId: "");
-          messProvaider.removeMessIdFromMemberProfile(
-            memberUid: authProvaider.userModel!.uId, 
+          await messProvaider.removeMessIdFromMemberProfile(
+            memberUid: authProvaider.getUserModel!.uId, 
             onFail: (p0) {
               showSnackber(context: context, content: "somthing wrong!");
             },
@@ -96,6 +103,8 @@ class _MessDeleteState extends State<MessDelete> {
     return Container(
       child: Column(
         children: [
+          messProvaider.isLoading?  showCircularProgressIndicator()
+          :
           messProvaider.getMessModel!=null?
           Card(
             color: Colors.red.shade500,

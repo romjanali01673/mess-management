@@ -48,8 +48,8 @@ class _MessCreateState extends State<MessCreate> {
     // (_) here will be given a duration but we dont't need the duration that's why we are ignoring using  underscore.
     WidgetsBinding.instance.addPostFrameCallback((_){
       final authProvaider = context.read<AuthenticationProvider>();
-      messOwnerIdController.text = authProvaider.userModel!.createdAt;
-      messOwnerNameController.text = authProvaider.userModel!.fname;
+      messOwnerIdController.text = authProvaider.getUserModel!.uId;
+      messOwnerNameController.text = authProvaider.getUserModel!.fname;
     });
   }
   
@@ -71,7 +71,7 @@ class _MessCreateState extends State<MessCreate> {
 
       // check are the member already connected to a mess.
       // if connected stop creations.
-      if(authProvaider.userModel!.currentMessId!=""){
+      if(authProvaider.getUserModel!.currentMessId!=""){
         showSnackber(
           context: context, 
           content: "Already you are connected With a mess. \nTo create a new mess \nAt first you have to leave from current mess."
@@ -91,14 +91,14 @@ class _MessCreateState extends State<MessCreate> {
           messId: "", 
           messName: messNameController.text.toString(), 
           messAddress: messAddressController.text.toString(), 
-          messAuthorityId: authProvaider.userModel!.uId.toString(), 
+          messAuthorityId: authProvaider.getUserModel!.uId.toString(), 
           messAuthorityId2nd: "", // secondary owner id will be published leter
-          messAuthorityName:authProvaider.userModel!.fname.toString() , 
+          messAuthorityName:authProvaider.getUserModel!.fname.toString() , 
           messAuthorityName2nd: "", // secondary owner name will be published leter
           messAuthorityNumber: authorityPhoneController.text.toString(), 
           messAuthorityEmail: authorityEmailController.text.toString(),
           messMemberList: [
-            authProvaider.userModel!.uId.toString(),
+            authProvaider.getUserModel!.uId.toString(),
           ],
           disabledMemberList:[]
         ),
@@ -112,11 +112,11 @@ class _MessCreateState extends State<MessCreate> {
             },
             onSuccess: (){
               // assign mess id to user model
-              authProvaider.userModel!.currentMessId = messProvaider.getMessModel!.messId; 
+              authProvaider.getUserModel!.currentMessId = messProvaider.getMessModel!.messId; 
               showSnackber(context: context, content: "Mess Has Created");
               formKey.currentState!.reset();
             },
-            memberUid: authProvaider.userModel!.uId,
+            memberUid: authProvaider.getUserModel!.uId,
             messId: messProvaider.getMessModel!.messId,
           );
           messProvaider.setIsloading(false);
