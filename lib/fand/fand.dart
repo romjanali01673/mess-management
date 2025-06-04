@@ -162,9 +162,11 @@ class _FandHomeState extends State<FandHome> {
                             leading: Text("${index+1}",),
                             title: Text(fandmodel.title),// title
                             subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text("${fandmodel.type}"), // type
                                 Text("${DateFormat("hh:mm a dd-MM-yyyy").format(fandmodel.CreatedAt!.toDate().toLocal())}"),
+                                // Text((fandmodel.CreatedAt!.toDate().toString())),
                               ],
                             ),
                             trailing: Row(

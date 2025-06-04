@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/bazer_model.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/bazer_provaider.dart';
 import 'package:meal_hisab/provaiders/mess_provaider.dart';
 import 'package:provider/provider.dart';
 
@@ -75,7 +77,9 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final messProvaider = context.read<MessProvaider>();
-    final authprovaider = context.read<AuthenticationProvider>();
+    final authProvaider = context.read<AuthenticationProvider>();
+    final bazerProvaider = context.read<BazerProvaider>();
+
 
 
     return Expanded(
@@ -259,16 +263,23 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                     backgroundColor: Colors.grey.shade500,
                                     child: Text("${index}", style: TextStyle(fontSize: 20)),
                                   ),
-                                  title: Text(value[BazerEntry.product.name], style: TextStyle(fontSize: 16)),
+                                  title: Text(value[Constants.product], style: TextStyle(fontSize: 16), textAlign: TextAlign.center,),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(value[BazerEntry.price.name], style: TextStyle(fontSize: 16),),
+                                      Text(value[Constants.price], style: TextStyle(fontSize: 16),),
+                                      IconButton(
+                                        onPressed: ()async{
+                                          await showInputDialog(product: value[Constants.product], price:value[Constants.price], index: index);
+                                          setState(() {
+                                          });
+                                        }, 
+                                        icon: Icon(Icons.edit_square,color: Colors.green,)
+                                      ),
                                       IconButton(
                                         onPressed: (){
-                                          bazerList.removeAt(index);
                                           setState(() {
-                                            
+                                            bazerList.removeAt(index);
                                           });
                                         }, 
                                         icon: Icon(Icons.disabled_by_default_rounded,color: Colors.red.shade800,)
@@ -299,12 +310,107 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
               
                     child: GestureDetector(
                       onTap: () async{
+                        await showInputDialog();
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey.shade700,
+                        child: Icon(Icons.add,color: Colors.blue,),
+                      ),
+                    )
+                  ),                  
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 50,
+            ),
+          
+            getButton(
+              label: "save", 
+              ontap: ()async{
+                if(amIAdmin(messProvaider:messProvaider , authProvaider: authProvaider) || amIactmenager(messProvaider:messProvaider , authProvaider: authProvaider)){
+                  if(selectedItem=="Select Member"){
+                    showSnackber(context: context, content: "Member Was Not Slelcted.");
+                    return;
+                  }
+                  if(date==null){
+                    showSnackber(context: context, content: "Date Was Not Slelcted.");
+                    return;
+                  }
+                  if(time==null){
+                    showSnackber(context: context, content: "Time Was Not Slelcted.");
+                    return;
+                  }
+                  if(bazerList.isEmpty){
+                    showSnackber(context: context, content: "The list of bazer are empty");
+                    return;
+                  }
+                  else{
+                    // all valid
+                    double totalAmount=0;
+                    try {
+                      bazerList.map((x){
+                        totalAmount += double.parse(x[Constants.price]);
+                      }).toList();
+                    } catch (e) {
+                      print(e);
+                      return;
+                    }
+                    BazerModel  bazerModel = BazerModel(
+                      transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                      amount: totalAmount, 
+                      bazerList: bazerList,
+                      bazerTime: formatTimeOfDay(time!).toString(),
+                      bazerDate: DateFormat("dd/MM/yyyy").format(date!).toString(),
+                      byWho: {
+                        Constants.uId: memberUidList[selectedItem]!.$1, 
+                        Constants.fname:memberUidList[selectedItem]!.$2,
+                      },
+                    );
+                    print(totalAmount.toString()+"a");
+
+                    await bazerProvaider.addABazerTransaction(
+                      bazerModel: bazerModel, 
+                      messId: authProvaider.getUserModel!.currentMessId, 
+                      onFail: (message ) { 
+                        showSnackber(context: context, content: "Bazer Entry Failed!\n$message");
+                      },
+                      onSuccess: (){
+                        showSnackber(context: context, content: "Bazer Entry Successed!");
+                      }
+                    );
+
+                    // success 
+                    setState(() {
+                      bazerList.clear();
+                    });
+                  }
+                }
+                else{
+                  showSnackber(context: context, content: "Required Menager/Act Menager power");
+                }
+              }
+            ),
+        
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> showInputDialog({String? product, String? price, int? index})async{
+    bool isUpdate = index!=null ? true:false;
+    TextEditingController productController = TextEditingController();
+    TextEditingController priceController = TextEditingController();
+
+    productController.text = product??"";
+    priceController.text = price??"";
+
                         final formKey = GlobalKey<FormState>();
                         FocusNode focusProduct = FocusNode();
                         FocusNode focusPrice = FocusNode();
-
-                        String product = "";
-                        String price = "";
                         
                         Map<String,dynamic>? map = await showDialog(
                           context: context, 
@@ -316,6 +422,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                               child: Column(
                                 children: [
                                   TextFormField(
+                                    controller: productController ,
                                     textInputAction: TextInputAction.next,
                                     autofocus: true,
                                     focusNode: focusProduct,
@@ -342,6 +449,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                     height: 10,
                                   ),
                                   TextFormField(
+                                    controller: priceController,
                                     autofocus: true,
                                     focusNode: focusPrice,
                                     onFieldSubmitted: (value){
@@ -384,19 +492,26 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                               ),
                               TextButton(
                                 onPressed: (){
-                                  Navigator.pop(context, {BazerEntry.product.name : product, BazerEntry.price.name: price});
+                                  Navigator.pop(context, {Constants.product : product, Constants.price: price});
                                 }, 
-                                child: Text("Add"),
+                                
+                                child:isUpdate? Text("Update") : Text("Add"),
                               ),
                             ],
                           ),
                         );
                         if(map!=null){
-                          if(validatePrice(map[BazerEntry.price.name])==null){
+                          if(validatePrice(map[Constants.price])==null){
+                            isUpdate?
+                            bazerList[index!] = {
+                              Constants.price : price,
+                              Constants.product : product, 
+                            }
+                            : 
                             bazerList.add(
                               {
-                                BazerEntry.product.name : product, 
-                                BazerEntry.price.name : price,
+                                Constants.product : product, 
+                                Constants.price : price,
                               }
                             );
                             setState(() {
@@ -404,62 +519,8 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                             });
                           }
                           else{
-                            showSnackber(context: context, content: validatePrice(map[BazerEntry.price.name])!);
+                            showSnackber(context: context, content: validatePrice(map[Constants.price])!);
                           }
-                        }
-                      },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.grey.shade700,
-                        child: Icon(Icons.add,color: Colors.blue,),
-                      ),
-                    )
-                  ),                  
-                ],
-              ),
-            ),
-
-            SizedBox(
-              height: 50,
-            ),
-          
-            getButton(
-              label: "save", 
-              ontap: (){
-                if(amIAdmin(messProvaider:messProvaider , authProvaider: authprovaider) || amIactmenager(messProvaider:messProvaider , authProvaider: authprovaider)){
-                  if(selectedItem=="Select Member"){
-                    showSnackber(context: context, content: "Member Was Not Slelcted.");
-                    return;
-                  }
-                  if(date==null){
-                    showSnackber(context: context, content: "Date Was Not Slelcted.");
-                    return;
-                  }
-                  if(time==null){
-                    showSnackber(context: context, content: "Time Was Not Slelcted.");
-                    return;
-                  }
-                  if(bazerList.isEmpty){
-                    showSnackber(context: context, content: "The list of bazer are empty");
-                    return;
-                  }
-                  else{
-                    // all valid 
-
-
-                    // success 
-                    bazerList.clear();
-                  }
-                }
-                else{
-                  showSnackber(context: context, content: "Required Menager/Act Menager power");
-                }
-              }
-            ),
-        
-          ],
-        ),
-      ),
-    );
+                        };
   }
 }

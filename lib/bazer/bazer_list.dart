@@ -1,4 +1,15 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/bazer_model.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/bazer_provaider.dart';
+import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:provider/provider.dart';
 
 class BazerListScreen extends StatefulWidget {
   const BazerListScreen({super.key});
@@ -8,77 +19,183 @@ class BazerListScreen extends StatefulWidget {
 }
 
 class _BazerListScreenState extends State<BazerListScreen> {
+  bool showCost = false;
+  List<bool> showDetails = [];
+  
   @override
   Widget build(BuildContext context) {
+  final bazerProvaider = context.watch<BazerProvaider>();
+  final authProvaider = context.watch<AuthenticationProvider>();
+  final messProvaider = context.watch<MessProvaider>();
     return Expanded(
-         child: Container(
-          child: ListView.builder(itemBuilder: (context , index){
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.red,
-                child: Text("$index"),
+      child: Column(
+        children: [
+          Card(
+            color: Colors.green.shade500,
+            child: ListTile(
+              trailing: IconButton(
+                onPressed: (){
+                  setState(() {
+                  showCost = !showCost;
+                    
+                  });
+                }, 
+                icon: showCost? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
               ),
-              title: Text("Md Romjan Ali"),
-              subtitle: Text("${DateTime.now()}"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("121212", style: TextStyle(fontSize: 18),),
-                  PopupMenuButton(
-                    icon: Icon(Icons.more_vert),
-                    itemBuilder: (context) =>[
-                      
-                      PopupMenuItem(
-                        value: 0,
-                        child: ListTile(
-                          title: Text("Edit"),
-                          leading: Icon(Icons.edit),
-                          ), 
-                      ),
+              title: 
+              showCost? Text("Current Blance: ${bazerProvaider.getCost}",)
+              :
+              Text("tap to see blance"),
+            ),
+          ),
+      
+          amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider) || amIactmenager(messProvaider: messProvaider, authProvaider: authProvaider)?
+          Expanded(
+               child: FutureBuilder(
+                future: bazerProvaider.getBazerTransactions(
+                  messId: authProvaider.getUserModel!.currentMessId, 
+                  onFail: (message){
+                  }
+                ),
+                builder: (context,AsyncSnapshot<List<BazerModel>?> snapshot) {
+                  showDetails.clear();
+                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                    return Center(child: showCircularProgressIndicator());
+                  }
+                  else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } 
+                  else if (!snapshot.hasData || snapshot.data == null) {
+                    return Center(child: Text('No Transaction found.'));
+                  }
 
-                      PopupMenuItem(
-                        value: 1,
-                        // onTap: (){
-                        //   // if i use this function. we don't need to Navigator.pop()
-                        // },
-                        child: ListTile(
-                          title: Text("Delete"),
-                          leading: Icon(Icons.delete),
-                          onTap: ()async{
-                            Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
-                            bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
-                              title: Text("Do you want to delete?"),
-                              actionsAlignment: MainAxisAlignment.start,
-                              actions: [
-                                TextButton(child: Text("No"), onPressed: (){
-                                  Navigator.pop(context, false);
-                                },),
-                                TextButton(child: Text("Yes") , onPressed: (){
-                                  Navigator.pop(context, true);
-                                },),
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context , index){
+                    BazerModel bazerModel = snapshot.data![index];
+                    showDetails.add(false);
+                  return StatefulBuilder(
+                    builder: (context, setLocalState){
+
+                    return Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            
+                            contentPadding: EdgeInsets.only(left: 2),
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.red,
+                              child: Text("$index"),
+                            ),
+                            title: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(bazerModel.CreatedAt!.toDate().toLocal())}"), // entry time 
+                            subtitle: Text(bazerModel.byWho[Constants.fname]),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(bazerModel.amount.toString(), style: TextStyle(fontSize: 18),),// amount
+                                PopupMenuButton(
+                                  icon: Icon(Icons.more_vert),
+                                  itemBuilder: (context) =>[
+                                    PopupMenuItem(
+                                      value: 0,
+                                      child: ListTile(
+                                        title: Text("Edit"),
+                                        leading: Icon(Icons.edit),
+                                        ), 
+                                    ),
+                                 
+                                    PopupMenuItem(
+                                      value: 1,
+                                      // onTap: (){
+                                      //   // if i use this function. we don't need to Navigator.pop()
+                                      // },
+                                      child: ListTile(
+                                        title: Text("Delete"),
+                                        leading: Icon(Icons.delete),
+                                        onTap: ()async{
+                                          Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
+                                          bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
+                                            title: Text("Do you want to delete?"),
+                                            actionsAlignment: MainAxisAlignment.start,
+                                            actions: [
+                                              TextButton(child: Text("No"), onPressed: (){
+                                                Navigator.pop(context, false);
+                                              },),
+                                              TextButton(child: Text("Yes") , onPressed: (){
+                                                Navigator.pop(context, true);
+                                              },),
+                                            ],
+                                          ));
+                                          if(confirm!=null && confirm){
+                                            debugPrint("Confirmed ------------");
+                                          }
+                                          else{
+                                            debugPrint("Confirmed false ------------");
+                                          }
+                                        },
+                                      ), 
+                                    ),
+                                 
+                                  ])
                               ],
-                            ));
-                            if(confirm!=null && confirm){
-                              debugPrint("Confirmed ------------");
-                            }
-                            else{
-                              debugPrint("Confirmed false ------------");
-                            }
-                          },
-                        ), 
+                            ),
+                            onTap: (){
+                              // show details here 
+                              setLocalState(() {
+                                showDetails[index] = !showDetails[index];
+                    
+                                debugPrint("show details");
+                              });
+                            },
+                          ),
+                          
+                          showDetails[index] ?
+                          Column(
+                           children: [
+                              Text("His/Her Id: ${bazerModel.byWho[Constants.uId]}"),
+                              Text("Bazer Time: ${bazerModel.bazerTime}"),
+                              Text("Bazer Date: ${bazerModel.bazerDate}"),
+                              Text("the details list of bazer below:"),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("SL No"),
+                                  Text("Product"),
+                                  Text("Price"),
+                                ],
+                              ),
+                              Divider(),
+                              ...List.generate(bazerModel.bazerList!.length, (index){
+                                return Container(
+                                  color: index%2==0? Colors.amber.shade50:Colors.green.shade50,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    spacing: 10,
+                                    children: [
+                                      Text("${index+1}."),
+                                      Expanded(child: Text("${bazerModel.bazerList![index][Constants.product]}",textAlign: TextAlign.center,)),
+                                      Text("${bazerModel.bazerList![index][Constants.price]}"),
+                                    ],
+                                  ),
+                                );
+                              }),
+                           ], 
+                          )
+                          :
+                          SizedBox.shrink(),
+                        ],
                       ),
-
-                    ])
-                ],
-              ),
-              onTap: (){
-                // show details here 
-                debugPrint("show Details Here");
-              },
-            );
-          },
-          itemCount: 50,
-        ),
+                    );
+                    }
+                  );
+                },
+                  );
+                },
+               ),
+          )
+          :
+          Text("required menager/Act menager power"),
+        ],
       ),
     );
   }

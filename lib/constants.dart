@@ -75,6 +75,20 @@ class Constants {
   static const String invaitedTime="invaitedTime";
   static const String myInvaitationList="myInvaitationList";
 
+  // bazer
+  static const String bazer="bazer";
+  static const String cost="cost";
+  static const String listOfBazerTransaction="listOfBazerTransaction";
+  static const String price="price";
+  static const String product="product";
+  static const String byWho="byWho";
+  static const String bazerTime="bazerTime";
+  static const String bazerDate="bazerDate";
+
+
+  
+
+
 
 
 }
@@ -84,14 +98,6 @@ enum BazerScreenMenu{
   bazerEntry,
 }
 
-enum BazerEntry{
-  product,
-  price,
-  member,
-  slNo,
-  date,
-  time,
-}
 enum NoticeAndAnnouncement{
   Notices,
   addNotice,
