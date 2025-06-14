@@ -41,6 +41,8 @@ class Constants {
   static const String isSignedIn = "isSignedIn";
 
   // mess model
+  static const String disable = "disable";
+  static const String enable = "enable";
   static const String mess = "mess";
   static const String messId="messId";
   static const String messName="messName";
@@ -85,9 +87,15 @@ class Constants {
   static const String bazerTime="bazerTime";
   static const String bazerDate="bazerDate";
 
+  // meal 
+  static const String date = "date";
+  static const String totalMeal = "totalMeal";
+  static const String meal = "meal";
+  static const String listOfBazerMeal = "listOfBazerMeal";
+  static const String listOfMeal = "listOfMeal";
 
   
-
+  static const String entryTime = "entryTime";
 
 
 
@@ -123,7 +131,7 @@ enum Meal{
   mealList,
   mealEntry,
   groupMealList,
-  
+  memberMealList,
 }
 
 enum Diposite{

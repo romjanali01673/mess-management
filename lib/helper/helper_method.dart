@@ -198,3 +198,13 @@ bool amIactmenager({required MessProvaider messProvaider,required Authentication
   }
 } 
 
+int getDaysInMonth(int year, int month) {
+  // If month is December, move to January of next year
+  if (month == 12) {
+    return DateTime(year + 1, 1, 0).day;
+  }
+  // Return the last day of the given month
+  return DateTime(year, month + 1, 0).day;
+}
+
+

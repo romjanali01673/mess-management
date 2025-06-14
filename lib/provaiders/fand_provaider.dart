@@ -62,28 +62,41 @@ class FandProvaider extends ChangeNotifier{
   // add a fand transaction to database 
   Future<void> addAFandTransaction({required FandModel fandModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-    try {
 
-      batch.set(
-        firebaseFirestore.collection(Constants.fand)
-        .doc(messId)
-        .collection(Constants.listOfFandTransaction)
-        .doc(fandModel.transactionId),
-        fandModel.toMap()
-      );
+    // fatch blance
+    await getFandTransactions(
+      messId: messId, 
+      onFail: onFail,
+      onSuccess: ()async{
+        try {
+          batch.set(
+            firebaseFirestore.collection(Constants.fand)
+            .doc(messId)
+            .collection(Constants.listOfFandTransaction)
+            .doc(fandModel.transactionId),
+            fandModel.toMap()
+          );
 
-      await batch.commit();
+          batch.set(
+            firebaseFirestore.collection(Constants.fand)
+            .doc(messId),
+            {Constants.blance:getBlance+fandModel.amount}
+          );
 
-      // await firebaseFirestore
-      //   .collection(Constants.fand)
-      //   .doc(messId)
-      //   .collection(Constants.listOfFandTransaction)
-      //   .doc(fandModel.transactionId)
-      //   .set(fandModel.toMap());
-      onSuccess!=null? onSuccess() : (){};
-    } catch (e) {
-      onFail(e.toString());
-    }  
+          await batch.commit();
+
+        // await firebaseFirestore
+        //   .collection(Constants.fand)
+        //   .doc(messId)
+        //   .collection(Constants.listOfFandTransaction)
+        //   .doc(fandModel.transactionId)
+        //   .set(fandModel.toMap());
+          onSuccess!=null? onSuccess() : (){};
+        } catch (e) {
+          onFail(e.toString());
+        } 
+      }
+    );
   }
 
   //

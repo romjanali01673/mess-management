@@ -50,7 +50,7 @@ class MessProvaider extends ChangeNotifier {
     String? messAuthorityName2nd,
     String? messAuthorityNumber,
     String? messAuthorityEmail,
-    List? messMemberList,
+    List<Map<String,dynamic>>? messMemberList,
     List?disabledMemberList,
   }){
     if(messId != null) _messModel!.messId = messId;
@@ -63,7 +63,6 @@ class MessProvaider extends ChangeNotifier {
     if(messAuthorityNumber != null)_messModel!.messAuthorityNumber = messAuthorityNumber;
     if(messAuthorityEmail != null)_messModel!.messAuthorityEmail = messAuthorityEmail;
     if(messMemberList != null)_messModel!.messMemberList = messMemberList;
-    if(disabledMemberList != null)_messModel!.disabledMemberList = disabledMemberList;
     notifyListeners();
   }
   
@@ -235,7 +234,7 @@ class MessProvaider extends ChangeNotifier {
     if(documentSnapshot!=null && documentSnapshot.exists){
       _messModel = MessModel.fromMap(documentSnapshot!.data() as Map<String,dynamic>);
       notifyListeners();
-        onSuccess!=null?onSuccess():(){};
+      onSuccess!=null?onSuccess():(){};
       
     }
     else{
@@ -293,9 +292,45 @@ class MessProvaider extends ChangeNotifier {
   }
 
   // join mess 
-  Future<void> joiningToInvaitatedMess({required Function(String) onFail, Function()? onSuccess, required String messId, required String uId})async{
+  Future<void> joiningToInvaitatedMess({required Function(String) onFail, Function()? onSuccess, required String messId, required Map<String,dynamic> member, required String invaitationsId,required String status})async{
+    final batch = firebaseFirestore.batch();
     try{
-      await firebaseFirestore.collection(Constants.mess).doc(messId).update({Constants.messMemberList : FieldValue.arrayUnion([uId])});
+      // add member to mess
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId),
+        {
+          Constants.messMemberList : FieldValue.arrayUnion([member])
+        }
+      );
+      
+      
+      // change invaitation ststus
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.invaitations)
+        .doc(member[Constants.uId])
+        .collection(Constants.myInvaitationList)
+        .doc(invaitationsId),
+
+        ({Constants.status:status})
+      );
+
+
+                                              
+      // update current mess id
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(member[Constants.uId]),
+
+        {
+          Constants.currentMessId : messId
+        },        
+      );
+
+      await batch.commit();                                 
       onSuccess!=null? onSuccess():(){};
     }catch (e){
       onFail(e.toString());
@@ -382,32 +417,45 @@ class MessProvaider extends ChangeNotifier {
     }
   }
 
-  // add disible member
-  Future<void> addDisabledMemberData({required String memberUid})async{
+  // change status member
+  Future<void> changeMemberStatus()async{
+    if(_isOnline == false){
+      debugPrint("cancel for offline ");
+      return;
+    } 
     try {
-      
-      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.disabledMemberList:FieldValue.arrayUnion([memberUid])});
+      // update changed/new member list. where already changed the member status
+      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).update({Constants.messMemberList: getMessModel!.messMemberList});
     } catch (e) {
-      
-      debugPrint(e.toString());
-    }
-  }
-
-  // remove disible member
-  Future<void> removeDisabledMemberData({required String memberUid})async{
-    try {
-      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.disabledMemberList:FieldValue.arrayRemove([memberUid])});
-      
-    } catch (e) {
-      
       debugPrint(e.toString());
     }
   }
 
   // cick member
-  Future<void> cickMemberFromMess({required String memberUid})async{
+  Future<void> kickMemberFromMess({required Map<String,dynamic> member})async{
+    final batch = firebaseFirestore.batch();
     try {
-      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).set({Constants.messMemberList:FieldValue.arrayRemove([memberUid])});
+      // remove member from mess
+      batch.set(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId),
+        {Constants.messMemberList:FieldValue.arrayRemove([member])}
+      );
+      // remove current mess id from member profile
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(member[Constants.uId]),
+        {
+          Constants.currentMessId : "",
+        },        
+      );
+
+      await batch.commit();
+      final list = getMessModel!.messMemberList;
+      list.remove(member);
+      setMessModel(messMemberList: list);
       
     } catch (e) {
       debugPrint(e.toString());

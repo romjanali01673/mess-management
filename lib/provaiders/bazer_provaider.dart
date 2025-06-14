@@ -62,7 +62,7 @@ class BazerProvaider extends ChangeNotifier{
   // add a fand transaction to database 
   Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-    // fatch blance,
+    // fatch cost,
     await getBazerTransactions(
       messId: messId, 
       onFail: (message) {  

@@ -10,8 +10,7 @@ class MessModel {
   String messAuthorityName2nd;
   String messAuthorityNumber;
   String messAuthorityEmail;
-  List messMemberList;
-  List disabledMemberList;
+  List<Map<String,dynamic>> messMemberList;
 
   MessModel({
     required this.messId,
@@ -23,8 +22,12 @@ class MessModel {
     required this.messAuthorityName2nd,
     required this.messAuthorityNumber,
     required this.messAuthorityEmail,
-    required this.messMemberList,
-    required this.disabledMemberList,
+    // {
+    //   Constants.uId: authProvaider.getUserModel!.uId.toString(),
+    //   Constants.fname: authProvaider.getUserModel!.fname.toString(),
+    //   Constants.status: Constants.enable,
+    // }
+    required this.messMemberList, 
   });
 
   Map<String, dynamic> toMap(){
@@ -39,7 +42,6 @@ class MessModel {
       Constants.messAuthorityNumber: messAuthorityNumber,
       Constants.messAuthorityEmail: messAuthorityEmail,
       Constants.messMemberList: messMemberList,
-      Constants.disabledMemberList: disabledMemberList,
     };
   }
 
@@ -54,8 +56,9 @@ class MessModel {
       messAuthorityName2nd: data[Constants.messAuthorityName2nd]?? "", 
       messAuthorityNumber: data[Constants.messAuthorityNumber]?? "", 
       messAuthorityEmail: data[Constants.messAuthorityEmail]?? "",
-      messMemberList: data[Constants.messMemberList]?? [],
-      disabledMemberList: data[Constants.disabledMemberList]?? [],
+      messMemberList: (data[Constants.messMemberList] as List<dynamic>?)
+        ?.map((e) => Map<String, dynamic>.from(e as Map))
+        .toList() ?? [],
     );
   }
 }

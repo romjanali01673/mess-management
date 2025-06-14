@@ -34,10 +34,12 @@ class _LandingScreenState extends State<LandingScreen> {
           showSnackber(context: context, content: "somthing Wrong\n uid fatch error");
           return;
         });
+        debugPrint("getUserProfileData");
         await authProvider.getUserProfileData(onFail: (message) {  
           showSnackber(context: context, content: message.toString());
+          return;
         });
-
+        debugPrint("sessionValid");
         await authProvider.sessionValid(
           onSuccess:(res)async{
             if(res){

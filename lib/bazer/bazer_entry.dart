@@ -37,26 +37,57 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
   String selectedItem = "Select Member";
   Set<String> disabledItems ={};
 
+  // Future<List<String>> _getAllMemberData()async{
+  //   list.clear();
+  //   disabledItems.clear();
+  //   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  //   final messProvaider = context.read<MessProvaider>();
+    
+  //   if(messProvaider.getMessModel==null) return list;
+  //   for(String uid in messProvaider.getMessModel!.messMemberList){
+  //     try {
+  //       DocumentSnapshot documentSnapshot = await firebaseFirestore
+  //         .collection(Constants.users)
+  //         .doc(uid)
+  //         .get();
+  //       if(documentSnapshot.exists){
+  //         list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
+  //         memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
+  //         if(messProvaider.getMessModel!.disabledMemberList.contains(uid)){
+  //           disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
+  //         }
+  //       }
+  //     } catch (e) {
+  //       showSnackber(context: context, content: e.toString());
+  //     }
+  //   }
+  //   return list;
+  // }
+
+
   Future<List<String>> _getAllMemberData()async{
     list.clear();
     disabledItems.clear();
     final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     final messProvaider = context.read<MessProvaider>();
-    
+    final authProvaider = context.read<AuthenticationProvider>();
+    await messProvaider.getMessData(
+      onFail: (message){
+
+      }, 
+      messId:authProvaider.getUserModel!.currentMessId,
+    );
+
     if(messProvaider.getMessModel==null) return list;
-    for(String uid in messProvaider.getMessModel!.messMemberList){
+    for(dynamic member in messProvaider.getMessModel!.messMemberList){
       try {
-        DocumentSnapshot documentSnapshot = await firebaseFirestore
-          .collection(Constants.users)
-          .doc(uid)
-          .get();
-        if(documentSnapshot.exists){
-          list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
-          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
-          if(messProvaider.getMessModel!.disabledMemberList.contains(uid)){
-            disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
+        
+          list.add("Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}");
+          memberUidList["Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}"] = (member[Constants.uId],member[Constants.fname]);//(uid,name)
+          if(member[Constants.status]==Constants.disable){
+            disabledItems.add("Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}");
           }
-        }
+        
       } catch (e) {
         showSnackber(context: context, content: e.toString());
       }
@@ -408,119 +439,121 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
     productController.text = product??"";
     priceController.text = price??"";
 
-                        final formKey = GlobalKey<FormState>();
-                        FocusNode focusProduct = FocusNode();
-                        FocusNode focusPrice = FocusNode();
-                        
-                        Map<String,dynamic>? map = await showDialog(
-                          context: context, 
-                          builder: (context) =>AlertDialog(
-                            title: Text("Add Product-"),
-                            scrollable: true,
-                            content: Form(
-                              key: formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                    controller: productController ,
-                                    textInputAction: TextInputAction.next,
-                                    autofocus: true,
-                                    focusNode: focusProduct,
-                                    onFieldSubmitted: (value){
-                                      FocusScope.of(context).requestFocus(focusPrice);
-                                    },
-                                    validator: (value) {
-                                      if(value.toString().trim()==""){
-                                        return "";
-                                      }
-                                      return null;
-                                    },
-                                    onChanged: (value) {
-                                      product = value.trim();
-                                    },
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        
-                                      ),
-                                      label: Text("Product Name-")
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  TextFormField(
-                                    controller: priceController,
-                                    autofocus: true,
-                                    focusNode: focusPrice,
-                                    onFieldSubmitted: (value){
-                                      FocusScope.of(context).unfocus();
-                                    },
-                                    keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
-                                    textInputAction: TextInputAction.done,
-                                    validator: (value) {
-                                      if(value.toString().trim()==""){
-                                        return "";
-                                      }
-                                      int pr =0;
-                                        try{
-                                          pr = int.parse(value.toString().trim());
-                                          print(pr);
-                                        }catch (e){
-                                          return "enter int value";
-                                        }
-                                      return null;
-                                    },
-                                    onChanged: (value){
-                                      price = value.trim();
-                                    },
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        
-                                      ),
-                                      label: Text("Product Price-")
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: (){
-                                  Navigator.pop(context);
-                                }, 
-                                child: Text("Cancle"),
-                              ),
-                              TextButton(
-                                onPressed: (){
-                                  Navigator.pop(context, {Constants.product : product, Constants.price: price});
-                                }, 
-                                
-                                child:isUpdate? Text("Update") : Text("Add"),
-                              ),
-                            ],
-                          ),
-                        );
-                        if(map!=null){
-                          if(validatePrice(map[Constants.price])==null){
-                            isUpdate?
-                            bazerList[index!] = {
-                              Constants.price : price,
-                              Constants.product : product, 
-                            }
-                            : 
-                            bazerList.add(
-                              {
-                                Constants.product : product, 
-                                Constants.price : price,
-                              }
-                            );
-                            setState(() {
-                            
-                            });
-                          }
-                          else{
-                            showSnackber(context: context, content: validatePrice(map[Constants.price])!);
-                          }
-                        };
+    final formKey = GlobalKey<FormState>();
+    FocusNode focusProduct = FocusNode();
+    FocusNode focusPrice = FocusNode();
+    
+    Map<String,dynamic>? map = await showDialog(
+      context: context, 
+      builder: (context) =>AlertDialog(
+        title: Text("Add Product-"),
+        scrollable: true,
+        content: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: productController ,
+                textInputAction: TextInputAction.next,
+                autofocus: true,
+                focusNode: focusProduct,
+                onFieldSubmitted: (value){
+                  FocusScope.of(context).requestFocus(focusPrice);
+                },
+                validator: (value) {
+                  if(value.toString().trim()==""){
+                    return "";
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  product = value.trim();
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    
+                  ),
+                  label: Text("Product Name-")
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                controller: priceController,
+                autofocus: true,
+                focusNode: focusPrice,
+                onFieldSubmitted: (value){
+                  FocusScope.of(context).unfocus();
+                },
+                keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
+                textInputAction: TextInputAction.done,
+                validator: (value) {
+                  if(value.toString().trim()==""){
+                    return "";
+                  }
+                  int pr =0;
+                    try{
+                      pr = int.parse(value.toString().trim());
+                      print(pr);
+                    }catch (e){
+                      return "enter int value";
+                    }
+                  return null;
+                },
+                onChanged: (value){
+                  price = value.trim();
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    
+                  ),
+                  label: Text("Product Price-")
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.pop(context);
+            }, 
+            child: Text("Cancle"),
+          ),
+          TextButton(
+            onPressed: (){
+              Navigator.pop(context, {Constants.product : product, Constants.price: price});
+            }, 
+            
+            child:isUpdate? Text("Update") : Text("Add"),
+          ),
+        ],
+      ),
+    );
+    if(map!=null){
+      if(validatePrice(map[Constants.price])==null){
+        isUpdate?
+        bazerList[index!] = {
+          Constants.price : price,
+          Constants.product : product, 
+        }
+        : 
+        bazerList.add(
+          {
+            Constants.product : product, 
+            Constants.price : price,
+          }
+        );
+        setState(() {
+        
+        });
+      }
+      else{
+        showSnackber(context: context, content: validatePrice(map[Constants.price])!);
+      }
+    }
+    productController.dispose();
+    priceController.dispose();
   }
 }

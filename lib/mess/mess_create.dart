@@ -98,9 +98,12 @@ class _MessCreateState extends State<MessCreate> {
           messAuthorityNumber: authorityPhoneController.text.toString(), 
           messAuthorityEmail: authorityEmailController.text.toString(),
           messMemberList: [
-            authProvaider.getUserModel!.uId.toString(),
+            {
+              Constants.uId: authProvaider.getUserModel!.uId.toString(),
+              Constants.fname: authProvaider.getUserModel!.fname.toString(),
+              Constants.status: Constants.enable,
+            }
           ],
-          disabledMemberList:[]
         ),
         onSuccess: ()async{
           // mess has created so,

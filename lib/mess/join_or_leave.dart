@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/joining_model.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
@@ -41,6 +42,11 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
     final authProvaider = context.read<AuthenticationProvider>();
     final messProvaider = context.read<MessProvaider>();
     if(authProvaider.getUserModel!.currentMessId!=""){
+
+      if(amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider)){
+        showSnackber(context: context, content: "At first you have to either delete the mess or transfer ownership!");
+        return;
+      }
 
       // if offline stop leave process .
       if(!messProvaider.isOnline) {
@@ -160,39 +166,24 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                             //   // you are valid join to the mess
                                             messProvaider.joiningToInvaitatedMess(
                                               messId: joiningModel.messId, 
-                                              uId: authProvaider.getUserModel!.uId,
+                                              member: {
+                                                Constants.uId:authProvaider.getUserModel!.uId,
+                                                Constants.fname:authProvaider.getUserModel!.fname,
+                                                Constants.status:Constants.enable,
+                                                },
+                                              invaitationsId: joiningModel.invaitationId, 
+                                              status:JoiningStatus.joined,
                                               onFail: (message){
                                                 showSnackber(context: context, content: "Mess Joining Failed\n$message");
                                               }, 
                                               onSuccess: ()async{
-                                                
-                                                // change invaitation ststus
-                                                await messProvaider.changeJoiningInvaitationStatus(
-                                                  status: JoiningStatus.joined,
-                                                  invaitationsId: joiningModel.invaitationId,
-                                                  onFail: (message){
-                                                    showSnackber(context: context, content: "somthing Wrong-1\n$message");
-                                                  },
-                                                  uId: authProvaider.getUserModel!.uId,
-                                                );
-                                                
-                                                // update current mess id
-                                                debugPrint("assign mess id to member profile");
-                                                await messProvaider.assignMessIdToMemberProfile(
-                                                  memberUid: authProvaider.getUserModel!.uId, 
-                                                  messId: joiningModel.messId,
-                                                  onFail: (message){
-                                                    showSnackber(context: context, content: "somthing Wrong-2\n$message");
-                                                    debugPrint("assign");
-                                                  }, 
-                                                );
-                                                authProvaider.setUserModel(currentMessId: joiningModel.messId);
                                                 showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
+                                                authProvaider.setUserModel(currentMessId: joiningModel.messId);
                                                 setState(() {
                                                   
                                                 });
 
-                                              }
+                                              }, 
                                             );  
                                           }
                                           else

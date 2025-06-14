@@ -174,7 +174,6 @@ class _MessUpdateState extends State<MessUpdate> {
                               messAuthorityNumber: authorityPhoneController.text.toString(), 
                               messAuthorityEmail: authorityEmailController.text.toString(), 
                               messMemberList: [],
-                              disabledMemberList: [],
                             ),
                             onSuccess: (){
                               if(context.mounted){
@@ -208,18 +207,17 @@ class _MessUpdateState extends State<MessUpdate> {
     final messProvaider = context.read<MessProvaider>();
     
     if(messProvaider.getMessModel==null) return list;
-    for(String uid in messProvaider.getMessModel!.messMemberList){
+    for(Map<String,dynamic> member in messProvaider.getMessModel!.messMemberList){
       try {
         DocumentSnapshot documentSnapshot = await firebaseFirestore
           .collection(Constants.users)
-          .doc(uid)
+          .doc(member[Constants.uId])
           .get();
         if(documentSnapshot.exists){
           list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
-          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
-          if(messProvaider.getMessModel!.disabledMemberList.contains(uid)){
-            disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
-          }
+          if(member[Constants.status]==Constants.disable) disabledItems.add(member[Constants.uId]);
+          memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (member[Constants.uId],documentSnapshot[Constants.fname]);//(uid,name)
+          
         }
 
       

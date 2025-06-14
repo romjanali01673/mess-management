@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/meal_model.dart';
+import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/provaiders/meal_provaider.dart';
+import 'package:provider/provider.dart';
 
 class GroupMealList extends StatefulWidget {
   const GroupMealList({super.key});
@@ -9,46 +16,28 @@ class GroupMealList extends StatefulWidget {
   State<GroupMealList> createState() => _GroupMealListState();
 }
 
-bool leapYear(int year){
-  if(year % 4==0){ // if the yaer divisible by 4 that's mean it's can be leap year
-    if(year%100==0){ // if the year divisible by 100. it's should be divisible by 400 other wise it's not leep year.
-      return year%400==0;
-    }
-    // if the year are not divisible by 100 it's leep year.
-    return true;
-  }
-  return false;
-}
 
 
 class _GroupMealListState extends State<GroupMealList> {
+  bool showTotalMeal = false;
   int year = DateTime.now().year;
   TextEditingController dateController = TextEditingController(text: DateTime.now().year.toString());
   List<Map<String, List>> month = [
     
-    {"January" : [false, "January", 31]},
-    {"February" : [false, "February", 28]},
-    {"March" : [false, "March", 31]},
-    {"January" : [false, "April", 30]},
-    {"January" : [false, "May", 31]},
-    {"January" : [false, "January", 30]},
-    {"January" : [false, "January", 31]},
-    {"January" : [false, "January", 31]},
-    {"January" : [false, "January", 30]},
-    {"January" : [false, "January", 31]},
-    {"January" : [false, "January", 30]},
-    {"January" : [false, "January", 31]},
+    {"January" : [false, "January",1]},
+    {"January" : [false, "January",2]},
+    {"January" : [false, "January",3]},
+    {"January" : [false, "January",4]},
+    {"January" : [false, "January",5]},
+    {"January" : [false, "January",6]},
+    {"January" : [false, "January",7]},
+    {"January" : [false, "January",8]},
+    {"January" : [false, "January",9]},
+    {"January" : [false, "January",10]},
+    {"January" : [false, "January",11]},
+    {"January" : [false, "January",12]},
     //  "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
     ];
-  List<Map<String, List>> monthDay = [
-    
-    {"January" : [false, "January"]},
-    {"January" : [false, "January"]},
-    {"January" : [false, "January"]},
-    {"January" : [false, "January"]},
-    //  "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-    ];
-
 
   @override
   void dispose() {
@@ -58,15 +47,71 @@ class _GroupMealListState extends State<GroupMealList> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
+      // color: Colors.red,
+      // width: double.infinity,
+      // height: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          getMealList(),
+        ],
+      ),
+    );
+  }
+
+  Widget getMealList(){
+    final mealProvaider = context.read<MealProvaider>();
+    final authProvaider = context.read<AuthenticationProvider>();
+
+    return Expanded(
+      child: Column(
+        children: [
+          Card(
+            color: Colors.green.shade500,
+            child: ListTile(
+              trailing: IconButton(
+                onPressed: (){
+                  setState(() {
+                  showTotalMeal = !showTotalMeal;
+                    
+                  });
+                }, 
+                icon: showTotalMeal? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+              ),
+              title: 
+              showTotalMeal? 
+              FutureBuilder(
+                future: mealProvaider.getMealList(
+                  messId: authProvaider.getUserModel!.currentMessId,
+                  onFail: (message){
+                    showSnackber(context: context, content: "somthing Wrong! \n$message");
+                  },
+                ),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                    return Center(child: showCircularProgressIndicator());
+                  }
+                  else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                  } 
+                  else if (!snapshot.hasData || snapshot.data == null) {
+                      return Center(child: Text('No Transaction found.'));
+                }
+                  return Text("Total Mess Meal: ${mealProvaider.getTotalMealOfMess}",);
+                }
+              )
+              :
+              Text("tap to see Meal"),
+            ),
+          ),
           Row(
             children: [
+              
               RichText(
                 text: const TextSpan(
                   style: TextStyle(
@@ -85,7 +130,7 @@ class _GroupMealListState extends State<GroupMealList> {
                   child: TextField(
                     onTap: () async{
                       DateTime? date = await showDatePicker(
-                        // fieldHintText: "mm/dd/YYYY",
+                        fieldHintText: "mm/dd/YYYY",
                         fieldLabelText: "mm/dd/YYYY", // defalut "Enter Date"
                         context: context,
                         initialDate: DateTime.now(),
@@ -118,18 +163,18 @@ class _GroupMealListState extends State<GroupMealList> {
               ),
             ],
           ),
-
           Expanded(
             child: ListView(
               children: month.asMap().entries.map((val){
                 int index = val.key;
                 Map<String, List> monthName = val.value;
+                int days = getDaysInMonth(year,monthName[monthName.keys.first]![2]);
+                debugPrint(monthName[monthName.keys.first]![2].toString()+"-"+days.toString());
                 
                 return Card(
                   child: Column(
                     children: [
                       ListTile(
-                        
                         onTap: () {
                           monthName[monthName.keys.first]![0] = !monthName[monthName.keys.first]![0];
                           setState(() {
@@ -140,44 +185,82 @@ class _GroupMealListState extends State<GroupMealList> {
                           }
                           else{
                             debugPrint("Hello romjan how are you?-----");
-                      
                           }
                         },
-                        title: Text("${monthName.keys}"),
+                        title: Text("${monthName[monthName.keys.first]![1]}"),
                         subtitle: Text("$year"),
                         leading: CircleAvatar(
                           child: Text("${index+1}"),
                         ),
                         trailing: monthName[monthName.keys.first]![0] ? Icon(Icons.arrow_drop_down_rounded) : Icon(Icons.arrow_right),
                       ),
-                      if(monthName[monthName.keys.first]![0])...[ // if user has clicked in this row either show the data of this row and close
-                        SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: Column(
-                            // here nexted listview. because we can't use nexted listview with out fixed sized that's why we have to use this method for unfixed size. 
-                            children: List.generate(monthName[monthName.keys.first]![2], (index) {//(length,(index){})
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    title: ListTile(
+                      if(monthName[monthName.keys.first]![0]) ...List.generate(
+                        days, (x){
+                          bool canSee = false;
+                          return StatefulBuilder(
+                            builder: ( context,setLocalState){
+                              return Card(
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text("${x+1}-${monthName[monthName.keys.first]![1]}"),
                                       onTap: () {
-                                        
+                                        canSee = !canSee;
+                                        setLocalState(() {
+                                          
+                                        });
                                       },
-                                      title: Text("Day ${index+1}"),
                                     ),
-                                  ),
-                                  Column(
-                                    children: List.generate(monthName[monthName.keys.first]![2], (index) {
-                                      return Text("romjan-3");
-                                      
-                                    })
-                                  )
-                                ],
+                                    if(canSee)...[
+                                      FutureBuilder(
+                                        future: mealProvaider.checkMealModelExist(
+                                          messId: authProvaider.getUserModel!.currentMessId, 
+                                          date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
+                                          onFail: (message){
+                                            showSnackber(context: context, content: "somthing Wrong \n $message");
+                                          },
+                                        ), 
+                                        builder: (context, AsyncSnapshot<MealModel?> snapshot){
+                                          if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                                            return Center(child: showCircularProgressIndicator());
+                                          }
+                                          else if (snapshot.hasError) {
+                                            return Center(child: Text('Error: ${snapshot.error}'));
+                                          } 
+                                          else if (!snapshot.hasData || snapshot.data == null) {
+                                            return Center(child: Text('No Transaction found.'));
+                                          }
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              ...List.generate(snapshot.data!.listOfMeal.length, (no){
+                                                return ListTile(
+                                                  leading: Text("${no+1}"),
+                                                  title: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text("Name: " + snapshot.data!.listOfMeal[no][Constants.fname].toString()),
+                                                      Text("UId: " + snapshot.data!.listOfMeal[no][Constants.uId].toString()),
+                                                      Text("Meal : " + snapshot.data!.listOfMeal[no][Constants.meal].toString()),
+                                                    ],
+                                                  ),
+                                                );
+                                              }),
+                                              Text("Total Meal: "+ snapshot.data!.totalMeal.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
+                                              Text("Meal Day: "+snapshot.data!.date.toString()),
+                                              Text("Entry Time: "+ "${DateFormat("hh:mm a dd-MM-yyyy").format(snapshot.data!.CreatedAt!.toDate().toLocal())}"),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ]
+                                  ],
+                                ),
                               );
-                            }),
-                          ),
-                        ),
-                      ]
+                            },
+                          );
+                        }    
+                      ),
                     ],
                   ),
                 );
@@ -188,4 +271,6 @@ class _GroupMealListState extends State<GroupMealList> {
       ),
     );
   }
+
+
 }
