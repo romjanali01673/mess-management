@@ -9,6 +9,7 @@ import 'package:meal_hisab/firebase_options.dart';
 import 'package:meal_hisab/home.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
 import 'package:meal_hisab/provaiders/bazer_provaider.dart';
+import 'package:meal_hisab/provaiders/deposit_provaider.dart';
 import 'package:meal_hisab/provaiders/fand_provaider.dart';
 import 'package:meal_hisab/provaiders/meal_provaider.dart';
 import 'package:meal_hisab/provaiders/mess_provaider.dart';
@@ -27,9 +28,10 @@ void main()async{
     MultiProvider(
       providers: [
         // add all provaider here
-        ChangeNotifierProvider(create: (_)=>FandProvaider()),
-        ChangeNotifierProvider(create: (_)=>MealProvaider()),
-        ChangeNotifierProvider(create: (_)=>BazerProvaider()),
+        ChangeNotifierProvider(create: (_) => FandProvaider()),
+        ChangeNotifierProvider(create: (_) => DepositProvaider()),
+        ChangeNotifierProvider(create: (_) => MealProvaider()),
+        ChangeNotifierProvider(create: (_) => BazerProvaider()),
         ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
         ChangeNotifierProvider(create: (_) =>  MessProvaider()),
       ],

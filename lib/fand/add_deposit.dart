@@ -13,14 +13,14 @@ import 'package:meal_hisab/provaiders/fand_provaider.dart';
 import 'package:meal_hisab/provaiders/mess_provaider.dart';
 import 'package:provider/provider.dart';
 
-class AddDiposite extends StatefulWidget {
-  const AddDiposite({super.key});
+class AddDeposit extends StatefulWidget {
+  const AddDeposit({super.key});
 
   @override
-  State<AddDiposite> createState() => _AddDipositeState();
+  State<AddDeposit> createState() => _AddDepositState();
 }
 
-class _AddDipositeState extends State<AddDiposite> {
+class _AddDepositState extends State<AddDeposit> {
   final formKey = GlobalKey<FormState>();
 
   FocusNode focusTitle = FocusNode();
@@ -83,6 +83,11 @@ class _AddDipositeState extends State<AddDiposite> {
 
     FandProvaider fandProvaider = context.watch<FandProvaider>();
     AuthenticationProvider authProvaider = context.read<AuthenticationProvider>();
+    MessProvaider messProvaider = context.read<MessProvaider>();
+
+    if(!(amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider)||amIactmenager(messProvaider: messProvaider, authProvaider: authProvaider))){
+      return Center(child: Text("Required Administrator Power"));
+    }
     
     return Expanded(
       child: Container(
@@ -143,7 +148,7 @@ class _AddDipositeState extends State<AddDiposite> {
                     },
                     decoration: FromFieldDecoration(
                       hintText: "Write Details about",
-                      label: "Description",
+                      label: "Description (Optional)",
                     )
                   ),
                 ),

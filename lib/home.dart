@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/bazer/bazer_screen.dart';
 import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/diposite/diposite.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/setting/edit_info.dart';
+import 'package:meal_hisab/deposit/deposit.dart';
 import 'package:meal_hisab/fand/fand.dart';
 import 'package:meal_hisab/meal/meal.dart';
 import 'package:meal_hisab/member/member_screen.dart';
@@ -127,11 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             getItems(icon: Icons.assessment, 
-              label: "Diposite",
-              selected: DrawerItemGroup==DrawerItem.Diposite, 
+              label: "Deposit",
+              selected: DrawerItemGroup==DrawerItem.Deposit, 
               ontap: () {
                 Navigator.pop(context);
-                DrawerItemGroup=DrawerItem.Diposite;
+                DrawerItemGroup=DrawerItem.Deposit;
                 setState(() {
                 
                 });
@@ -202,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
       :
       DrawerItemGroup == DrawerItem.Settings ? SettingScreen()
       :
-      DrawerItemGroup == DrawerItem.Diposite ? DipositeScreen()
+      DrawerItemGroup == DrawerItem.Deposit ? DepositScreen()
       :
       DrawerItemGroup == DrawerItem.Mess ? MessScreen()
       :

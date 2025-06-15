@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/fand/add_cost.dart';
-import 'package:meal_hisab/fand/add_diposite.dart';
+import 'package:meal_hisab/fand/add_deposit.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/fand_model.dart';
 import 'package:meal_hisab/provaiders/authantication_provaider.dart';
@@ -48,15 +48,15 @@ class _FandScreenState extends State<FandScreen> {
                     ),
                     getMenuItems(
                       icon: Icons.add_box_rounded,
-                      label: "Add Diposite", 
+                      label: "Add Deposit", 
                       ontap: (){
-                        fandItemGroup = Fand.addDiposite;
+                        fandItemGroup = Fand.addDeposit;
                         setState(() {
                           
                         });
                             
                       },
-                      selected: fandItemGroup == Fand.addDiposite,
+                      selected: fandItemGroup == Fand.addDeposit,
                     ),
                     getMenuItems(
                       icon: FontAwesomeIcons.circleMinus,
@@ -74,7 +74,7 @@ class _FandScreenState extends State<FandScreen> {
                 ),
               ),
             ),
-            fandItemGroup==Fand.addDiposite? AddDiposite() 
+            fandItemGroup==Fand.addDeposit? AddDeposit() 
             :
             fandItemGroup==Fand.addCost? AddCost()
             :

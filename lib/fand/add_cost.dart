@@ -93,7 +93,7 @@ class _AddCostState extends State<AddCost> {
                     },
                     decoration: FromFieldDecoration(
                       hintText: "Write Details about",
-                      label: "Description",
+                      label: "Description (optional)",
                     )
                   ),
                 ),

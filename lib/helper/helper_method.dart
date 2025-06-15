@@ -161,12 +161,15 @@ String? validatePrice(String value){
   if(value.toString().trim()==""){
     return "Enter price";
   }
-  int pr=0;
-    try{
-      pr = int.parse(value.toString().trim());
-    }catch (e){
-      return "Invalid Price";
-    }
+  double pr=0;
+  try{
+    pr = double.parse(value.toString().trim());
+  }catch (e){
+    return "Invalid Price";
+  }
+  if(pr<0){
+    return "Argument Can't be Negetive";
+  }
   return null;
 }
 

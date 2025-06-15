@@ -68,6 +68,12 @@ class Constants {
   static const String sub = "sub";
   static const String blance = "blance";
 
+  //deposit
+  static const String listOfDepositTransactions = "listOfDepositTransactions";
+  static const String deposit = "deposit";
+  static const String refund = "refund";
+  
+
 
   //
   static const String invaitations = "invaitations";
@@ -96,6 +102,8 @@ class Constants {
 
   
   static const String entryTime = "entryTime";
+  static const String userData = "userData";
+
 
 
 
@@ -112,7 +120,7 @@ enum NoticeAndAnnouncement{
 }
 enum Fand{
   fand,
-  addDiposite,
+  addDeposit,
   addCost,
 }
 enum DrawerItem{
@@ -124,7 +132,7 @@ enum DrawerItem{
   Bazer,
   Mess,
   Settings,
-  Diposite,
+  Deposit,
 }
 
 enum Meal{
@@ -134,13 +142,13 @@ enum Meal{
   memberMealList,
 }
 
-enum Diposite{
-  myDiposite,
-  addDiposite,
+enum Deposit{
+  myDeposit,
+  addDeposit,
   refund,
-  historyOfDiposite
+  historyOfDeposit
 }
-enum HistoryOfDiposite{
+enum HistoryOfDeposit{
   memberWise,
   allHostory,
 }
