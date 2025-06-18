@@ -5,7 +5,7 @@ import 'package:meal_hisab/model/bazer_model.dart';
 import 'package:meal_hisab/model/meal_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
 
-class MealProvaider extends ChangeNotifier{
+class MealProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
@@ -34,6 +34,14 @@ class MealProvaider extends ChangeNotifier{
   double get getTotalMeal => _totalMeal;
   double get getTotalMealOfMess => _totalMealOfMess;
   List get getListOfMember => _listOfmember!;
+
+  void reset(){
+    _mealModel = null;
+  }
+
+
+
+
   // function -----------
 
   // get member data

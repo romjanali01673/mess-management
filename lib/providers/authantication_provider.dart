@@ -69,11 +69,15 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reset(){
+    setSignedIn(val: false);
+    _userModel = null;
+  }
+
 
 
   // function here ---------------------------------------
   
-
 
   // store uid to firestore
   // authToken we will get from userCurdential.user!.uid
@@ -116,6 +120,20 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  // get a spacific user data
+  Future<UserModel?> getMemberData({required String uId})async{
+    try {
+        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
+      if(snapshot.exists && snapshot.data()!=null){
+        _userModel = UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+        return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+      }
+    } catch (e) {
+      e.toString();
+    }
+    return null;
+  }
+
   // set session key to firestore
   Future<void> setSessionKey({required Function(String) onFail,Function()? onSuccess})async{
     try {
@@ -155,6 +173,28 @@ class AuthenticationProvider extends ChangeNotifier {
     return true;
   }
 
+  // change password
+  Future<void> changePassword({required String currentPass, required String newPass, Function()? onSuccess, required Function(String) onFail})async{
+    setLoading(val: true);
+    try {
+      await Future.delayed(Duration(seconds: 3));
+      bool valid = await checkUserIsValid(email: getUserModel!.email, password: currentPass);
+      if(valid){
+        debugPrint("valid data");
+        await firebaseAuth.currentUser!.updatePassword(newPass);
+        onSuccess!=null? onSuccess(): (){};
+      }
+      else{
+        onFail("Wrong Password!");
+      }
+    } catch (e) {
+      setLoading(val: false);
+      onFail(e.toString());
+    }
+    debugPrint("done");
+    setLoading(val: false);
+  }
+
 
   // check user exist
   Future<bool> getUserProfileData({required Function(String) onFail})async{
@@ -184,22 +224,64 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   // signIn with email and password
-  Future<UserCredential?> signInWithEmailAndPassword({required String email, required String password,required Function(String) onFail})async{
-
+  Future<UserCredential?> signInWithEmailAndPassword({required String email, required String password,required Function(String) onFail, Function()? onSuccess})async{
     UserCredential? userCredential;
     try {
       userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       //"firebaseAuth.currentUser!.uid" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout.
-      
-    }on FirebaseException catch(e){
-      if(e.toString()=="user-not-found"){
+      onSuccess!= null? onSuccess():(){};
+    } on FirebaseAuthException catch(e) {
+      if(e.code == 'user-not-found') {
         onFail("User Not Found");
+      } else if(e.code == 'wrong-password') {
+        onFail("Wrong Password");
+      } else {
+        onFail( "Wrong Email or Password\n" + e.message.toString());
       }
-      else onFail(e.toString());
     }catch (e) {
       onFail(e.toString());
     }
     return userCredential;
+  }
+
+  // signIn with email and password
+  Future<bool> checkUserIsValid({required String email, required String password,Function(String)? onFail, Function()? onSuccess})async{
+    UserCredential? userCredential;
+    try {
+      userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      if(onFail!=null){
+        onFail(e.toString());
+      }
+      return false; 
+    }
+
+    if(userCredential!=null && userCredential.user != null){
+      return true;
+    }
+    return false;
+  }
+
+  // delete usr pre auth account
+  Future<bool> deletePreAuthAccount({required String email, required String password,required Function(String) onFail, Function()? onSuccess})async{
+    try {
+      await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      await firebaseAuth.currentUser!.delete();
+      onSuccess!= null? onSuccess():(){};
+      return true;
+    } on FirebaseAuthException catch(e) {
+      if(e.code == 'user-not-found') {
+        onFail("User Not Found");
+      } else if(e.code == 'wrong-password') {
+        onFail("Wrong Password");
+      } else {
+        onFail( "Wrong Email or Password\n" + e.message.toString());
+      }
+    }catch (e) {
+      onFail(e.toString());
+    }
+    return false;
   }
 
 
@@ -255,6 +337,168 @@ class AuthenticationProvider extends ChangeNotifier {
     }
     setLoading(val: false);
   }
+
+
+
+  // update user data from Firestore database
+  // and update user name to current mess in member list.
+  Future<void> updateUserDataToFireStore({
+    required UserModel currentUser,
+    required File? fileImage,
+    required Function() onSuccess,
+    required Function(String) onFail,
+  })async{
+    final batch = firebaseFirestore.batch();
+    
+    try{
+      if(fileImage!=null){
+        // upload image to firestore storage and  assign the given link in currentUser
+        String imageUrl = await storeFileImageToStorage(
+          ref: "${Constants.userImages}/$_uId",
+          file: fileImage,
+          onFail: (val){
+            // image up failed
+          }
+        );
+        currentUser.image = imageUrl;
+      } 
+
+      _userModel = currentUser;
+
+      // get my current data in my mess
+      Map<String, dynamic> myCurrentDataInMess = {};
+      Map<String, dynamic> myWantedDataInMess = {
+        Constants.fname : currentUser.fname,
+        Constants.uId : currentUser.uId,
+      };
+      DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.mess).doc(currentUser.currentMessId).get(); 
+      if(snapshot.exists && snapshot.data()!= null){
+        (((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]) as List<dynamic>).map((x){
+          if(x[Constants.uId]==currentUser.uId){
+      debugPrint(((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]).toString());
+
+            myWantedDataInMess[Constants.status] = x[Constants.status];
+            myCurrentDataInMess = x ;
+          }
+        }).toList();
+      }
+
+      // update data to firestore
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(currentUser.uId),
+        
+        currentUser.toMap()
+      );
+
+      // delete current data from mess
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(currentUser.currentMessId),        
+        {Constants.messMemberList : FieldValue.arrayRemove([myCurrentDataInMess])}
+      );
+
+      // add new data to mess
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(currentUser.currentMessId),        
+        {Constants.messMemberList : FieldValue.arrayUnion([myWantedDataInMess])}
+      );
+
+
+      await batch.commit();
+
+      onSuccess();
+
+    }catch(e){
+        onFail(e.toString());
+        debugPrint(e.toString());
+        setLoading(val: false);
+    }
+    setLoading(val: false);
+  }
+
+
+  // update user data from Firestore database
+  // and update user name to current mess in member list.
+  Future<void> updateMemberEmail({
+    required String preEmail,
+    required String email,
+    required String password,
+    Function()? onSuccess,
+    required Function(String) onFail,
+  })async{
+    final batch = firebaseFirestore.batch();
+    // create a user account in authentication
+    setLoading(val:true);
+    String preAuthToken = firebaseAuth.currentUser!.uid;
+
+    UserCredential? userCredential;
+    userCredential = await signInWithEmailAndPassword(email: getUserModel!.email, password: password, onFail:onFail);
+    if(userCredential!=null && userCredential.user !=null){
+      userCredential = null;
+      try {
+        userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+      } catch (e) {
+        setLoading(val: false);
+        onFail(e.toString());
+        notifyListeners();
+      }
+
+      if(userCredential!=null && userCredential.user != null){
+        try{
+          // delete pre authToken from uid
+          batch.delete(
+            firebaseFirestore
+            .collection(Constants.uId)
+            .doc(preAuthToken)
+          );
+
+          // set new authToken in uid
+          batch.set(
+            firebaseFirestore
+            .collection(Constants.uId)
+            .doc(userCredential.user!.uid), // as auth tocken
+            
+            {Constants.uId : getUserModel!.uId}
+          );
+
+
+          // set new email in firestore
+          batch.update(
+            firebaseFirestore
+            .collection(Constants.users)
+            .doc(getUserModel!.uId),        
+            {Constants.email : email}
+          );
+
+        
+
+          await batch.commit();
+          setUserModel(email: email);
+
+          await deletePreAuthAccount(email: preEmail, password: password, onFail: (_){});
+          await firebaseAuth.signOut();
+          await signInWithEmailAndPassword(email: email, password: password, onFail: (_){});
+          onSuccess!= null ?onSuccess():(){};
+
+        }catch(e){
+            onFail(e.toString());
+            debugPrint(e.toString());
+            setLoading(val: false);
+        }         
+      }
+
+    } 
+    setLoading(val: false);
+  }
+
 
   // store file to firebase storage
   Future<String> storeFileImageToStorage({

@@ -8,9 +8,8 @@ import 'package:meal_hisab/meal/Member_meal_list.dart';
 import 'package:meal_hisab/meal/group_meal_list.dart';
 import 'package:meal_hisab/meal/meal_entry.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/meal_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
 import 'package:provider/provider.dart';
 
 class MealScreen extends StatefulWidget {
@@ -66,7 +65,7 @@ class _MealScreenState extends State<MealScreen> {
             child: Row(
               children: [
                 getMenuItems(
-                  label: "Meal List", 
+                  label: "My Meal List", 
                   ontap: (){
                     mealGroup = Meal.mealList;
                     setState(() {
@@ -122,16 +121,16 @@ class _MealScreenState extends State<MealScreen> {
           mealGroup ==Meal.memberMealList?
           MemberMealList()
           :
-          getMealList(),// defalut page or home page
+          getMyMealList(),// defalut page or home page
 
         ],
       ),
     );
   }
 
-  Widget getMealList(){
-    final mealProvaider = context.read<MealProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+  Widget getMyMealList(){
+    final mealProvider = context.read<MealProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -151,8 +150,8 @@ class _MealScreenState extends State<MealScreen> {
               title: 
               showTotalMeal? 
               FutureBuilder(
-                future: mealProvaider.getMealList(
-                  messId: authProvaider.getUserModel!.currentMessId,
+                future: mealProvider.getMealList(
+                  messId: authProvider.getUserModel!.currentMessId,
                   onFail: (message){
                     showSnackber(context: context, content: "somthing Wrong! \n$message");
                   },
@@ -167,7 +166,7 @@ class _MealScreenState extends State<MealScreen> {
                   else if (!snapshot.hasData || snapshot.data == null) {
                       return Center(child: Text('No Transaction found.'));
                 }
-                  return Text("Total Meal: ${mealProvaider.getTotalMeal}",);
+                  return Text("Total Meal: ${mealProvider.getTotalMeal}",);
                 }
               )
               :
@@ -177,9 +176,9 @@ class _MealScreenState extends State<MealScreen> {
          
           Expanded(
             child: FutureBuilder(
-              future: mealProvaider.getAllMealListOfAMember(
-                messId: authProvaider.getUserModel!.currentMessId, 
-                uId: authProvaider.getUserModel!.uId, 
+              future: mealProvider.getAllMealListOfAMember(
+                messId: authProvider.getUserModel!.currentMessId, 
+                uId: authProvider.getUserModel!.uId, 
                 onFail: (_){},
               ),
               builder: (context, AsyncSnapshot<List<Map<String,dynamic>>?> snapshot) {

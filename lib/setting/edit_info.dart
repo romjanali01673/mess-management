@@ -5,7 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/home.dart';
+import 'package:meal_hisab/model/user_model.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/services/asset_manager.dart';
+import 'package:provider/provider.dart';
 
 class EditInfo extends StatefulWidget {
   const EditInfo({super.key});
@@ -15,18 +18,55 @@ class EditInfo extends StatefulWidget {
 }
 
 class _EditInfoState extends State<EditInfo> {
+  TextEditingController nameContriller = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneContriller = TextEditingController();
+  TextEditingController addressContriller = TextEditingController();
+
+
   GlobalKey<FormState> FormKey = GlobalKey<FormState>();
   bool checked = false;
-  String Fname="";
-  String Phone="";
-  String Email="";
+  
 
   File? finalFileImage;
 
 
-  void updateInfo(){
-    if(FormKey.currentState!.validate()){
+  @override
+  void dispose() {
+    nameContriller.dispose();
+    addressContriller.dispose();
+    emailController.dispose();
+    phoneContriller.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
 
+  void updateInfo()async{
+    final authProvider = context.read<AuthenticationProvider>();
+
+    if(FormKey.currentState!.validate() && checked){
+      await authProvider.updateUserDataToFireStore(
+        currentUser: UserModel(
+          uId: authProvider.getUserModel!.uId, 
+          email: authProvider.getUserModel!.email, 
+          image: '', 
+          number: phoneContriller.text.toString(), 
+          sessionKey: authProvider.getUserModel!.sessionKey, 
+          currentMessId: authProvider.getUserModel!.currentMessId, 
+          fullAddress: addressContriller.text.toString(), 
+          fname: nameContriller.text.toString(),
+        ), 
+        fileImage: finalFileImage, 
+        onSuccess: (){
+          showSnackber(context: context, content: "Update Successfully");
+          setState(() {
+            
+          });
+        }, 
+        onFail: (message){
+          showSnackber(context: context, content: "Update Failed!\nTry Again.");
+        }
+      );
     }
   }
 
@@ -81,212 +121,242 @@ class _EditInfoState extends State<EditInfo> {
   
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthenticationProvider>();
     return Scaffold(
         appBar: AppBar(
 
         ),
         
-        body: Container(
-          child: Column(
-            children: [
-              Form(
-                key: FormKey,
-                child: Column(
-                  children: [
-            
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
-                        ),
-                        Checkbox(
-                          value: checked, 
-                          onChanged: (val){
-                          setState(() {
-                            checked = !checked;
-                          });
-                        }),
-                      ],
-                    ),
+        body: FutureBuilder(
+          future: authProvider.getMemberData(uId: authProvider.getUserModel!.uId),
+          builder: (context, AsyncSnapshot<UserModel?> snapshot) { 
+            if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+              return Center(child: showCircularProgressIndicator());
+            }
+            else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } 
+            else if (!snapshot.hasData || snapshot.data == null) {
+              return Center(child: Text('Data Not Found'));
+            }
+            phoneContriller.text = snapshot.data!.number;
+            emailController.text = snapshot.data!.email;
+            nameContriller.text = snapshot.data!.fname;
+            addressContriller.text = snapshot.data!.fullAddress;
+
+            return Column(
+              children: [
+                Form(
+                  key: FormKey,
+                  child: Column(
+                    children: [
               
-                    finalFileImage!=null?
-                    Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 50,
-                              foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.black,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border : Border.all(color: Colors.white, width: 2),
-                                  color: Colors.lightBlue,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                  onPressed: () {
-                                    // pick image from camera or galery
-                                      showImagePickerDialog();
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                          )
-                          :
-                          Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 50,
-                              foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.black,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border : Border.all(color: Colors.white, width: 2),
-                                  color: Colors.lightBlue,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                  onPressed: () {
-                                    // pick image from camera or galery
-                                    setState(() {
-                                      showImagePickerDialog();
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
                           ),
-                    
-                   Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.grey.shade300,
-                                          border: Border(bottom: BorderSide(color: Colors.black))
-                                        ),
-                                        margin: EdgeInsets.all(10),
-                                        child: TextFormField(
-                                          enabled: checked,
-                                          onChanged: (value){
-                                            Fname = value.trim();
-                                          },
-                                          validator: (value) {
-                                            if(Fname.length<4){
-                                              return "Name should Contain at least 4 character";
-                                            }
-                                            return null;
-                                          },
-                                          keyboardType: TextInputType.text,
-                                          textInputAction: TextInputAction.next,
-                                          decoration: InputDecoration(
-                                            label: Text("Full Name"),
-                                            border: InputBorder.none,
-                              
+                          Checkbox(
+                            value: checked, 
+                            onChanged: (val){
+                            setState(() {
+                              checked = !checked;
+                            });
+                          }),
+                        ],
+                      ),
+                
+                      finalFileImage!=null?
+                      Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.black,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border : Border.all(color: Colors.white, width: 2),
+                                    color: Colors.lightBlue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                    onPressed: () {
+                                      // pick image from camera or galery
+                                        showImagePickerDialog();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                            )
+                            :
+                            Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.black,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border : Border.all(color: Colors.white, width: 2),
+                                    color: Colors.lightBlue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                    onPressed: () {
+                                      // pick image from camera or galery
+                                      setState(() {
+                                        showImagePickerDialog();
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                            ),
+                      
+                     Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.grey.shade300,
+                                            border: Border(bottom: BorderSide(color: Colors.black))
+                                          ),
+                                          margin: EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            controller: nameContriller,
+                                            enabled: checked,
+                                            
+                                            
+                                            validator: (value) {
+                                              return nameValidator(value.toString());
+                                            },
+                                            keyboardType: TextInputType.text,
+                                            textInputAction: TextInputAction.next,
+                                            decoration: InputDecoration(
+                                              label: Text("Full Name"),
+                                              border: InputBorder.none,
+                                
+                                            ),
                                           ),
                                         ),
-                                      ),
-                        
-                   Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.grey.shade300,
-                                          border: Border(bottom: BorderSide(color: Colors.black))
-                                        ),
-                                        margin: EdgeInsets.all(10),
-                                        child: TextFormField(
-                                          enabled: checked,
-                                          onChanged: (value){
-                                            Email = value.trim();
-                                          },
-                                          validator: (value) {
-                                            if (value == null || value.isEmpty) {
-                                              return 'Email is required';
-                                            }
-                                            final pattern = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                                            if (!pattern.hasMatch(value)) {
-                                              return 'Enter a valid email';
-                                            }
-                                            return null;
-                                          },
-                                          keyboardType: TextInputType.text,
-                                          textInputAction: TextInputAction.next,
-                                          decoration: InputDecoration(
-                                            label: Text("Email"),
-                                            border: InputBorder.none,
-                              
+                          
+                     Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.grey.shade300,
+                                            border: Border(bottom: BorderSide(color: Colors.black))
+                                          ),
+                                          margin: EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            controller: emailController,
+                                            enabled: false,
+                                            
+                                            validator: (value) {
+                                              return emailValidator(value.toString());
+                                            },
+                                            keyboardType: TextInputType.text,
+                                            textInputAction: TextInputAction.next,
+                                            decoration: InputDecoration(
+                                              label: Text("Email"),
+                                              border: InputBorder.none,
+                                
+                                            ),
                                           ),
                                         ),
-                                      ),
-                   Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: Colors.grey.shade300,
-                                          border: Border(bottom: BorderSide(color: Colors.black))
-                                        ),
-                                        margin: EdgeInsets.all(10),
-                                        child: TextFormField(
-                                          
-                                          enabled: checked,
-                                          onChanged: (value){
-                                            Phone = value.trim();
-                                          },
-                                          validator: (value) {
-                                            // ^(?:\+88|88)? → allows optional country code +88 or 88.
-                                            // 01[2-9] → valid operator codes (e.g., 013 to 019).
-                                            // \d{8}$ → exactly 8 digits after the operator code (total 11 digits).
-                                            final pattern = RegExp(r'^(?:\+88|88)?01[2-9]\d{8}$');
-                                            if (value == null || value.isEmpty) {
-                                              return 'Phone number is required';
-                                            }
-                                            if(!pattern.hasMatch(value.toString())){
-                                              return "Enter Valid Phone Number";
-                                            }
-                                            return null;
-                                          },
-                                          keyboardType: TextInputType.number,
-                                          textInputAction: TextInputAction.next,
-                                          decoration: InputDecoration(
-                                            label: Text("Phone"),
-                                            border: InputBorder.none,
-                                            hintText: "Enter Your Phone With Country Code"
+                     Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.grey.shade300,
+                                            border: Border(bottom: BorderSide(color: Colors.black))
+                                          ),
+                                          margin: EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            controller: phoneContriller,
+                                            enabled: checked,
+                                            
+                                            validator: (value) {
+                                              // ^(?:\+88|88)? → allows optional country code +88 or 88.
+                                              // 01[2-9] → valid operator codes (e.g., 013 to 019).
+                                              // \d{8}$ → exactly 8 digits after the operator code (total 11 digits).
+                                              final pattern = RegExp(r'^(?:\+88|88)?01[2-9]\d{8}$');
+                                              if (value == null || value.isEmpty) {
+                                                return 'Phone number is required';
+                                              }
+                                              if(!pattern.hasMatch(value.toString())){
+                                                return "Enter Valid Phone Number";
+                                              }
+                                              return null;
+                                            },
+                                            keyboardType: TextInputType.number,
+                                            textInputAction: TextInputAction.next,
+                                            decoration: InputDecoration(
+                                              label: Text("Phone"),
+                                              border: InputBorder.none,
+                                              hintText: "Enter Your Phone With Country Code"
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 40,
-                                      ),
-                                      getButton(label: "Update", ontap: (){
-                                        updateInfo();
-                                      }),
-                  ],
+                      
+                     Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.grey.shade300,
+                                            border: Border(bottom: BorderSide(color: Colors.black))
+                                          ),
+                                          margin: EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            controller: addressContriller,
+                                            enabled: checked,
+                                           
+                                            validator: (value) {
+                                              return addressValidator(value.toString());
+                                            },
+                                            keyboardType: TextInputType.text,
+                                            textInputAction: TextInputAction.next,
+                                            decoration: InputDecoration(
+                                              label: Text("Full Address"),
+                                              border: InputBorder.none,
+                                
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 40,
+                                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+                getButton(label: "Update", ontap: (){
+                  updateInfo();
+                }),
+              ],
+            );
+          }
         ),
     );
   }

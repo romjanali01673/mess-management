@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class NoticeAndAnnouncementScreen extends StatefulWidget {
@@ -35,8 +35,8 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
   @override
   Widget build(BuildContext context) {
     bool show_comment = false;
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
 
     return Scaffold(
       body: Stack(
@@ -361,7 +361,7 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
               ],
             ),
           ),
-          (amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider) || amIactmenager(messProvaider: messProvaider, authProvaider: authProvaider))?
+          (amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))?
           Positioned(
             left: posX,
             top: posY,

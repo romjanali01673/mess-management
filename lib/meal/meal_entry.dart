@@ -5,9 +5,9 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/meal_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MealEntryScreen extends StatefulWidget {
@@ -38,9 +38,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mealProvaider  = context.watch<MealProvaider>();
-    final messProvaider  = context.read<MessProvaider>();
-    final authProvaider  = context.watch<AuthenticationProvider>();
+    final mealProvider  = context.watch<MealProvider>();
+    final messProvider  = context.read<MessProvider>();
+    final authProvider  = context.watch<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -84,11 +84,11 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
           ),
           Expanded(
             child: FutureBuilder(
-              future:messProvaider.getMessData(
+              future:messProvider.getMessData(
                 onFail: (message) { 
                   showSnackber(context: context, content: message);
                 },
-                messId: authProvaider.getUserModel!.currentMessId,
+                messId: authProvider.getUserModel!.currentMessId,
                 isDisposed: ()=> _isDisposed,
                 onSuccess: (){
                   debugPrint("get mess data successfull.");
@@ -99,11 +99,11 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                 return Center(child: CircularProgressIndicator());
               }
               
-              else if (messProvaider.getMessModel==null ||messProvaider.getMessModel!.messMemberList.isEmpty ) {
+              else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
                 return Center(child: Text('No member found.'));
               }
 
-              List data = messProvaider.getMessModel!.messMemberList;
+              List data = messProvider.getMessModel!.messMemberList;
 
                 
               // // set here the list of meal.
@@ -130,8 +130,8 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                           }
                           MealModel? m;
                           bool failed = false;
-                          m = await mealProvaider.checkMealModelExist(
-                            messId: authProvaider.getUserModel!.currentMessId, 
+                          m = await mealProvider.checkMealModelExist(
+                            messId: authProvider.getUserModel!.currentMessId, 
                             date: DateFormat("dd-MM-yyyy").format(date!), 
                             onFail: (message){
                               showSnackber(context: context, content: message);
@@ -159,9 +159,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                             );
                             print(mealModel.toMap());
 
-                            mealProvaider.addAMeal(
+                            mealProvider.addAMeal(
                               mealModel: mealModel, 
-                              messId: authProvaider.getUserModel!.currentMessId, 
+                              messId: authProvider.getUserModel!.currentMessId, 
                               onFail: (message){
                                 showSnackber(context: context, content: message);
                               },

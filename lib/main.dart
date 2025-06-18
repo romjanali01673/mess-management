@@ -7,12 +7,12 @@ import 'package:meal_hisab/authantication/sign_in.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/firebase_options.dart';
 import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/bazer_provaider.dart';
-import 'package:meal_hisab/provaiders/deposit_provaider.dart';
-import 'package:meal_hisab/provaiders/fand_provaider.dart';
-import 'package:meal_hisab/provaiders/meal_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/bazer_provider.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 // void main() {
@@ -27,13 +27,13 @@ void main()async{
   runApp(
     MultiProvider(
       providers: [
-        // add all provaider here
-        ChangeNotifierProvider(create: (_) => FandProvaider()),
-        ChangeNotifierProvider(create: (_) => DepositProvaider()),
-        ChangeNotifierProvider(create: (_) => MealProvaider()),
-        ChangeNotifierProvider(create: (_) => BazerProvaider()),
+        // add all provider here
+        ChangeNotifierProvider(create: (_) => FandProvider()),
+        ChangeNotifierProvider(create: (_) => DepositProvider()),
+        ChangeNotifierProvider(create: (_) => MealProvider()),
+        ChangeNotifierProvider(create: (_) => BazerProvider()),
         ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-        ChangeNotifierProvider(create: (_) =>  MessProvaider()),
+        ChangeNotifierProvider(create: (_) => MessProvider()),
       ],
       child: const MyApp(),
     )

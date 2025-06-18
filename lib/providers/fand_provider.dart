@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/model/fand_model.dart';
 
-class FandProvaider extends ChangeNotifier{
+class FandProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
@@ -29,6 +29,12 @@ class FandProvaider extends ChangeNotifier{
   bool get isLoading => _isLoading;
   FandModel? get getFandModel => _fandModel;
   double get getBlance => _blance;
+
+
+  void reset(){
+    _fandModel = null;
+  }
+
 
   // function -----------
 

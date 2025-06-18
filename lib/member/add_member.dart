@@ -6,8 +6,8 @@ import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/joining_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddMemberScreen extends StatefulWidget{
@@ -32,8 +32,8 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
   }
   @override
   Widget build(BuildContext context){
-    final messProvaider = context.watch<MessProvaider>();
-    final authProvaider = context.watch<AuthenticationProvider>();
+    final messProvider = context.watch<MessProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -89,7 +89,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                           ),
                     ),
                   ),
-                  messProvaider.isLoading? CircularProgressIndicator() 
+                  messProvider.isLoading? CircularProgressIndicator() 
                   : 
                   ElevatedButton(
                     onPressed: ()async{
@@ -99,11 +99,11 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                         userModel = null;
                       });
 
-                      if(amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider)){
+                      if(amIAdmin(messProvider: messProvider, authProvider: authProvider)){
                         if(fromKey.currentState!.validate()){
-                          messProvaider.setIsloading(true);
-                          UserModel? memberData =  await messProvaider.getMemberData(uId: searchController.text.toString().trim());
-                          messProvaider.setIsloading(false);
+                          messProvider.setIsloading(true);
+                          UserModel? memberData =  await authProvider.getMemberData(uId: searchController.text.toString().trim());
+                          messProvider.setIsloading(false);
 
                           if(memberData==null){
                           showSnackber(context: context, content: "No Data Found!");
@@ -186,7 +186,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                 ),SizedBox(
                   height: 40,
                 ),
-                if(messProvaider.isLoading) SizedBox.square(dimension: 50 ,child: CircularProgressIndicator()),
+                if(messProvider.isLoading) SizedBox.square(dimension: 50 ,child: CircularProgressIndicator()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 20,
@@ -203,26 +203,26 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                       bool confirm = await showConfirmDialog(context: context, title: "Are your Sure to About this invitation");
                       if(confirm){
                         searchController.clear();
-                        messProvaider.setIsloading(true);
-                        await messProvaider.sendMessInvaitaionCard(
+                        messProvider.setIsloading(true);
+                        await messProvider.sendMessInvaitaionCard(
                           memberUid: userModel!.uId, 
                           joiningModel:JoiningModel(
                             invaitationId: DateTime.now().millisecondsSinceEpoch.toString(), 
-                            messName: messProvaider.getMessModel!.messName, 
-                            messId: messProvaider.getMessModel!.messId, 
+                            messName: messProvider.getMessModel!.messName, 
+                            messId: messProvider.getMessModel!.messId, 
                             status: JoiningStatus.panding, 
                             description: "Hello ${userModel!.fname}! \nWe’re inviting you to become a member of our mess. We work together to manage meals, expenses, and a smooth daily routine. Hope you’ll join us!", 
-                            messAddress: messProvaider.getMessModel!.messAddress, 
+                            messAddress: messProvider.getMessModel!.messAddress, 
                           ),
                           onSuccess:(){
-                            messProvaider.setIsloading(false);
+                            messProvider.setIsloading(false);
                             userModel = null;
                             found=false;
 
                             showSnackber(context: context, content: "Invaitations Message has send Successfully");
                           }
                         );
-                        messProvaider.setIsloading(false);
+                        messProvider.setIsloading(false);
                       }
                       found=false;
                     }),

@@ -27,10 +27,10 @@ class Constants {
   static const String currentMessId = "currentMessId";
   static const String fullAddress = "fullAddress";
 
-  static const String memberType = Constants.member;
-  static const String member = "member";
-  static const String menager = "menager";
+  static const String member = "Member";
+  static const String menager = "Menager";
   static const String actMenager = "Act Menager";
+  static const String memberType = Constants.member;
 
   //
   static const String userImages = "userImages";
@@ -112,6 +112,7 @@ class Constants {
 enum BazerScreenMenu{
   bazerList,
   bazerEntry,
+  bazerUpdate,
 }
 
 enum NoticeAndAnnouncement{

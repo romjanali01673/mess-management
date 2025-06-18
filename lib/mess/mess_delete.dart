@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessDelete extends StatefulWidget {
@@ -23,59 +23,60 @@ class _MessDeleteState extends State<MessDelete> {
     });
   }
 
+
   void getMessData()async{
     
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     
-    if(authProvaider.getUserModel!.currentMessId==""){
+    if(authProvider.getUserModel!.currentMessId==""){
       // because the member are not included to a mess
       return;
     }
 
-    messProvaider.setIsloading(true);
-    await messProvaider.getMessData(  
+    messProvider.setIsloading(true);
+    await messProvider.getMessData(  
       onFail: (message){
         if(context.mounted){
           showSnackber(context: context, content: message);
           print(message);
         }
       }, 
-      messId:authProvaider.getUserModel!.currentMessId ,
+      messId:authProvider.getUserModel!.currentMessId ,
     );
-    messProvaider.setIsloading(false);
+    messProvider.setIsloading(false);
   }
 
   void _deleteMess()async{
-    final authProvaider = context.read<AuthenticationProvider>();
-    final messProvaider = context.read<MessProvaider>();
-    if(authProvaider.getUserModel!.currentMessId != "" && messProvaider.getMessModel != null && messProvaider.getMessModel!.messAuthorityId==authProvaider.getUserModel!.uId){
+    final authProvider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    if(authProvider.getUserModel!.currentMessId != "" && messProvider.getMessModel != null && messProvider.getMessModel!.messAuthorityId==authProvider.getUserModel!.uId){
 
       // if offline stop leave process .
-      if(!messProvaider.isOnline) {
+      if(!messProvider.isOnline) {
         showSnackber(context: context, content: "No Internet");
-        messProvaider.setIsloading(false);
+        messProvider.setIsloading(false);
         return;
       }
 
-      messProvaider.setIsloading(true);
+      messProvider.setIsloading(true);
 
       // delete mess collection/table
-      await messProvaider.deleteMess(
+      await messProvider.deleteMess(
         onFail: (message) 
         {  
           // on failed show a "failed message"
-          messProvaider.setIsloading(false);
+          messProvider.setIsloading(false);
           showSnackber(context: context, content: message);
         }, 
-        MessId: messProvaider.getMessModel!.messId,
+        MessId: messProvider.getMessModel!.messId,
         onSuccess: ()async{
           //remove current mess id from your user id.
-          // because auth provaider hold current mess id in user model. it will not replace until you relunch/login the app. 
+          // because auth provider hold current mess id in user model. it will not replace until you relunch/login the app. 
           // clear manually
-          authProvaider.setUserModel(currentMessId: "");
-          await messProvaider.removeMessIdFromMemberProfile(
-            memberUid: authProvaider.getUserModel!.uId, 
+          authProvider.setUserModel(currentMessId: "");
+          await messProvider.removeMessIdFromMemberProfile(
+            memberUid: authProvider.getUserModel!.uId, 
             onFail: (p0) {
               showSnackber(context: context, content: "somthing wrong!");
             },
@@ -89,7 +90,7 @@ class _MessDeleteState extends State<MessDelete> {
         },
       );
       // al done. stop loading
-      messProvaider.setIsloading(false);
+      messProvider.setIsloading(false);
     }
     else{
       showSnackber(context: context, content: "May you don't have own Mess! \n only primary Mess owner can delete Mess!");
@@ -98,23 +99,23 @@ class _MessDeleteState extends State<MessDelete> {
 
   @override
   Widget build(BuildContext context) {
-    final messProvaider = context.watch<MessProvaider>();
+    final messProvider = context.watch<MessProvider>();
 
     return Container(
       child: Column(
         children: [
-          messProvaider.isLoading?  showCircularProgressIndicator()
+          messProvider.isLoading?  showCircularProgressIndicator()
           :
-          messProvaider.getMessModel!=null?
+          messProvider.getMessModel!=null?
           Card(
             color: Colors.red.shade500,
             child: ListTile(
-              title: Text(messProvaider.getMessModel!.messName),
+              title: Text(messProvider.getMessModel!.messName),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Id :${messProvaider.getMessModel!.messId} "),
-                  Text("Address :${messProvaider.getMessModel!.messAddress} "),
+                  Text("Id :${messProvider.getMessModel!.messId} "),
+                  Text("Address :${messProvider.getMessModel!.messAddress} "),
                 ],
               ),
             )
@@ -126,7 +127,7 @@ class _MessDeleteState extends State<MessDelete> {
           SizedBox(
             height: 100,
           ),
-          messProvaider.isLoading?
+          messProvider.isLoading?
           SizedBox.square(
             dimension: 50,
             child: CircularProgressIndicator(),

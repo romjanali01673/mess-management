@@ -1,11 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/deposit_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class DepositHistory extends StatefulWidget {
@@ -16,6 +18,8 @@ class DepositHistory extends StatefulWidget {
 }
 
 class _DepositHistoryState extends State<DepositHistory> {
+  bool  showTotalDepositOfMess = false;
+  bool _isDisposed = false;
   HistoryOfDeposit historyOfDepositItemGroup = HistoryOfDeposit.allHostory;
   List<Map<String, List>> month = [
     
@@ -26,14 +30,72 @@ class _DepositHistoryState extends State<DepositHistory> {
     //  "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
   ];
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _isDisposed = true;
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthenticationProvider>();
+    final depositProvider = context.read<DepositProvider>();
 
     return Expanded(
       child: Column(
         children: [
-          SingleChildScrollView(
+            StatefulBuilder(
+              builder: (context, setLocalState) {
+                return Card(
+                   color: Colors.green.shade500,
+                   child: ListTile(
+                     trailing: IconButton(
+                       onPressed: (){
+                         setLocalState(() {
+                         showTotalDepositOfMess = !showTotalDepositOfMess;
+
+                         });
+                       }, 
+                       icon: showTotalDepositOfMess? Icon(Icons.remove_red_eye_sharp) : FaIcon(FontAwesomeIcons.arrowsToEye),
+                     ),
+                     title: 
+                     showTotalDepositOfMess? 
+                     FutureBuilder(
+                       future: depositProvider.getDepositAmount(
+                         messId: authProvider.getUserModel!.currentMessId,
+                         uId: authProvider.getUserModel!.uId,
+                         onFail: (message){
+                           showSnackber(context: context, content: "somthing Wrong! \n$message");
+                         },
+                       ),
+                       builder: (context, AsyncSnapshot snapshot) {
+                         if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                           return Center(child: showCircularProgressIndicator());
+                         }
+                         // else if (snapshot.hasError) {
+                         //     return Center(child: Text('Error: ${snapshot.error}'));
+                         // } 
+                         // else if (!snapshot.hasData || snapshot.data == null) {
+                         //     return Center(child: Text('No Transaction found.'));
+                         // }
+                         return Row(
+                           children: [
+                             Expanded(child: Text("Total Deposit Of Mess: ",)),
+                             showPrice(value: depositProvider.getTotalDepositOfMess),
+                           ],
+                         );
+                       }
+                     )
+                     :
+                     Text("See Deposited Amount Of Mess"),
+                   ),
+                 );
+              }
+            ),
+
+            SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -78,12 +140,12 @@ class _DepositHistoryState extends State<DepositHistory> {
 
 
   Widget getAllHistoryOfDeposit(){
-    final depositProvaider  = context.read<DepositProvaider>();
-    final authProvaider  = context.read<AuthenticationProvider>();
+    final depositProvider  = context.read<DepositProvider>();
+    final authProvider  = context.read<AuthenticationProvider>();
     return Expanded(
       child: FutureBuilder(
-        future: depositProvaider.getAllDepositList(
-          messId: authProvaider.getUserModel!.currentMessId, 
+        future: depositProvider.getAllDepositList(
+          messId: authProvider.getUserModel!.currentMessId, 
           onFail: (message ) { 
             showSnackber(context: context, content: "somthing Wrong! \n$message");
           },
@@ -157,53 +219,173 @@ class _DepositHistoryState extends State<DepositHistory> {
   }
 
   Widget getHistoryMemberWise(){
+
+    final messProvider = context.read<MessProvider>();
+    final depositProvider = context.watch<DepositProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
     return Expanded(
-            child: ListView(
-              children: month.asMap().entries.map((val){
-                int index = val.key;
-                Map<String, List> monthName = val.value;
-                
-                return Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        
-                        onTap: () {
-                          monthName[monthName.keys.first]![0] = !monthName[monthName.keys.first]![0];
-                          setState(() {
-                            
-                          });
-                          if(monthName[monthName.keys.first]![0]){
-                            debugPrint("Hello romjan how are you?");
-                          }
-                          else{
-                            debugPrint("Hello romjan how are you?-----");
-                      
-                          }
-                        },
-                        title: Text("name"),
-                        subtitle: Text("ID: 12345678"),
-                        leading: CircleAvatar(
-                          child: Text("${index+1}"),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text("234"),
-                            monthName[monthName.keys.first]![0] ? Icon(Icons.arrow_drop_down_rounded) : Icon(Icons.arrow_right),
-                          ],
-                        ),
+      child: FutureBuilder(
+        future:messProvider.getMessData(
+          onFail: (message) { 
+            showSnackber(context: context, content: message);
+          },
+          messId: authProvider.getUserModel!.currentMessId,
+          isDisposed: ()=> _isDisposed,
+          onSuccess: (){
+            debugPrint("get mess data success");
+          },
+        ),
+        builder:(context, AsyncSnapshot snapshot) { 
+          if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's save 
+            return Center(child: CircularProgressIndicator());
+          }
+          
+          else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
+            return Center(child: Text('No member found.'));
+          }
+          else{
+            List<Map<String,dynamic>> data = messProvider.getMessModel!.messMemberList;
+            
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                bool showDetails = false;
+                Map<String,dynamic> memberData = data[index];
+                String memberType = 
+                  messProvider.getMessModel!.messAuthorityId==memberData[Constants.uId]? 
+                    Constants.menager
+                    : messProvider.getMessModel!.messAuthorityId2nd==memberData[Constants.uId]? 
+                    Constants.actMenager : Constants.member;
+
+                return StatefulBuilder(
+                    builder: (context, setLocalState) { 
+                    return  Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.only(left: 10),
+                            leading: CircleAvatar(
+                              child: Text(index.toString()),
+                              backgroundColor: memberType==Constants.member? Colors.amber :Colors.red,
+                            ),
+                            title: Text(memberData[Constants.fname]),
+                            subtitle: Text("${memberData[Constants.uId]}   ($memberType)"),
+                            onTap: () {
+                              setLocalState(() {
+                                showDetails = !showDetails; 
+                              });
+                            },
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                FutureBuilder(
+                                  future: depositProvider.getTotalDepositOfAMember(
+                                    messId: authProvider.getUserModel!.currentMessId,
+                                    uId: memberData[Constants.uId],
+                                    onFail: (_){}
+                                  ), 
+                                  builder: (context , AsyncSnapshot<double> snapshot){
+                                    if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                                      return Center(child: showCircularProgressIndicator());
+                                    }
+                                    else if (snapshot.hasError) {
+                                      return Center(child: Text('Error:'));
+                                    } 
+                                    else if (!snapshot.hasData || snapshot.data == null) {
+                                        return Center(child: Text('Error'));
+                                    }
+                                    return showPrice(value:snapshot.data);
+                                  },
+                                ),
+                                showDetails ? Icon(Icons.arrow_downward) : Icon(Icons.arrow_forward),
+                              ],
+                            ),
+                          ),
+                          // here is the spacific member deposit transaction list 
+                          if(showDetails) Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              future: depositProvider.getMemberDepositList(
+                                messId: authProvider.getUserModel!.currentMessId, 
+                                uId: authProvider.getUserModel!.uId,
+                                onFail: (message ) { 
+                                  showSnackber(context: context, content: "somthing Wrong! \n$message");
+                                },
+                              ), 
+                              builder: (context, AsyncSnapshot<List<DepositModel>?> snapshot){
+                                if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                                  return Center(child: showCircularProgressIndicator());
+                                }
+                                else if (snapshot.hasError) {
+                                    return Center(child: Text('Error: ${snapshot.error}'));
+                                } 
+                                else if (!snapshot.hasData || snapshot.data == null) {
+                                    return Center(child: Text('No Transaction found.'));
+                                }
+                                return ListView.builder(
+                                  shrinkWrap: true, // ← This is the key
+                                  physics: NeverScrollableScrollPhysics(),
+                                  // reverse: true,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index){
+                                    DepositModel depositModel = snapshot.data![index];
+                                    bool showDetails = false;
+                                    return StatefulBuilder(
+                                      builder:(context, setLocalState){
+                                        return Column(
+                                          children: [
+                                            ListTile(
+                                              contentPadding: EdgeInsets.only(left: 10),
+                                              leading: CircleAvatar(
+                                                backgroundColor: Colors.green,
+                                                child: Text("${index+1}"),
+                                              ),
+                                              title: Text("Type: ${depositModel.type}"),
+                                              subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Tnx Id: ${depositModel.transactionId}"),
+                                                  Text("Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(depositModel.CreatedAt!.toDate().toLocal())}"),
+                                                ],
+                                              ),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  showPrice(value: depositModel.amount),
+                                                  showDetails? Icon(Icons.arrow_downward_rounded):Icon(Icons.arrow_right_rounded),
+                                                ],
+                                              ),
+                                              onTap: () {
+                                                setLocalState((){
+                                                  showDetails = !showDetails;
+                                                });
+                                              },
+                                            ),
+                                            if(showDetails)...[
+                                              // show description here 
+                                              Text(depositModel.description==""? "Description are Empty!" : depositModel.description),
+                                            ]
+                                          ],
+                                        );
+                                      } 
+                                    );
+                                  }
+                                );
+                              }
+                            ),
+                          ),
+                        ],
                       ),
-                      if(monthName[monthName.keys.first]![0])...[
-                        Text("hello md romjan ali i am a student i want to be your gf."),
-                        Text("hello md romjan ali i am a student i want to be your gf."),
-                      ]
-                    ],
-                  ),
+                    );
+                  },
                 );
-              }).toList(),
-            ),
-          );
+              },
+            );
+          }
+        } 
+      ),
+    );
+  
   }
 
 

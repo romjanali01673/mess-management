@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/meal_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
+
 import 'package:provider/provider.dart';
 
 class MemberMealList extends StatefulWidget {
@@ -48,8 +46,8 @@ class _MemberMealListState extends State<MemberMealList> {
   }
 
   Widget getMealList(){
-    final mealProvaider = context.read<MealProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+    final mealProvider = context.read<MealProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -84,8 +82,8 @@ class _MemberMealListState extends State<MemberMealList> {
                 onPressed: ()async{
                   memberMealData = null;
                   debugPrint(userId);
-                  memberMealData = await mealProvaider.getAllMealListOfAMember(
-                    messId: authProvaider.getUserModel!.currentMessId, 
+                  memberMealData = await mealProvider.getAllMealListOfAMember(
+                    messId: authProvider.getUserModel!.currentMessId, 
                     uId: userId, 
                     onFail: (message){showSnackber(context: context, content: "somthing Wrong \n $message");},
                   );
@@ -112,7 +110,7 @@ class _MemberMealListState extends State<MemberMealList> {
                         children: [
                           Text("Name: ${memberMealData![0][Constants.fname]}"),
                           Text("UId: $userId"),
-                          Text("Total Meal: ${mealProvaider.getTotalMeal}", style: TextStyle(fontWeight: FontWeight.bold),),
+                          Text("Total Meal: ${mealProvider.getTotalMeal}", style: TextStyle(fontWeight: FontWeight.bold),),
                         ],
                       ),
                     ),

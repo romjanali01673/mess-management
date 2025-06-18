@@ -6,8 +6,8 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/mess_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessUpdate extends StatefulWidget {
@@ -45,15 +45,15 @@ class _MessUpdateState extends State<MessUpdate> {
     // addPostFrameCallback, the function will be called after fully building the screen.
     // (_) here will be given a duration but we dont't need the duration that's why we are ignoring using  underscore.
     WidgetsBinding.instance.addPostFrameCallback((_)async{
-      final messProvaider = context.read<MessProvaider>();
-      final authProvaider = context.read<AuthenticationProvider>();
-      if(authProvaider.getUserModel!.currentMessId==""){
+      final messProvider = context.read<MessProvider>();
+      final authProvider = context.read<AuthenticationProvider>();
+      if(authProvider.getUserModel!.currentMessId==""){
         debugPrint("you are not mess owner, update page");
         return;
       }
-      await messProvaider.getMessData(
+      await messProvider.getMessData(
         isDisposed: ()=>_disposed,
-        messId: authProvaider.getUserModel!.currentMessId,
+        messId: authProvider.getUserModel!.currentMessId,
         onFail: (message){
           if(!context.mounted) return;
           
@@ -63,12 +63,12 @@ class _MessUpdateState extends State<MessUpdate> {
         onSuccess: (){
           if(!context.mounted) return;
 
-          messOwnerIdController.text = messProvaider.getMessModel!.messAuthorityId;
-          messOwnerNameController.text = messProvaider.getMessModel!.messAuthorityName;
-          messNameController.text = messProvaider.getMessModel!.messName;
-          messAddressController.text = messProvaider.getMessModel!.messAddress;
-          authorityPhoneController.text = messProvaider.getMessModel!.messAuthorityNumber;
-          authorityEmailController.text = messProvaider.getMessModel!.messAuthorityEmail;
+          messOwnerIdController.text = messProvider.getMessModel!.messAuthorityId;
+          messOwnerNameController.text = messProvider.getMessModel!.messAuthorityName;
+          messNameController.text = messProvider.getMessModel!.messName;
+          messAddressController.text = messProvider.getMessModel!.messAddress;
+          authorityPhoneController.text = messProvider.getMessModel!.messAuthorityNumber;
+          authorityEmailController.text = messProvider.getMessModel!.messAuthorityEmail;
         
         }
       );
@@ -92,7 +92,7 @@ class _MessUpdateState extends State<MessUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    final messProvaider = context.watch<MessProvaider>();
+    final messProvider = context.watch<MessProvider>();
 
     return Expanded(
       child: Container(
@@ -130,14 +130,14 @@ class _MessUpdateState extends State<MessUpdate> {
                 context:context,
                 label: "Update", 
                 ontap:()async{
-                  if(amIAdmin(messProvaider: messProvaider, authProvaider: context.read<AuthenticationProvider>())){
+                  if(amIAdmin(messProvider: messProvider, authProvider: context.read<AuthenticationProvider>())){
                     if(transferOwnership){
                       bool? res =await showConfirmDialog(context: context, title: "you are going to transfer \nyour administrator power. \nAre you sure about this Update.");
                       if(res ?? false){
                         // transfer ownership
                         if(selectedItem!="Select Member"){
                           debugPrint("ownership transfer requesting");
-                          await messProvaider.transferMessOwnership(
+                          await messProvider.transferMessOwnership(
                             adminId: memberUidList[selectedItem]!.$1, 
                             adimnName: memberUidList[selectedItem]!.$2, 
                             onFail: (message){
@@ -159,20 +159,20 @@ class _MessUpdateState extends State<MessUpdate> {
                         bool? res =await showConfirmDialog(context: context, title: "Are you sure about this Update.");
                         if(res?? false){
                           // update mess data
-                          await messProvaider.updateMessDataToFirestore(
+                          await messProvider.updateMessDataToFirestore(
                             onFail: (message){
                               showSnackber(context: context, content: message);
                             }, 
                             messModel: MessModel(
                               messId: "", 
-                              messName: messNameController.text.toString(), 
-                              messAddress: messAddressController.text.toString(), 
+                              messName: messNameController.text.toString().trim(), 
+                              messAddress: messAddressController.text.toString().trim(), 
                               messAuthorityId: "", 
                               messAuthorityId2nd: "", 
                               messAuthorityName: "", 
                               messAuthorityName2nd: "", 
-                              messAuthorityNumber: authorityPhoneController.text.toString(), 
-                              messAuthorityEmail: authorityEmailController.text.toString(), 
+                              messAuthorityNumber: authorityPhoneController.text.toString().trim(), 
+                              messAuthorityEmail: authorityEmailController.text.toString().trim(), 
                               messMemberList: [],
                             ),
                             onSuccess: (){
@@ -204,10 +204,10 @@ class _MessUpdateState extends State<MessUpdate> {
     list.clear();
     disabledItems.clear();
     final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    final messProvaider = context.read<MessProvaider>();
+    final messProvider = context.read<MessProvider>();
     
-    if(messProvaider.getMessModel==null) return list;
-    for(Map<String,dynamic> member in messProvaider.getMessModel!.messMemberList){
+    if(messProvider.getMessModel==null) return list;
+    for(Map<String,dynamic> member in messProvider.getMessModel!.messMemberList){
       try {
         DocumentSnapshot documentSnapshot = await firebaseFirestore
           .collection(Constants.users)

@@ -23,8 +23,8 @@ class MessModel {
     required this.messAuthorityNumber,
     required this.messAuthorityEmail,
     // {
-    //   Constants.uId: authProvaider.getUserModel!.uId.toString(),
-    //   Constants.fname: authProvaider.getUserModel!.fname.toString(),
+    //   Constants.uId: authProvider.getUserModel!.uId.toString(),
+    //   Constants.fname: authProvider.getUserModel!.fname.toString(),
     //   Constants.status: Constants.enable,
     // }
     required this.messMemberList, 

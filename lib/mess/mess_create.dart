@@ -5,8 +5,9 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/mess_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessCreate extends StatefulWidget {
@@ -47,60 +48,60 @@ class _MessCreateState extends State<MessCreate> {
     // addPostFrameCallback, the function will be called after fully building the screen.
     // (_) here will be given a duration but we dont't need the duration that's why we are ignoring using  underscore.
     WidgetsBinding.instance.addPostFrameCallback((_){
-      final authProvaider = context.read<AuthenticationProvider>();
-      messOwnerIdController.text = authProvaider.getUserModel!.uId;
-      messOwnerNameController.text = authProvaider.getUserModel!.fname;
+      final authProvider = context.read<AuthenticationProvider>();
+      messOwnerIdController.text = authProvider.getUserModel!.uId;
+      messOwnerNameController.text = authProvider.getUserModel!.fname;
     });
   }
   
 
   void _createMess()async{
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     if(formKey.currentState!.validate()){
       formKey.currentState!.save();
-      messProvaider.setIsloading(true);
+      messProvider.setIsloading(true);
 
       // stop process and show an dialog if user offline
       // if offline stop creations.
-      if(!messProvaider.isOnline) {
+      if(!messProvider.isOnline) {
         showSnackber(context: context, content: "No Internet");
-        messProvaider.setIsloading(false);
+        messProvider.setIsloading(false);
         return;
       }
 
       // check are the member already connected to a mess.
       // if connected stop creations.
-      if(authProvaider.getUserModel!.currentMessId!=""){
+      if(authProvider.getUserModel!.currentMessId!=""){
         showSnackber(
           context: context, 
           content: "Already you are connected With a mess. \nTo create a new mess \nAt first you have to leave from current mess."
         );
-        messProvaider.setIsloading(false);
+        messProvider.setIsloading(false);
         return;
       }
     
 
       // store mess created info to firestore
-      await messProvaider.storeMessDataToFirestore(
+      await messProvider.storeMessDataToFirestore(
         onFail: (message){
           showSnackber(context: context, content: message);
-          messProvaider.setIsloading(false);
+          messProvider.setIsloading(false);
         }, 
         messModel: MessModel(
           messId: "", 
-          messName: messNameController.text.toString(), 
-          messAddress: messAddressController.text.toString(), 
-          messAuthorityId: authProvaider.getUserModel!.uId.toString(), 
+          messName: messNameController.text.toString().trim(), 
+          messAddress: messAddressController.text.toString().trim(), 
+          messAuthorityId: authProvider.getUserModel!.uId.toString(), 
           messAuthorityId2nd: "", // secondary owner id will be published leter
-          messAuthorityName:authProvaider.getUserModel!.fname.toString() , 
+          messAuthorityName:authProvider.getUserModel!.fname.toString() , 
           messAuthorityName2nd: "", // secondary owner name will be published leter
-          messAuthorityNumber: authorityPhoneController.text.toString(), 
-          messAuthorityEmail: authorityEmailController.text.toString(),
+          messAuthorityNumber: authorityPhoneController.text.toString().trim(), 
+          messAuthorityEmail: authorityEmailController.text.toString().trim(),
           messMemberList: [
             {
-              Constants.uId: authProvaider.getUserModel!.uId.toString(),
-              Constants.fname: authProvaider.getUserModel!.fname.toString(),
+              Constants.uId: authProvider.getUserModel!.uId.toString(),
+              Constants.fname: authProvider.getUserModel!.fname.toString(),
               Constants.status: Constants.enable,
             }
           ],
@@ -108,21 +109,21 @@ class _MessCreateState extends State<MessCreate> {
         onSuccess: ()async{
           // mess has created so,
           // assign mess id to to mess owner profile
-          await messProvaider.assignMessIdToMemberProfile(
+          await messProvider.assignMessIdToMemberProfile(
             onFail: (message) {
-              messProvaider.setIsloading(false);
+              messProvider.setIsloading(false);
               showSnackber(context: context, content: message);
             },
             onSuccess: (){
               // assign mess id to user model
-              authProvaider.getUserModel!.currentMessId = messProvaider.getMessModel!.messId; 
+              authProvider.getUserModel!.currentMessId = messProvider.getMessModel!.messId; 
               showSnackber(context: context, content: "Mess Has Created");
               formKey.currentState!.reset();
             },
-            memberUid: authProvaider.getUserModel!.uId,
-            messId: messProvaider.getMessModel!.messId,
+            memberUid: authProvider.getUserModel!.uId,
+            messId: messProvider.getMessModel!.messId,
           );
-          messProvaider.setIsloading(false);
+          messProvider.setIsloading(false);
         }
       );
 
@@ -133,8 +134,8 @@ class _MessCreateState extends State<MessCreate> {
   @override
   Widget build(BuildContext context) {
 
-    final authProvaider = context.watch<AuthenticationProvider>();
-    final messProvaider = context.watch<MessProvaider>();
+    final authProvider = context.watch<AuthenticationProvider>();
+    final messProvider = context.watch<MessProvider>();
 
 
     return Expanded(
@@ -324,7 +325,7 @@ class _MessCreateState extends State<MessCreate> {
                   ),
                 ),
           
-                messProvaider.isLoading?
+                messProvider.isLoading?
                 SizedBox.square(
                   dimension: 50,
                   child: CircularProgressIndicator()

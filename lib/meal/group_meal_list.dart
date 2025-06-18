@@ -5,8 +5,8 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/meal_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
 import 'package:provider/provider.dart';
 
 class GroupMealList extends StatefulWidget {
@@ -24,18 +24,18 @@ class _GroupMealListState extends State<GroupMealList> {
   TextEditingController dateController = TextEditingController(text: DateTime.now().year.toString());
   List<Map<String, List>> month = [
     
-    {"January" : [false, "January",1]},
-    {"January" : [false, "January",2]},
-    {"January" : [false, "January",3]},
-    {"January" : [false, "January",4]},
-    {"January" : [false, "January",5]},
-    {"January" : [false, "January",6]},
-    {"January" : [false, "January",7]},
-    {"January" : [false, "January",8]},
-    {"January" : [false, "January",9]},
-    {"January" : [false, "January",10]},
-    {"January" : [false, "January",11]},
-    {"January" : [false, "January",12]},
+    {"January"   : [false, "January",1]},
+    {"February"  : [false, "February",2]},
+    {"March"     : [false, "March",3]},
+    {"April"     : [false, "April",4]},
+    {"May"       : [false, "May",5]},
+    {"June"      : [false, "June",6]},
+    {"July"      : [false, "July",7]},
+    {"August"    : [false, "August",8]},
+    {"September" : [false, "September",9]},
+    {"October"   : [false, "October",10]},
+    {"November"  : [false, "November",11]},
+    {"December"  : [false, "December",12]},
     //  "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
     ];
 
@@ -65,8 +65,8 @@ class _GroupMealListState extends State<GroupMealList> {
   }
 
   Widget getMealList(){
-    final mealProvaider = context.read<MealProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
+    final mealProvider = context.read<MealProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -86,8 +86,8 @@ class _GroupMealListState extends State<GroupMealList> {
               title: 
               showTotalMeal? 
               FutureBuilder(
-                future: mealProvaider.getMealList(
-                  messId: authProvaider.getUserModel!.currentMessId,
+                future: mealProvider.getMealList(
+                  messId: authProvider.getUserModel!.currentMessId,
                   onFail: (message){
                     showSnackber(context: context, content: "somthing Wrong! \n$message");
                   },
@@ -102,7 +102,7 @@ class _GroupMealListState extends State<GroupMealList> {
                   else if (!snapshot.hasData || snapshot.data == null) {
                       return Center(child: Text('No Transaction found.'));
                 }
-                  return Text("Total Mess Meal: ${mealProvaider.getTotalMealOfMess}",);
+                  return Text("Total Mess Meal: ${mealProvider.getTotalMealOfMess}",);
                 }
               )
               :
@@ -213,8 +213,8 @@ class _GroupMealListState extends State<GroupMealList> {
                                     ),
                                     if(canSee)...[
                                       FutureBuilder(
-                                        future: mealProvaider.checkMealModelExist(
-                                          messId: authProvaider.getUserModel!.currentMessId, 
+                                        future: mealProvider.checkMealModelExist(
+                                          messId: authProvider.getUserModel!.currentMessId, 
                                           date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
                                           onFail: (message){
                                             showSnackber(context: context, content: "somthing Wrong \n $message");

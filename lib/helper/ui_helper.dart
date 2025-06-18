@@ -150,3 +150,28 @@ Widget showCircularProgressIndicator(){
   );
 }
    
+Widget showPrice({required dynamic value , int maxWidth = 100}) {
+  double? number;
+
+  try {
+    number = double.parse(value.toString());
+  } catch (_) {
+    return const Text("Invalid", style: TextStyle(fontSize: 18));
+  }
+
+  // Check if the value is whole number (e.g., 123.00)
+  bool isWhole = number == number.toInt();
+
+  return Container(
+    constraints: BoxConstraints(
+      maxWidth: maxWidth.toDouble(),
+    ),
+    child: FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        isWhole ? number.toInt().toString() : number.toStringAsFixed(2),
+        style: const TextStyle(fontSize: 18),
+      ),
+    ),
+  );
+}

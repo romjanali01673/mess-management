@@ -7,8 +7,8 @@ import 'package:meal_hisab/fand/add_cost.dart';
 import 'package:meal_hisab/fand/add_deposit.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/fand_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/fand_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
 import 'package:provider/provider.dart';
 
 class FandScreen extends StatefulWidget {
@@ -101,8 +101,8 @@ class _FandHomeState extends State<FandHome> {
 
   @override
   Widget build(BuildContext context) {
-    FandProvaider fandProvaider = context.watch<FandProvaider>();
-    AuthenticationProvider authProvaider = context.watch<AuthenticationProvider>();
+    FandProvider fandProvider = context.watch<FandProvider>();
+    AuthenticationProvider authProvider = context.watch<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -120,7 +120,7 @@ class _FandHomeState extends State<FandHome> {
                 icon: showBlance? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
               ),
               title: 
-              showBlance? Text("Current Blance: ${fandProvaider.getBlance}",)
+              showBlance? Text("Current Blance: ${fandProvider.getBlance}",)
               :
               Text("tap to see blance"),
             ),
@@ -128,8 +128,8 @@ class _FandHomeState extends State<FandHome> {
           Expanded(
             child: Container(
               child: FutureBuilder(
-                future: fandProvaider.getFandTransactions(
-                  messId: authProvaider.getUserModel!.currentMessId, 
+                future: fandProvider.getFandTransactions(
+                  messId: authProvider.getUserModel!.currentMessId, 
                   onFail: (message) { 
                     showSnackber(context: context, content: "");
                   }, 

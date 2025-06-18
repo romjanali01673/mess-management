@@ -5,8 +5,8 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/joining_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class JoinOrLeave extends StatefulWidget {
@@ -23,14 +23,14 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_){
-      final messProvaider = context.read<MessProvaider>();
-      final authProvaider = context.read<AuthenticationProvider>();
-      if(authProvaider.getUserModel!.currentMessId=="") return;
-      messProvaider.getMessData(
+      final messProvider = context.read<MessProvider>();
+      final authProvider = context.read<AuthenticationProvider>();
+      if(authProvider.getUserModel!.currentMessId=="") return;
+      messProvider.getMessData(
         onFail:(message){
           showSnackber(context: context, content: "$message");
         } , 
-        messId:authProvaider.getUserModel!.currentMessId,
+        messId:authProvider.getUserModel!.currentMessId,
         onSuccess: (){
           debugPrint("success");
         }
@@ -39,44 +39,44 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
   }
 
   void _LeaveMess()async{
-    final authProvaider = context.read<AuthenticationProvider>();
-    final messProvaider = context.read<MessProvaider>();
-    if(authProvaider.getUserModel!.currentMessId!=""){
+    final authProvider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    if(authProvider.getUserModel!.currentMessId!=""){
 
-      if(amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider)){
+      if(amIAdmin(messProvider: messProvider, authProvider: authProvider)){
         showSnackber(context: context, content: "At first you have to either delete the mess or transfer ownership!");
         return;
       }
 
       // if offline stop leave process .
-      if(!messProvaider.isOnline) {
+      if(!messProvider.isOnline) {
         showSnackber(context: context, content: "No Internet");
-        messProvaider.setIsloading(false);
+        messProvider.setIsloading(false);
         return;
       }
 
-      messProvaider.setIsloading(true);
+      messProvider.setIsloading(true);
 
       // remove assign mess id from user profile data.
-      await messProvaider.removeMessIdFromMemberProfile(
+      await messProvider.removeMessIdFromMemberProfile(
         onFail: (message) 
         {  
           // on failed show a "failed message"
-          messProvaider.setIsloading(false);
+          messProvider.setIsloading(false);
           showSnackber(context: context, content: message);
         }, 
-        memberUid: authProvaider.getUserModel!.uId,
+        memberUid: authProvider.getUserModel!.uId,
         onSuccess: (){
           //remove current mess id from your user id.
-          // because auth provaider hold current mess id in user model. it will not replace until you relunch/login the app. 
+          // because auth provider hold current mess id in user model. it will not replace until you relunch/login the app. 
           // clear manually
-          authProvaider.setUserModel(currentMessId: "");
+          authProvider.setUserModel(currentMessId: "");
           // on success show a "success message"
           showSnackber(context: context, content: "Leaved from the Mess");
         },
       );
       // al done. stop loading
-      messProvaider.setIsloading(false);
+      messProvider.setIsloading(false);
     }
     else{
       showSnackber(context: context, content: "you not in any mess!");
@@ -87,8 +87,8 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
   
   @override
   Widget build(BuildContext context) {
-    final authProvaider = context.watch<AuthenticationProvider>();
-    final messProvaider = context.watch<MessProvaider>();
+    final authProvider = context.watch<AuthenticationProvider>();
+    final messProvider = context.watch<MessProvider>();
     return Expanded(
       child: Column(
         spacing: 10,
@@ -100,7 +100,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
             ),
           ),
           
-          messProvaider.isLoading? SizedBox.square(dimension: 50,child: CircularProgressIndicator(),)
+          messProvider.isLoading? SizedBox.square(dimension: 50,child: CircularProgressIndicator(),)
           :
           getMaterialButton(icon: Icons.run_circle ,context: context, label: "Leave Current Mess", ontap: ()async{
             bool? res = await showConfirmDialog(context: context, title: "Do you Want to leave your Current mess");
@@ -113,7 +113,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
           
           Expanded(
             child: FutureBuilder(
-              future:messProvaider.getInvaitationsList(uId: authProvaider.uid!, onFail: (message) {showSnackber(context: context, content: "invaitations list found Error!\n$message");}) ,
+              future:messProvider.getInvaitationsList(uId: authProvider.uid!, onFail: (message) {showSnackber(context: context, content: "invaitations list found Error!\n$message");}) ,
               
               builder: (context, AsyncSnapshot<List<JoiningModel?>?> snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
@@ -155,7 +155,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                   PopupMenuItem(
                                     child: Text("Join"),
                                     onTap: ()async{
-                                      if(authProvaider.getUserModel!.currentMessId==""){
+                                      if(authProvider.getUserModel!.currentMessId==""){
                                         bool? res = await showConfirmDialog(
                                           context: context, 
                                           title: "Do you Want to join?",
@@ -164,11 +164,11 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                           // join to the new mess
                                           if(joiningModel.status==JoiningStatus.panding){
                                             //   // you are valid join to the mess
-                                            messProvaider.joiningToInvaitatedMess(
+                                            messProvider.joiningToInvaitatedMess(
                                               messId: joiningModel.messId, 
                                               member: {
-                                                Constants.uId:authProvaider.getUserModel!.uId,
-                                                Constants.fname:authProvaider.getUserModel!.fname,
+                                                Constants.uId:authProvider.getUserModel!.uId,
+                                                Constants.fname:authProvider.getUserModel!.fname,
                                                 Constants.status:Constants.enable,
                                                 },
                                               invaitationsId: joiningModel.invaitationId, 
@@ -178,7 +178,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                               }, 
                                               onSuccess: ()async{
                                                 showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
-                                                authProvaider.setUserModel(currentMessId: joiningModel.messId);
+                                                authProvider.setUserModel(currentMessId: joiningModel.messId);
                                                 setState(() {
                                                   
                                                 });
@@ -204,7 +204,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                       // change invaitation ststus
                                       bool? res = await showConfirmDialog(context: context, title: "Do you want to declain this invaitations.");
                                       if(res??false){
-                                        await messProvaider.changeJoiningInvaitationStatus(
+                                        await messProvider.changeJoiningInvaitationStatus(
                                           status: JoiningStatus.declain,
                                           invaitationsId: joiningModel.invaitationId,
                                           onFail: (message){
@@ -213,7 +213,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                           onSuccess: (){
                                             showSnackber(context: context, content: "Declained");
                                           }, 
-                                          uId: authProvaider.getUserModel!.uId,
+                                          uId: authProvider.getUserModel!.uId,
                                         );
                                       }
                                     },

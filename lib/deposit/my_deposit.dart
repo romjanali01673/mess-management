@@ -4,8 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/deposit_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
 import 'package:provider/provider.dart';
 
 class MyDeposit extends StatefulWidget {
@@ -20,8 +20,8 @@ class _MyDepositState extends State<MyDeposit> {
   
   @override
   Widget build(BuildContext context) {
-    final depositProvaider  = context.read<DepositProvaider>();
-    final authProvaider  = context.read<AuthenticationProvider>();
+    final depositProvider  = context.read<DepositProvider>();
+    final authProvider  = context.read<AuthenticationProvider>();
 
     return Expanded(
       child: Column(
@@ -43,9 +43,9 @@ class _MyDepositState extends State<MyDeposit> {
                   title: 
                   showTotalDeposit? 
                   FutureBuilder(
-                    future: depositProvaider.getDepositAmount(
-                      messId: authProvaider.getUserModel!.currentMessId,
-                      uId: authProvaider.getUserModel!.uId,
+                    future: depositProvider.getDepositAmount(
+                      messId: authProvider.getUserModel!.currentMessId,
+                      uId: authProvider.getUserModel!.uId,
                       onFail: (message){
                         showSnackber(context: context, content: "somthing Wrong! \n$message");
                       },
@@ -60,7 +60,7 @@ class _MyDepositState extends State<MyDeposit> {
                       // else if (!snapshot.hasData || snapshot.data == null) {
                       //     return Center(child: Text('No Transaction found.'));
                       // }
-                      return Text("Total Meal: ${depositProvaider.getTotalDeposit}",);
+                      return Text("Total Meal: ${depositProvider.getTotalDeposit}",);
                     }
                   )
                   :
@@ -73,9 +73,9 @@ class _MyDepositState extends State<MyDeposit> {
           // here my deposit list.
           Expanded(
             child: FutureBuilder(
-              future: depositProvaider.getMemberDepositList(
-                messId: authProvaider.getUserModel!.currentMessId, 
-                uId: authProvaider.getUserModel!.uId,
+              future: depositProvider.getMemberDepositList(
+                messId: authProvider.getUserModel!.currentMessId, 
+                uId: authProvider.getUserModel!.uId,
                 onFail: (message ) { 
                   showSnackber(context: context, content: "somthing Wrong! \n$message");
                 },
@@ -117,7 +117,7 @@ class _MyDepositState extends State<MyDeposit> {
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("${depositModel.amount}", style: TextStyle(fontSize: 18),),
+                                  showPrice(value: depositModel.amount),
                                   showDetails? Icon(Icons.arrow_downward_rounded):Icon(Icons.arrow_right_rounded),
                                 ],
                               ),

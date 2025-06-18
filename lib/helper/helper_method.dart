@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 
 // pick an image 
 Future<File?> pickedImage({ required bool fromCamera, required BuildContext context, required Function(String) onFail })async{
@@ -116,6 +116,9 @@ String? emailValidator(String email){
 // \d{8}$ → exactly 8 digits after the operator code (total 11 digits).
 String? numberVAladator(String phone){
   phone = phone.trim();
+  if(phone.contains(" ")){
+    return "Number Can't Contain \"Space\"";
+  }
   if(phone.isEmpty) return "Number Required";
   final pattern = RegExp(r'^(?:\+88|88)?01[2-9]\d{8}$');
   return pattern.hasMatch(phone)?null:"Invalid Phone";
@@ -125,7 +128,7 @@ String? numberVAladator(String phone){
 String? nameValidator(String value) {
   value = value.trim();
   if (value.trim().isEmpty) {
-    return 'Name is required';
+    return 'Name are required';
   }
   if(value.length<4){
     return "Name shouldcontain  at least 4 character!";
@@ -139,10 +142,23 @@ String? nameValidator(String value) {
   return null; // valid
 }
 
-String? addressValidator(String value) {
-  value = value.trim();
+String? passValidator(String value) {
   if (value.trim().isEmpty) {
-    return 'Address is required';
+    return 'Password are required';
+  }
+  if(value.contains(" ")){
+    return "pass can't contain \"Space\"";
+  }
+  if(value.length<6){
+    return "Password should contain  at least 6 character!";
+  }
+
+  return null; // valid
+}
+
+String? addressValidator(String value) {
+  if (value.trim().isEmpty) {
+    return 'Address are required';
   }
   if(value.length<10){
     return "Address should contain at least 10 character!";
@@ -173,9 +189,9 @@ String? validatePrice(String value){
   return null;
 }
 
-bool amIAdmin({required MessProvaider messProvaider,required AuthenticationProvider authProvaider}){
-  if(messProvaider.getMessModel!=null){
-    if(messProvaider.getMessModel!.messAuthorityId == authProvaider.getUserModel!.uId){
+bool amIAdmin({required MessProvider messProvider,required AuthenticationProvider authProvider}){
+  if(messProvider.getMessModel!=null){
+    if(messProvider.getMessModel!.messAuthorityId == authProvider.getUserModel!.uId){
       return true;
     }
     else{
@@ -187,9 +203,9 @@ bool amIAdmin({required MessProvaider messProvaider,required AuthenticationProvi
   }
 } 
 
-bool amIactmenager({required MessProvaider messProvaider,required AuthenticationProvider authProvaider}){
-  if(messProvaider.getMessModel!=null){
-    if(messProvaider.getMessModel!.messAuthorityId2nd == authProvaider.getUserModel!.uId){
+bool amIactmenager({required MessProvider messProvider,required AuthenticationProvider authProvider}){
+  if(messProvider.getMessModel!=null){
+    if(messProvider.getMessModel!.messAuthorityId2nd == authProvider.getUserModel!.uId){
       return true;
     }
     else{
@@ -200,6 +216,18 @@ bool amIactmenager({required MessProvaider messProvaider,required Authentication
     return false;
   }
 } 
+
+String capitalizeEachWord(String text) {
+  if (text.isEmpty) return "";
+
+  return text
+      .toLowerCase()
+      .split(' ')
+      .map((word) =>
+          word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '')
+      .join(" ");
+}
+
 
 int getDaysInMonth(int year, int month) {
   // If month is December, move to January of next year

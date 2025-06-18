@@ -4,9 +4,9 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/fand_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/fand_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddCost extends StatefulWidget {
@@ -31,8 +31,8 @@ class _AddCostState extends State<AddCost> {
   @override
   Widget build(BuildContext context) {
 
-    FandProvaider fandProvaider = context.watch<FandProvaider>();
-    AuthenticationProvider authProvaider = context.read<AuthenticationProvider>();
+    FandProvider fandProvider = context.watch<FandProvider>();
+    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
 
     return Expanded(
       child: Container(
@@ -140,7 +140,7 @@ class _AddCostState extends State<AddCost> {
                   height: 50,
                 ),
             
-                fandProvaider.isLoading? 
+                fandProvider.isLoading? 
                 SizedBox.square(
                   child: CircularProgressIndicator(
                     color: Colors.green,
@@ -152,9 +152,9 @@ class _AddCostState extends State<AddCost> {
                   ontap: ()async{
                     bool valided  = formKey.currentState!.validate();
                     if(valided){
-                      if(amIAdmin(messProvaider: context.read<MessProvaider>(), authProvaider:context.read<AuthenticationProvider>(),)){
+                      if(amIAdmin(messProvider: context.read<MessProvider>(), authProvider:context.read<AuthenticationProvider>(),)){
                         // add a transaction to datebase 
-                        await fandProvaider.addAFandTransaction(
+                        await fandProvider.addAFandTransaction(
                           fandModel: FandModel(
                             transactionId: DateTime.now().millisecondsSinceEpoch.toString(),
                             amount: amount,
@@ -163,13 +163,13 @@ class _AddCostState extends State<AddCost> {
                             // CreatedAt: DateTime.now().millisecondsSinceEpoch.toString(), 
                             type: Constants.sub
                           ), 
-                          messId: authProvaider.getUserModel!.currentMessId,
+                          messId: authProvider.getUserModel!.currentMessId,
                           onSuccess: (){
-                            fandProvaider.setIsLoading(value: false);
+                            fandProvider.setIsLoading(value: false);
                             showSnackber(context: context, content: "Entry Successed");
                           }, 
                           onFail: (message){
-                            fandProvaider.setIsLoading(value: false);
+                            fandProvider.setIsLoading(value: false);
                             showSnackber(context: context, content: "Entry Failed!\n$message");
                           },
                         );

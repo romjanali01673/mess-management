@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/model/bazer_model.dart';
 
-class BazerProvaider extends ChangeNotifier{
+class BazerProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
@@ -29,6 +29,12 @@ class BazerProvaider extends ChangeNotifier{
   bool get isLoading => _isLoading;
   BazerModel? get getBazerModel => _bazerModel;
   double get getCost => _cost;
+
+
+  void reset(){
+    _bazerModel = null;
+  }
+
 
   // function -----------
 
@@ -59,7 +65,7 @@ class BazerProvaider extends ChangeNotifier{
     return list?.reversed.toList();
   }
 
-  // add a fand transaction to database 
+  // add a bazer transaction to database 
   Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
@@ -86,6 +92,89 @@ class BazerProvaider extends ChangeNotifier{
 
           await batch.commit();
           setCost(amount: getCost+bazerModel.amount);
+          onSuccess!=null? onSuccess() : (){};
+        } catch (e) {
+          onFail(e.toString());
+        }  
+      }
+    );
+  }
+
+  
+
+  // update a bazer transaction to database 
+  Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+    // fatch cost,
+    await getBazerTransactions(
+      messId: messId, 
+      onFail: (message) {  
+        onFail(message);
+      }, 
+      onSuccess: () async{
+        try {
+          batch.set(
+            firebaseFirestore.collection(Constants.bazer)
+            .doc(messId)
+            .collection(Constants.listOfBazerTransaction)
+            .doc(bazerModel.transactionId),
+            bazerModel.toMap(),
+            SetOptions(
+              mergeFields: [
+                Constants.amount,
+                Constants.bazerList ,
+                Constants.byWho,
+                Constants.bazerTime,
+                Constants.bazerDate,
+              ],
+            ),
+          );
+         
+          batch.set(
+            firebaseFirestore.collection(Constants.bazer)
+            .doc(messId),
+            {Constants.cost:(getCost+extraAdd)}
+          );
+
+          await batch.commit();
+          setCost(amount: (getCost+ extraAdd));
+          onSuccess!=null? onSuccess() : (){};
+        } catch (e) {
+          onFail(e.toString());
+          print(e.toString());
+        }  
+      }
+    );
+  }
+
+  
+
+  // update a bazer transaction to database 
+  Future<void> deleteABazerTransaction({required String tnxId,required String messId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+    // fatch cost,
+    await getBazerTransactions(
+      messId: messId, 
+      onFail: (message) {  
+        onFail(message);
+      }, 
+      onSuccess: () async{
+        try {
+          batch.delete(
+            firebaseFirestore.collection(Constants.bazer)
+            .doc(messId)
+            .collection(Constants.listOfBazerTransaction)
+            .doc(tnxId),
+          );
+         
+          batch.set(
+            firebaseFirestore.collection(Constants.bazer)
+            .doc(messId),
+            {Constants.cost:(getCost+extraAdd)}
+          );
+
+          await batch.commit();
+          setCost(amount: (getCost + extraAdd));
           onSuccess!=null? onSuccess() : (){};
         } catch (e) {
           onFail(e.toString());

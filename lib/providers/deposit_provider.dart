@@ -4,12 +4,12 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/deposit/deposit.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
 
-class DepositProvaider extends ChangeNotifier{
+class DepositProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
-  DepositModel? _dipositeModel;
+  DepositModel? _depositModel;
   double _totalDeposit = -1;
   double _totalDepositOfMess = -1;
 
@@ -34,9 +34,14 @@ class DepositProvaider extends ChangeNotifier{
 
   bool get isLoading => _isLoading;
   
-  DepositModel? get getDepositModel => _dipositeModel;
+  DepositModel? get getDepositModel => _depositModel;
   double get getTotalDeposit => _totalDeposit;
   double get getTotalDepositOfMess => _totalDepositOfMess;
+
+
+  void reset(){
+    _depositModel = null;
+  }
 
   // function -----------
 
@@ -99,6 +104,23 @@ class DepositProvaider extends ChangeNotifier{
     }  
     _isLoading  = false;
     return null;
+  }
+
+  // get total deposit of a member 
+  Future<double> getTotalDepositOfAMember({required String messId, required String uId, required Function(String) onFail, Function()? onSuccess,})async{
+    double amount = 0.0;
+    try {
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).doc(uId).get();
+      if(snapshot.exists && snapshot.data() != null){
+        amount = (snapshot.data() as Map<String, dynamic>)[Constants.deposit];
+      }
+      onSuccess!=null? onSuccess():(){};    
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint("getDepositAmount");
+    }  
+    _isLoading  = false;
+    return amount;
   }
 
   // get all deposit list 

@@ -5,7 +5,7 @@ import 'package:meal_hisab/authantication/Sign_up.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -27,24 +27,24 @@ class _SignInScreenState extends State<SignInScreen> {
     
     if(FormKey.currentState!.validate()){
       FormKey.currentState!.save();
-      final AuthenticationProvider authProvaider = context.read<AuthenticationProvider>();
-      authProvaider.setLoading(val: true);
-      UserCredential? userCredential = await authProvaider.signInWithEmailAndPassword(
+      final AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+      authProvider.setLoading(val: true);
+      UserCredential? userCredential = await authProvider.signInWithEmailAndPassword(
         email: email, 
         password: pass, 
         onFail: (message){
           showSnackber(context: context, content: message);
-          authProvaider.setLoading(val: false);
+          authProvider.setLoading(val: false);
         },
       );
       if(userCredential!=null){
         //user valid, now try to fatch user data
         bool isSuccess = false;
         // get
-        await authProvaider.getUidFromFiretore(onFail: (message){
+        await authProvider.getUidFromFiretore(onFail: (message){
 
         });
-        await authProvaider.setSessionKey(
+        await authProvider.setSessionKey(
           onSuccess: (){
             isSuccess = true;
           },
@@ -54,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
           }
         );
         if(isSuccess){
-          isSuccess = await authProvaider.getUserProfileData(onFail: (message){
+          isSuccess = await authProvider.getUserProfileData(onFail: (message){
             showSnackber(context: context, content: "somthing Wrong\n try again!");
           });
         }
@@ -62,13 +62,13 @@ class _SignInScreenState extends State<SignInScreen> {
         
         if(isSuccess){
         // get user data, 
-          isSuccess = await authProvaider.saveUserDataToSharedPref();
+          isSuccess = await authProvider.saveUserDataToSharedPref();
         }
 
         if(isSuccess){
         
           // now try to save user data to local store
-          await authProvaider.setSignedIn(val: true);
+          await authProvider.setSignedIn(val: true);
           showSnackber(context: context, content: "Sign In Success");
           Navigator.pushReplacementNamed(context, Constants.LandingScreen);
         }
@@ -78,13 +78,13 @@ class _SignInScreenState extends State<SignInScreen> {
       else{
         showSnackber(context: context, content: "Data Not Found In DataBase! \nplease try again.");
       }
-      authProvaider.setLoading(val: false);
+      authProvider.setLoading(val: false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final AuthenticationProvider authProvaider = context.watch<AuthenticationProvider>();
+    final AuthenticationProvider authProvider = context.watch<AuthenticationProvider>();
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -190,13 +190,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                           pass = value.trim();
                                         },
                                         validator: (value) {
-                                          if(value.toString().contains(" ")){
-                                            return "password can't contain SPACE";
-                                          }
-                                          if(value.toString().length<8){
-                                            return "pass should be al least 8 character";
-                                          }
-                                          return null;
+                                          return passValidator(value.toString());
                                         },
                                         decoration: InputDecoration(
                                           label: Text("Password",),
@@ -213,7 +207,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             height: 30,
                           ),
                           FadeInUp(duration: Duration(milliseconds:2200),
-                            child: !authProvaider.isLoading? SizedBox(
+                            child: !authProvider.isLoading? SizedBox(
                               width: 200,
                               child: getButton(label: "Sign In", ontap: (){
                                 signIn();

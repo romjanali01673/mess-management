@@ -11,7 +11,7 @@ import 'package:meal_hisab/model/mess_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
 
 
-class MessProvaider extends ChangeNotifier {
+class MessProvider extends ChangeNotifier {
     List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
@@ -20,7 +20,7 @@ class MessProvaider extends ChangeNotifier {
   bool _isLoading = false;
   MessModel? _messModel;
 
-  MessProvaider(){
+  MessProvider(){
     initConnectivity();
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   
@@ -66,6 +66,10 @@ class MessProvaider extends ChangeNotifier {
     notifyListeners();
   }
   
+  void reset(){
+    _messModel = null;
+  }
+
 
   // get -----------------------------
   MessModel? get getMessModel =>_messModel;
@@ -223,24 +227,24 @@ class MessProvaider extends ChangeNotifier {
           .doc(messId)
           .get();
       
-      if(!(isDisposed==null || !isDisposed())) return;
+    if(!(isDisposed==null || !isDisposed())) return;
       
 
     }catch (e){
+      if(!(isDisposed==null || !isDisposed())) return;
         onFail(e.toString()+"get mess data");
     }
+    if(!(isDisposed==null || !isDisposed())) return;
     // for any kind of error we gat null.
     // if everything is okk check has found or not 
     if(documentSnapshot!=null && documentSnapshot.exists){
       _messModel = MessModel.fromMap(documentSnapshot!.data() as Map<String,dynamic>);
       notifyListeners();
       onSuccess!=null?onSuccess():(){};
-      
     }
     else{
       // we fatch data successfully but there has no data
-        onFail("No Data found");
-      
+      onFail("No Data found");
     }
   }
 
@@ -353,20 +357,11 @@ class MessProvaider extends ChangeNotifier {
     }catch(e){
         debugPrint(e.toString());
     }
+
     return list.isEmpty?null:list;
   }
 
-  Future<UserModel?> getMemberData({required String uId})async{
-    try {
-        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
-      if(snapshot.exists){
-        return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
-      }
-    } catch (e) {
-      e.toString();
-    }
-    return null;
-  }
+
 
   // change joining invaitation status 
   Future<void> changeJoiningInvaitationStatus({required Function(String) onFail,required String uId, required String invaitationsId, Function()? onSuccess,required String status})async{
@@ -416,6 +411,7 @@ class MessProvaider extends ChangeNotifier {
       debugPrint(e.toString());
     }
   }
+
 
   // change status member
   Future<void> changeMemberStatus()async{

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/member/add_member.dart';
 import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MemberScreen extends StatefulWidget {
@@ -18,36 +19,34 @@ class _MemberScreenState extends State<MemberScreen> {
   bool _isDisposed = false;
 
   Member memberScreemItemGrpup = Member.members;
-  bool showScreen = false;
-  Widget otherWiseScreen = Text("Loading...");
   @override
   void initState(){
     super.initState();
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
-    if(authProvaider.getUserModel!.currentMessId == ""){
-      setState(() {
-        otherWiseScreen =  Text("You are not connected to any mess.");
-        showScreen = false;
-      });
-    } 
-    else{
-      messProvaider.getMessData(
-        messId: authProvaider.getUserModel!.currentMessId,
-        onFail: (message){
-          setState(() {
-            showScreen = false;
-            showSnackber(context: context, content: "Mess Data Did Not Found\n$message");
-            otherWiseScreen =  Text("Somthing Wrong\n try again");
-          });
-        }, 
-        onSuccess: () {
-          setState(() {
-            showScreen = true;
-          });
-        },
-      );
-    }
+    // final messProvider = context.read<MessProvider>();
+    // final authProvider = context.read<AuthenticationProvider>();
+    // if(authProvider.getUserModel!.currentMessId == ""){
+    //   setState(() {
+    //     otherWiseScreen =  Text("You are not connected to any mess.");
+    //     showScreen = false;
+    //   });
+    // } 
+    // else{
+    //   messProvider.getMessData(
+    //     messId: authProvider.getUserModel!.currentMessId,
+    //     onFail: (message){
+    //       setState(() {
+    //         showScreen = false;
+    //         showSnackber(context: context, content: "Mess Data Did Not Found\n$message");
+    //         otherWiseScreen =  Text("Somthing Wrong\n try again");
+    //       });
+    //     }, 
+    //     onSuccess: () {
+    //       setState(() {
+    //         showScreen = true;
+    //       });
+    //     },
+    //   );
+    // }
   }
 
   @override
@@ -61,7 +60,7 @@ class _MemberScreenState extends State<MemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return showScreen? Scaffold(
+    return Scaffold(
       body: Container(
         color: Colors.grey.shade100,
         child: Padding(
@@ -108,29 +107,26 @@ class _MemberScreenState extends State<MemberScreen> {
           ),
         ),
       ),
-    )
-    :
-    Scaffold(body: Center(child: otherWiseScreen!));
+    );
   }
 
 
 
   Widget getListOfMember(){
 
-    final messProvaider = context.read<MessProvaider>();
-    // final messProvaider = context.watch<MessProvaider>();
-    final authProvaider = context.watch<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    // final messProvider = context.watch<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
     return Expanded(
       child: FutureBuilder(
-        future:messProvaider.getMessData(
+        future:messProvider.getMessData(
           onFail: (message) { 
             showSnackber(context: context, content: message);
           },
-          messId: authProvaider.getUserModel!.currentMessId,
+          messId: authProvider.getUserModel!.currentMessId,
           isDisposed: ()=> _isDisposed,
           onSuccess: (){
             debugPrint("get mess data success");
-            StatefulBuilder;
           },
         ),
         builder:(context, AsyncSnapshot snapshot) { 
@@ -138,11 +134,11 @@ class _MemberScreenState extends State<MemberScreen> {
             return Center(child: CircularProgressIndicator());
           }
           
-          else if (messProvaider.getMessModel==null ||messProvaider.getMessModel!.messMemberList.isEmpty ) {
+          else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
             return Center(child: Text('No member found.'));
           }
           else{
-            List<Map<String,dynamic>> data = messProvaider.getMessModel!.messMemberList;
+            List<Map<String,dynamic>> data = messProvider.getMessModel!.messMemberList;
             return StatefulBuilder(
               builder: (context, setLocalState) { 
 
@@ -151,9 +147,9 @@ class _MemberScreenState extends State<MemberScreen> {
                 itemBuilder: (context, index) {
                   Map<String,dynamic> memberData = data[index];
                   String memberType = 
-                    messProvaider.getMessModel!.messAuthorityId==memberData[Constants.uId]? 
+                    messProvider.getMessModel!.messAuthorityId==memberData[Constants.uId]? 
                       Constants.menager
-                      : messProvaider.getMessModel!.messAuthorityId2nd==memberData[Constants.uId]? 
+                      : messProvider.getMessModel!.messAuthorityId2nd==memberData[Constants.uId]? 
                       Constants.actMenager : Constants.member;
               
                   return  Card(
@@ -172,7 +168,28 @@ class _MemberScreenState extends State<MemberScreen> {
                         return [
                             PopupMenuItem(
                               onTap: ()async{
-                                await messProvaider.change2ndMessOwnership(
+                                UserModel? userModel =  await authProvider.getMemberData(uId: memberData[Constants.uId]);
+                                // show details in a dialog box.
+                                if(userModel!=null){
+                                  showMessageDialog(
+                                    context: context,
+                                    title: "Member Info", 
+                                    Discreption: 
+                                    "Image: Firestore Storage Paid \nName: ${userModel.fname} \nUser Id: ${userModel.uId} \nAddress: ${userModel.fullAddress} \nPhone: ${userModel.number} \nEmail: ${userModel.email}",
+                                  );
+                                }
+                              },
+                              value: 1,
+                              child: Row(
+                                children: [
+                                  Icon(FontAwesomeIcons.user),
+                                  Text("See Details"),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              onTap: ()async{
+                                await messProvider.change2ndMessOwnership(
                                   secondAdimnName: memberData[Constants.fname], 
                                   secondAdminId: memberData[Constants.uId], 
                                   onFail: (message){
@@ -200,7 +217,7 @@ class _MemberScreenState extends State<MemberScreen> {
                                 if(a??false){
                                   debugPrint("YES--------------");
                                   // remove from mess
-                                  await messProvaider.kickMemberFromMess(member: memberData);
+                                  await messProvider.kickMemberFromMess(member: memberData);
                                 }
                                 else{
                                   debugPrint("NO--------------");
@@ -226,10 +243,10 @@ class _MemberScreenState extends State<MemberScreen> {
                               onTap: ()async{
                                 // change member status
                                 memberData[Constants.status] = Constants.disable;
-                                final list = messProvaider.getMessModel!.messMemberList;
+                                final list = messProvider.getMessModel!.messMemberList;
                                 list[index] = memberData;
-                                messProvaider.setMessModel(messMemberList: list);
-                                await messProvaider.changeMemberStatus();
+                                messProvider.setMessModel(messMemberList: list);
+                                await messProvider.changeMemberStatus();
                                 
                               },
                             )
@@ -245,10 +262,10 @@ class _MemberScreenState extends State<MemberScreen> {
                               onTap: ()async{
                                 // change member status
                                 memberData[Constants.status] = Constants.enable;
-                                final list = messProvaider.getMessModel!.messMemberList;
+                                final list = messProvider.getMessModel!.messMemberList;
                                 list[index] = memberData;
-                                messProvaider.setMessModel(messMemberList: list);
-                                await messProvaider.changeMemberStatus();
+                                messProvider.setMessModel(messMemberList: list);
+                                await messProvider.changeMemberStatus();
                                 
                               },
                             ),

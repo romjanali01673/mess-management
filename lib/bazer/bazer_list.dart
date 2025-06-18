@@ -2,13 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:meal_hisab/bazer/bazer_update.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/bazer_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/bazer_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/bazer_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class BazerListScreen extends StatefulWidget {
@@ -24,9 +25,9 @@ class _BazerListScreenState extends State<BazerListScreen> {
   
   @override
   Widget build(BuildContext context) {
-  final bazerProvaider = context.watch<BazerProvaider>();
-  final authProvaider = context.watch<AuthenticationProvider>();
-  final messProvaider = context.watch<MessProvaider>();
+  final bazerProvider = context.watch<BazerProvider>();
+  final authProvider = context.watch<AuthenticationProvider>();
+  final messProvider = context.watch<MessProvider>();
     return Expanded(
       child: Column(
         children: [
@@ -43,17 +44,17 @@ class _BazerListScreenState extends State<BazerListScreen> {
                 icon: showCost? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
               ),
               title: 
-              showCost? Text("Current Blance: ${bazerProvaider.getCost}",)
+              showCost? Text("Current Blance: ${bazerProvider.getCost}",)
               :
               Text("tap to see blance"),
             ),
           ),
       
-          amIAdmin(messProvaider: messProvaider, authProvaider: authProvaider) || amIactmenager(messProvaider: messProvaider, authProvaider: authProvaider)?
+          amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)?
           Expanded(
                child: FutureBuilder(
-                future: bazerProvaider.getBazerTransactions(
-                  messId: authProvaider.getUserModel!.currentMessId, 
+                future: bazerProvider.getBazerTransactions(
+                  messId: authProvider.getUserModel!.currentMessId, 
                   onFail: (message){
                   }
                 ),
@@ -101,7 +102,11 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                       child: ListTile(
                                         title: Text("Edit"),
                                         leading: Icon(Icons.edit),
-                                        ), 
+                                        onTap: ()async{
+                                          Navigator.pop(context);
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> BazerListUpdateScreen(preBazerModel: bazerModel)));
+                                        },
+                                      ),
                                     ),
                                  
                                     PopupMenuItem(
@@ -128,9 +133,17 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                           ));
                                           if(confirm!=null && confirm){
                                             debugPrint("Confirmed ------------");
-                                          }
-                                          else{
-                                            debugPrint("Confirmed false ------------");
+                                            await bazerProvider.deleteABazerTransaction(
+                                              tnxId: bazerModel.transactionId, 
+                                              messId: authProvider.getUserModel!.currentMessId, 
+                                              extraAdd: (bazerModel.amount * -1), 
+                                              onFail: (message){
+                                                showSnackber(context: context, content: "Deletion Failed.\n$message");
+                                              },
+                                              onSuccess: () {
+                                                showSnackber(context: context, content: "Deletion Success.");
+                                              },
+                                            );
                                           }
                                         },
                                       ), 

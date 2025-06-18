@@ -1,7 +1,21 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/bazer_provider.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:meal_hisab/setting/change_email.dart';
+import 'package:meal_hisab/setting/change_password.dart';
 import 'package:meal_hisab/setting/edit_info.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -11,46 +25,51 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  bool visibleCurrent = false;
-  bool visibleNew = false;
-  bool visibleConfirm = false;
-
-  FocusNode FocusNodeCurrent = FocusNode();
-  FocusNode FocusNodeNew = FocusNode();
-  FocusNode FocusNodeConfirm = FocusNode();
-
-  String currentPass="";
-  String newPass="";
-  String confirmPass="";
 
 
 
-GlobalKey<FormState> formKey = GlobalKey<FormState>(); 
 
 
-  bool valid(){
-    if(formKey.currentState!.validate()){
-      formKey.currentState!.save();
-      if( newPass == confirmPass){
-        return true;
-      }
-      else{
-        // show in snack new pass & confirm pass dosenot matching.
-      }
+
+
+
+
+
+
+Future<void> logoutAndReset(BuildContext context) async {
+  try {
+    // Firebase logout
+    await FirebaseAuth.instance.signOut();
+
+    // Try to clear cache
+    try {
+      await Future.delayed(Duration(milliseconds: 500));
+      await FirebaseFirestore.instance.clearPersistence();
+    } catch (e) {
+      debugPrint("Firestore clearPersistence() failed: $e");
     }
-    return false;
-  }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    FocusNodeCurrent.dispose();
-    FocusNodeNew.dispose();
-    FocusNodeConfirm.dispose();
-    
-    super.dispose();
-  }
+    // Clear SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
 
+    // Reset provider state (if you have reset methods)
+    Provider.of<AuthenticationProvider>(context, listen: false).reset();
+    Provider.of<MessProvider>(context, listen: false).reset();
+    Provider.of<BazerProvider>(context, listen: false).reset();
+    Provider.of<DepositProvider>(context, listen: false).reset();
+    Provider.of<FandProvider>(context, listen: false).reset();
+    Provider.of<MealProvider>(context, listen: false).reset();
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Constants.LandingScreen, // or your login screen
+      (route) => false,
+    );
+  } catch (e) {
+    showSnackber(context: context, content: "Logout Failed\n${e.toString()}");
+    debugPrint(e.toString());
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -62,193 +81,20 @@ GlobalKey<FormState> formKey = GlobalKey<FormState>();
           width: double.infinity,
           child: ListView(
             children: [
-              getItem(label: "Edit Profile", icon: Icons.edit, ontap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>EditInfo()));} ),
-              getItem(label: "Security", icon: Icons.security, ontap: (){
-                return showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context, 
-                  builder: (BuildContext content){
-                    return StatefulBuilder(builder: (BuildContext context, StateSetter setModalState){
-                      return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                      ),
-                      height: 500,
-                      width: double.infinity,
-                      child: SingleChildScrollView(
-                       scrollDirection: Axis.vertical,
-                        child: Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey.shade300,
-                                  border: Border(bottom: BorderSide(color: Colors.black))
-                                ),
-                                margin: EdgeInsets.all(10),
-                                child: TextFormField(
-                                  focusNode: FocusNodeCurrent,
-                                  onFieldSubmitted: (value) {
-                                    FocusScope.of(context).requestFocus(FocusNodeNew);
-                                  },
-                                  onChanged: (value){
-                                    currentPass = value.trim();
-                                  },
-                                  validator: (value) {
-                                    if(currentPass.length<8){
-                                      return "password at least 8 character";
-                                    }
-                                    if(value.toString().contains(" ")){
-                                      return "Space are Not Allowed";
-                                    }
-                                    return null;
-                                  },
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  obscureText: visibleCurrent,
-                                  decoration: InputDecoration(
-                                    label: Text("Current Password"),
-                                    border: InputBorder.none,
-                                    suffixIcon:
-                                    IconButton(
-                                      onPressed: (){ 
-                                        setModalState(() { // the setModalState work in "showModalBottomSheet"
-                                          setState(() { // the setstate work in main page
-                                            
-                                          });
-                                          visibleCurrent = !visibleCurrent;
-                                        });
-                                      }, 
-                                      icon: visibleCurrent? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey.shade300,
-                                  border: Border(bottom: BorderSide(color: Colors.black))
-                                ),
-                                margin: EdgeInsets.all(10),
-                                child: TextFormField(
-                                  focusNode: FocusNodeNew,
-                                  onFieldSubmitted: (value){
-                                    FocusScope.of(context).requestFocus(FocusNodeConfirm);
-                                  },
-                                  textInputAction: TextInputAction.next,
-                                  obscureText: visibleNew,
-                                  keyboardType: TextInputType.text,
-                                  onChanged: (value){
-                                    newPass = value.trim();
-                                  },
-                                  validator: (value) {
-                                    if(newPass.length<8){
-                                      return "password at least 8 character";
-                                    }
-                                    if(value.toString().contains(" ")){
-                                      return "Space are Not Allowed";
-                                    }
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    label: Text("New Password"),
-                                    border: InputBorder.none,
-                                    suffixIcon:
-                                    IconButton(
-                                      onPressed: (){ 
-                                        setModalState(() { // the setModalState work in "showModalBottomSheet"
-                                          setState(() { // the setstate work in main page
-                                            
-                                          });
-                                          visibleNew = !visibleNew;
-                                        });
-                                      }, 
-                                      icon: visibleNew? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey.shade300,
-                                  border: Border(bottom: BorderSide(color: Colors.black))
-                                ),
-                                margin: EdgeInsets.all(10),
-                                child: TextFormField(
-                                  focusNode: FocusNodeConfirm,
-                                  onFieldSubmitted: (value){
-                                    FocusScope.of(context).unfocus();
-                                  },
-                                  textInputAction: TextInputAction.done,
-                                  obscureText: visibleConfirm,
-                                  keyboardType: TextInputType.text,
-                                  onChanged: (value){
-                                    confirmPass = value.trim();
-                                  },
-                                  validator: (value) {
-                                    if(confirmPass.length<8){
-                                      return "password at least 8 character";
-                                    }
-                                    if(value.toString().contains(" ")){
-                                      return "Space are Not Allowed";
-                                    }
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    label: Text("Confirm Password"),
-                                    border: InputBorder.none,
-                                    suffixIcon:
-                                    IconButton(
-                                      onPressed: (){ 
-                                        setModalState(() { // the setModalState work in "showModalBottomSheet"
-                                          setState(() { // the setstate work in main page
-                                            
-                                          });
-                                          visibleConfirm = !visibleConfirm;
-                                        });
-                                      }, 
-                                      icon: visibleConfirm? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              TextButton(
-                                onPressed: (){}, 
-                                child: Text("Forgot Passwprd?", style: TextStyle(color: Colors.blue, fontSize: 16),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              getButton(label: "Submit", ontap: (){
-                                valid();
-                                print(currentPass);
-                                print(newPass);
-                                print(confirmPass);
-                              }),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                    });
-                });
-              },
+              getItem(label: "Edit Profile", icon: Icons.supervised_user_circle_rounded, ontap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>EditInfo()));} ),
+              getItem(label: "Change Email", icon: Icons.edit, ontap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>ChangeEmail()));} ),
+              getItem(label: "Change Password", icon: Icons.lock, ontap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>ChangePassword()));}),
+              getItem(
+                label: "Logout", 
+                icon: Icons.logout, 
+                ontap: () async{
+                  bool? res = await showConfirmDialog(context: context, title: "Do you want to Logout?");
+                  if(res??false){
+                    // clear all cash and navigate  to login screen.
+                    logoutAndReset(context);
+                  }
+                },
               ),
-              getItem(label: "Logout", icon: Icons.logout, ),
             ],
           ),
         ),

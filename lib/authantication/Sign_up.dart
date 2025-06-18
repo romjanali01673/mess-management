@@ -2,13 +2,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/authantication/sign_in.dart';
 import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -37,10 +36,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // debugPrint(Fname);
       // debugPrint(email);
       // debugPrint(phone);
-      final authProvaider = context.read<AuthenticationProvider>();
+      final authProvider = context.read<AuthenticationProvider>();
       fromKey.currentState!.save();
-      authProvaider.setLoading(val: true);
-      UserCredential? userCredential = await authProvaider.createUserWithEmailAndPassword(
+      authProvider.setLoading(val: true);
+      UserCredential? userCredential = await authProvider.createUserWithEmailAndPassword(
         email:email,
         password: pass,
         onFail: (ErrorMessage) {
@@ -63,8 +62,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           currentMessId:"", 
           fullAddress: '',
         );
-        await authProvaider.storeUid(authToken:userCredential.user!.uid, uid: futureUid, onFail: (message){});
-        await authProvaider.saveUserDataToFireStore(
+        await authProvider.storeUid(authToken:userCredential.user!.uid, uid: futureUid, onFail: (message){});
+        await authProvider.saveUserDataToFireStore(
           currentUser: userModel, 
           fileImage: null, 
           onSuccess: ()async{
@@ -77,7 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
         
       }
-      authProvaider.setLoading(val: false);
+      authProvider.setLoading(val: false);
     }
     else{
       showSnackber(context: context, content: "please fill the all fields");
@@ -86,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthenticationProvider authProvaider = context.watch<AuthenticationProvider>();
+    final AuthenticationProvider authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
       body: Container(
@@ -164,10 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         Fname = value.trim();
                                       },
                                       validator: (value) {
-                                        if(Fname.length<4){
-                                          return "Name should Contain at least 4 character";
-                                        }
-                                        return null;
+                                        return nameValidator(value.toString());
                                       },
                                       keyboardType: TextInputType.text,
                                       textInputAction: TextInputAction.next,
@@ -242,13 +238,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           pass = value.trim();
                                         },
                                         validator: (value) {
-                                          if(value.toString().contains(" ")){
-                                            return "password can't contain SPACE";
-                                          }
-                                          if(value.toString().length<8){
-                                            return "pass should be al least 8 character";
-                                          }
-                                          return null;
+                                          return passValidator(value.toString());
                                         },
                                         decoration: InputDecoration(
                                           label: Text("Password",),
@@ -265,7 +255,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             height: 30,
                           ),
                           FadeInUp(duration: Duration(milliseconds:2200),
-                            child: authProvaider.isLoading?
+                            child: authProvider.isLoading?
                               SizedBox(
                                 height: 50,
                                 width: 50,
@@ -309,7 +299,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           FadeInUp(
                             duration:Duration(milliseconds:2800),
-                            child: HaveAccountWidget(label: "Don Have An Account? ", acctionText: "SignIn", ontap: (){
+                            child: HaveAccountWidget(label: "Have An Account? ", acctionText: "SignIn", ontap: (){
                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){return SignInScreen();}));
                           })),
                         ],

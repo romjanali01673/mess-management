@@ -12,14 +12,15 @@ import 'package:meal_hisab/providers/bazer_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
-class BazerEntryScreen extends StatefulWidget {
-  const BazerEntryScreen({super.key});
+class BazerListUpdateScreen extends StatefulWidget {
+  final BazerModel preBazerModel;
+  const BazerListUpdateScreen({super.key,required this.preBazerModel});
 
   @override
-  State<BazerEntryScreen> createState() => _BazerEntryScreenState();
+  State<BazerListUpdateScreen> createState() => _BazerListUpdateScreenState();
 }
 
-class _BazerEntryScreenState extends State<BazerEntryScreen> {
+class _BazerListUpdateScreenState extends State<BazerListUpdateScreen> {
 
   TimeOfDay? time;
   DateTime? date;
@@ -31,38 +32,31 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
 
-  List<String > list =["1","2","demo"];
-  // member uid|name
-  Map<String,(String,String)> memberUidList={};
+  List<String > list =[];
+
+  // "name" + "\n" + "uid"
   String selectedItem = "Select Member";
   Set<String> disabledItems ={};
 
-  // Future<List<String>> _getAllMemberData()async{
-  //   list.clear();
-  //   disabledItems.clear();
-  //   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  //   final messProvider = context.read<MessProvider>();
+
+
+  void setPreData(){
+    bazerList = (widget.preBazerModel.bazerList as List<dynamic>).map((x)=> Map<String, dynamic> .from(x as Map)).toList();
     
-  //   if(messProvider.getMessModel==null) return list;
-  //   for(String uid in messProvider.getMessModel!.messMemberList){
-  //     try {
-  //       DocumentSnapshot documentSnapshot = await firebaseFirestore
-  //         .collection(Constants.users)
-  //         .doc(uid)
-  //         .get();
-  //       if(documentSnapshot.exists){
-  //         list.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}");
-  //         memberUidList["Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.uId]}"] = (uid,documentSnapshot[Constants.fname]);//(uid,name)
-  //         if(messProvider.getMessModel!.disabledMemberList.contains(uid)){
-  //           disabledItems.add("Name: ${documentSnapshot[Constants.fname]} \nId: ${documentSnapshot[Constants.createdAt]}");
-  //         }
-  //       }
-  //     } catch (e) {
-  //       showSnackber(context: context, content: e.toString());
-  //     }
-  //   }
-  //   return list;
-  // }
+    DateTime dateTime = DateFormat("h:mm a").parse(widget.preBazerModel.bazerTime);
+    time = TimeOfDay.fromDateTime(dateTime);
+    timeController.text = widget.preBazerModel.bazerTime;
+
+    date = DateFormat("dd/MM/yyyy").parse(widget.preBazerModel.bazerDate);
+    dateController.text = widget.preBazerModel.bazerDate;
+
+    selectedItem = widget.preBazerModel.byWho[Constants.fname].toString()+"\n"+widget.preBazerModel.byWho[Constants.uId].toString();
+
+    setState(() {
+      
+    });
+  }
+
 
 
   Future<List<String>> _getAllMemberData()async{
@@ -82,10 +76,9 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
     for(dynamic member in messProvider.getMessModel!.messMemberList){
       try {
         
-          list.add("Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}");
-          memberUidList["Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}"] = (member[Constants.uId],member[Constants.fname]);//(uid,name)
+          list.add("${member[Constants.fname]}\n${member[Constants.uId]}");
           if(member[Constants.status]==Constants.disable){
-            disabledItems.add("Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}");
+            disabledItems.add("${member[Constants.fname]}\n${member[Constants.uId]}");
           }
         
       } catch (e) {
@@ -95,6 +88,12 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
     return list;
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setPreData();
+  }
 
   @override
   void dispose() {
@@ -113,8 +112,9 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
 
 
-    return Expanded(
-      child: Container(
+    return Scaffold(
+      appBar: AppBar(),
+      body: Container(
         // color: Colors.amber,
         height: double.infinity,
         width: double.infinity,
@@ -187,6 +187,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     child: TextField(
                       onTap: () async{
 
+            
                         date = await showDatePicker(
                           // fieldHintText: "mm/dd/YYYY",
                           fieldLabelText: "Enter Date (MM/DD/YYYY)", // defalut "Enter Date"
@@ -353,13 +354,13 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                 ],
               ),
             ),
-
+            
             SizedBox(
               height: 50,
             ),
           
             getButton(
-              label: "save", 
+              label: "Update", 
               ontap: ()async{
                 if(amIAdmin(messProvider:messProvider , authProvider: authProvider) || amIactmenager(messProvider:messProvider , authProvider: authProvider)){
                   if(selectedItem=="Select Member"){
@@ -390,19 +391,19 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       return;
                     }
                     BazerModel  bazerModel = BazerModel(
-                      transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                      transactionId: widget.preBazerModel.transactionId, 
                       amount: totalAmount, 
                       bazerList: bazerList,
                       bazerTime: formatTimeOfDay(time!).toString(),
                       bazerDate: DateFormat("dd/MM/yyyy").format(date!).toString(),
                       byWho: {
-                        Constants.uId: memberUidList[selectedItem]!.$1, 
-                        Constants.fname:memberUidList[selectedItem]!.$2,
+                        Constants.fname:selectedItem.split('\n')[0],
+                        Constants.uId: selectedItem.split('\n')[1], 
                       },
                     );
                     print(totalAmount.toString()+"a");
-
-                    await bazerProvider.addABazerTransaction(
+            
+                    await bazerProvider.updateABazerTransaction(
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
                       onFail: (message ) { 
@@ -410,9 +411,10 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       },
                       onSuccess: (){
                         showSnackber(context: context, content: "Bazer Entry Successed!");
-                      }
+                      }, 
+                      extraAdd: (bazerModel.amount - widget.preBazerModel.amount) ,
                     );
-
+            
                     // success 
                     setState(() {
                       bazerList.clear();
@@ -424,7 +426,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                 }
               }
             ),
-        
+            SizedBox(height: 50,),
           ],
         ),
       ),
@@ -532,6 +534,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
             }, 
             
             child:isUpdate? Text("Update") : Text("Add"),
+
           ),
         ],
       );

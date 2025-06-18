@@ -6,9 +6,9 @@ import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/home.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/provaiders/authantication_provaider.dart';
-import 'package:meal_hisab/provaiders/deposit_provaider.dart';
-import 'package:meal_hisab/provaiders/mess_provaider.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddRefund extends StatefulWidget {
@@ -39,17 +39,17 @@ class _AddRefundState extends State<AddRefund> {
     list.clear();
     disabledItems.clear();
     final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    final messProvaider = context.read<MessProvaider>();
-    final authProvaider = context.read<AuthenticationProvider>();
-    await messProvaider.getMessData(
+    final messProvider = context.read<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
+    await messProvider.getMessData(
       onFail: (message){
 
       }, 
-      messId:authProvaider.getUserModel!.currentMessId,
+      messId:authProvider.getUserModel!.currentMessId,
     );
 
-    if(messProvaider.getMessModel==null) return list;
-    for(dynamic member in messProvaider.getMessModel!.messMemberList){
+    if(messProvider.getMessModel==null) return list;
+    for(dynamic member in messProvider.getMessModel!.messMemberList){
       try {
         
           list.add("Name: ${member[Constants.fname]} \nId: ${member[Constants.uId]}");
@@ -69,9 +69,9 @@ class _AddRefundState extends State<AddRefund> {
 
   @override
   Widget build(BuildContext context) {
-    final depositProvaider = context.watch<DepositProvaider>();
-    final messProvaider = context.watch<MessProvaider>();
-    final authProvaider = context.watch<AuthenticationProvider>();
+    final depositProvider = context.watch<DepositProvider>();
+    final messProvider = context.watch<MessProvider>();
+    final authProvider = context.watch<AuthenticationProvider>();
 
     return Expanded(
       child: Container(
@@ -209,7 +209,7 @@ class _AddRefundState extends State<AddRefund> {
                   bool valided  = (formKey.currentState!.validate() && selectedItem!="Select Member");
                   
                   if(valided){
-                    await depositProvaider.addADepositTransaction(
+                    await depositProvider.addADepositTransaction(
                       depositModel: DepositModel(
                         transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
                         amount: double.parse(amount), 
@@ -217,7 +217,7 @@ class _AddRefundState extends State<AddRefund> {
                         type: Constants.refund, 
                       ), 
                       uId: memberUidList[selectedItem]!.$1, 
-                      messId: authProvaider.getUserModel!.currentMessId, 
+                      messId: authProvider.getUserModel!.currentMessId, 
                       onFail: (message ) { 
                         showSnackber(context: context, content: "Refund Failed! \n$message");
                       },
