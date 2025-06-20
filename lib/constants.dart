@@ -104,6 +104,7 @@ class Constants {
   static const String notice = "notice";
   static const String noticeId = "noticeId";
   static const String listOfNotice = "listOfNotice";
+  static const String homePindedNotice = "homePindedNotice";
 
   
   static const String entryTime = "entryTime";

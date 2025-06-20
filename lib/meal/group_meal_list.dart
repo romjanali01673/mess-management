@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/meal/meal_entry.dart';
 import 'package:meal_hisab/model/meal_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/meal_provider.dart';
@@ -199,10 +200,12 @@ class _GroupMealListState extends State<GroupMealList> {
                           bool canSee = false;
                           return StatefulBuilder(
                             builder: ( context,setLocalState){
+
                               return Card(
                                 child: Column(
                                   children: [
                                     ListTile(
+                                      contentPadding: EdgeInsets.only(left: 8),
                                       title: Text("${x+1}-${monthName[monthName.keys.first]![1]}"),
                                       onTap: () {
                                         canSee = !canSee;
@@ -213,7 +216,7 @@ class _GroupMealListState extends State<GroupMealList> {
                                     ),
                                     if(canSee)...[
                                       FutureBuilder(
-                                        future: mealProvider.checkMealModelExist(
+                                        future: mealProvider.checkMealModelAlreadyExist(
                                           messId: authProvider.getUserModel!.currentMessId, 
                                           date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
                                           onFail: (message){
@@ -233,22 +236,58 @@ class _GroupMealListState extends State<GroupMealList> {
                                           return Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  IconButton(
+                                                    padding: EdgeInsets.all(0),
+                                                    onPressed: ()async{
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=> MealEntryScreen(preMealModel: snapshot.data,)));
+                                                    }, 
+                                                    color: Colors.green.shade500,
+                                                    icon:Icon(Icons.edit),
+                                                  ),
+
+                                                  IconButton(
+                                                    padding: EdgeInsets.all(0),
+                                                    onPressed: ()async{
+                                                      await mealProvider.deleteAMeal(
+                                                        date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
+                                                        onFail: (message){
+                                                          showSnackber(context: context, content: "Deletein Failed!\n$message");
+                                                        }, 
+                                                        onSuccess: () {
+                                                          showSnackber(context: context, content: "Deletein Successed.");
+                                                          setLocalState((){
+
+                                                          });
+                                                        },
+                                                        messId: authProvider.getUserModel!.currentMessId, 
+                                                        extraMeal: (- snapshot.data!.totalMeal),
+                                                      );
+                                                    }, 
+                                                    color: Colors.red.shade400,
+                                                    icon:Icon(Icons.delete),
+                                                  ),
+                                                ],
+                                              ),
                                               ...List.generate(snapshot.data!.listOfMeal.length, (no){
                                                 return ListTile(
                                                   leading: Text("${no+1}"),
                                                   title: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      Text("Name: " + snapshot.data!.listOfMeal[no][Constants.fname].toString()),
-                                                      Text("UId: " + snapshot.data!.listOfMeal[no][Constants.uId].toString()),
-                                                      Text("Meal : " + snapshot.data!.listOfMeal[no][Constants.meal].toString()),
+                                                      Text(" Name: " + snapshot.data!.listOfMeal[no][Constants.fname].toString()),
+                                                      Text(" UId: " + snapshot.data!.listOfMeal[no][Constants.uId].toString()),
+                                                      Text(" Meal : " + snapshot.data!.listOfMeal[no][Constants.meal].toString()),
                                                     ],
                                                   ),
                                                 );
                                               }),
-                                              Text("Total Meal: "+ snapshot.data!.totalMeal.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
-                                              Text("Meal Day: "+snapshot.data!.date.toString()),
-                                              Text("Entry Time: "+ "${DateFormat("hh:mm a dd-MM-yyyy").format(snapshot.data!.CreatedAt!.toDate().toLocal())}"),
+                                              Text(" Total Meal: "+ snapshot.data!.totalMeal.toString(), style: TextStyle(fontWeight: FontWeight.bold),),
+                                              Text(" Meal Day: "+snapshot.data!.date.toString()),
+                                              Text(" Entry Time: "+ "${DateFormat("hh:mm a dd-MM-yyyy").format(snapshot.data!.CreatedAt!.toDate().toLocal())}"),
+                                              SizedBox(height: 5,),
                                             ],
                                           );
                                         },

@@ -40,6 +40,7 @@ class NoticeProvider extends ChangeNotifier{
   // function -----------
 
   Future<void> checkHasNoticeUnseen({required String uid, required String messId})async{
+    print("has notice called");
     try {
       DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.notice).doc(messId).get();
       if(snapshot.exists && snapshot.data() != null){
@@ -50,11 +51,21 @@ class NoticeProvider extends ChangeNotifier{
         }
         else{
           setHasUnseen(value: false);
-          print("has notice f");
+          print("has notice f$memberList");
         }
       }
     } catch (e) {
       print(e.toString()+"check has notice");
+    }
+  }
+  Future<void> pinToHome({required NoticeModel noticeModel, required String messId, required Function(String) onFail, Function()? onSuccess})async{
+    try {
+      await firebaseFirestore.collection(Constants.notice).doc(messId).set(
+        { Constants.homePindedNotice : noticeModel.toMap()}
+      );
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      onFail(e.toString());
     }
   }
 
@@ -110,7 +121,7 @@ class NoticeProvider extends ChangeNotifier{
         noticeModel.toMap()
       );
 
-      batch.set(
+      batch.update(
         firebaseFirestore.collection(Constants.notice)
         .doc(messId),
         {Constants.messMemberList : currentMessMemberUidList}

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/model/notice_model.dart';
 class FirstScreenProvider extends ChangeNotifier{
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
@@ -13,6 +14,8 @@ class FirstScreenProvider extends ChangeNotifier{
   double _totalBazerCost = 0;
   double _remainingFandBlance = 0;
   double _totalDepositOfMess = 0;
+
+  NoticeModel? _pindNoticeForHome;
 
 
 
@@ -35,6 +38,10 @@ class FirstScreenProvider extends ChangeNotifier{
   double get getTotalBazerCost =>  _totalBazerCost;
   double get getRemainingFandBlance => _remainingFandBlance;
   double get getTotalDepositOfMess => _totalDepositOfMess;
+
+  NoticeModel? get  getPindedNoticeForHome=> _pindNoticeForHome;
+
+
 
 // set ---------------------------------------------------------
 
@@ -72,6 +79,18 @@ class FirstScreenProvider extends ChangeNotifier{
     _totalDepositOfMess = value;
     notifyListeners();
   }
+
+  void setPindNoticeForHome({required NoticeModel? value}){
+    _pindNoticeForHome = value;
+    notifyListeners();
+  }
+
+
+
+
+
+
+
 
 
   Future<double> getFandBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
@@ -204,6 +223,30 @@ class FirstScreenProvider extends ChangeNotifier{
     }  
     setIsLoading(value: false);
     return meal;
+  }
+
+  Future<NoticeModel?> getPindNoticeForHomeFromDatabase({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    print("getPindedNotice called");
+    setIsLoading(value: true);
+    try {
+      NoticeModel? noticeModel;
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.notice).doc(messId).get();
+      
+    
+      if(snapshot.exists && snapshot.data() != null){
+        noticeModel = NoticeModel.fromMap(((snapshot.data()as Map<String,dynamic>)[Constants.homePindedNotice] as Map<String,dynamic>));
+      }
+    
+      setPindNoticeForHome(value: noticeModel);
+      
+      debugPrint("getPindedNotice"+noticeModel!.toMap().toString());
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      onFail(e.toString());
+      print(e.toString());
+    }  
+    setIsLoading(value: false);
+    return null;
   }
 
 }

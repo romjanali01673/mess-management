@@ -22,29 +22,10 @@ class MealScreen extends StatefulWidget {
 class _MealScreenState extends State<MealScreen> {
   bool showTotalMeal = false;
   Meal mealGroup = Meal.mealList;
-  int year = DateTime.now().year;
-  TextEditingController dateController = TextEditingController(text: DateTime.now().year.toString());
-  List<Map<String, List>> month = [
-    
-    {"January" : [false, "January",1]},
-    {"January" : [false, "January",2]},
-    {"January" : [false, "January",3]},
-    {"January" : [false, "January",4]},
-    {"January" : [false, "January",5]},
-    {"January" : [false, "January",6]},
-    {"January" : [false, "January",7]},
-    {"January" : [false, "January",8]},
-    {"January" : [false, "January",9]},
-    {"January" : [false, "January",10]},
-    {"January" : [false, "January",11]},
-    {"January" : [false, "January",12]},
-    //  "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-    ];
 
   @override
   void dispose() {
 
-    dateController.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -78,10 +59,7 @@ class _MealScreenState extends State<MealScreen> {
                 getMenuItems(
                   label: "Meal Entry", 
                   ontap: (){
-                    mealGroup = Meal.mealEntry;
-                    setState(() {
-                      
-                    });
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=> MealEntryScreen()));
                   },
                   selected: mealGroup == Meal.mealEntry,
                   icon: Icons.add,

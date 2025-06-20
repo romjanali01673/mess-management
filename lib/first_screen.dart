@@ -1,7 +1,9 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/notice_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/firstScreen_provider.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +44,7 @@ class _FirstScreenState extends State<FirstScreen> {
     firstScreenProvider.getTotalDeposit(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
     firstScreenProvider.getTotalDepositOfMember(uId: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId, onFail: (_){}, );
     firstScreenProvider.getTotalMealOfMember(uId: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId, onFail: (_){}, );
+    firstScreenProvider.getPindNoticeForHomeFromDatabase( messId: authProvider.getUserModel!.currentMessId, onFail: (_){}, );
   }
 
   @override
@@ -242,22 +245,38 @@ class _FirstScreenState extends State<FirstScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             spacing: 10,
                             children: [
-                              FaIcon(FontAwesomeIcons.message),
-                              Text("Menager Talk...."),
+                              Icon(Icons.push_pin_rounded),
+                              Text("Pind Notice"),
                             ],
                           ),
                           SizedBox(
                             height: 30,
                           ),
-                          Text("menager sayed to ...."),
-                          Center(child: Text("Nothing!"),),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              firstScreenProvider.getPindedNoticeForHome==null? Text("Nothing")
+                              :
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: 20,
+                                children: [
+                                  Text("Notice Id:${firstScreenProvider.getPindedNoticeForHome!.noticeId}",),
+                                  Text("Title: ${firstScreenProvider.getPindedNoticeForHome!.title}"),
+                                  Text("Description ${firstScreenProvider.getPindedNoticeForHome!.description}",),
+                                  Text("Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(firstScreenProvider.getPindedNoticeForHome!.CreatedAt!.toDate().toLocal())}",),
+                                ],
+                              )
+                              
+                            ],
+                          ),
                         ],
                       ),
                     ),

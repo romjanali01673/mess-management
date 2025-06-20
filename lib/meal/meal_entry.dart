@@ -11,20 +11,75 @@ import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MealEntryScreen extends StatefulWidget {
-  const MealEntryScreen({super.key});
+  final MealModel? preMealModel;
+  const MealEntryScreen({super.key, this.preMealModel });
 
   @override
   State<MealEntryScreen> createState() => _MealEntryScreenState();
 }
 
 class _MealEntryScreenState extends State<MealEntryScreen> {
+  bool isUpdate = false;
   bool _isDisposed = false;
   DateTime? date;
-  double totalMeal = 0.0;
 
   var dateController  = TextEditingController();
   late List<TextEditingController> listOfTexteditingController;
   late List<Map<String, dynamic>> listOfMeal;
+  List<Map<String,dynamic>> memberData =[];
+
+  double getTotalMeal(){
+    double totalMeal = 0;
+    listOfMeal.map((x){
+      totalMeal+= double.parse(x[Constants.meal].toString());
+    }).toList();
+
+    return totalMeal;
+  }
+
+  setData({required bool isUpdate}){
+    if(isUpdate){
+      date = DateFormat("dd-MM-yyyy").parse(widget.preMealModel!.date);
+      dateController.text = widget.preMealModel!.date;
+
+      memberData = widget.preMealModel!.listOfMeal;           
+      // set here the list of meal.
+      listOfMeal = List.generate(memberData!.length,(_)=><String,dynamic>{Constants.meal:0});
+      listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
+      
+      for(int i =0; i<memberData.length; i++){
+        listOfTexteditingController[i].text =memberData[i][Constants.meal].toString(); 
+      }
+
+      setState(() {
+        
+      });
+    }
+    else{
+      final messProvider  = context.read<MessProvider>();
+      memberData = messProvider.getMessModel!.messMemberList;           
+      // set here the list of meal.
+      listOfMeal = List.generate(memberData!.length,(_)=><String,dynamic>{Constants.meal:0});
+      listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
+      setState(() {
+        
+      });
+    }
+  }
+
+@override
+  void initState() {
+    // TODO: implement initState
+    if(widget.preMealModel==null){
+      setData(isUpdate :false);
+    }
+    else{
+      isUpdate = true;
+      setData(isUpdate :true);
+    }
+    super.initState();
+  }
+
 
   @override
   void dispose() {
@@ -39,11 +94,11 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final mealProvider  = context.watch<MealProvider>();
-    final messProvider  = context.read<MessProvider>();
     final authProvider  = context.watch<AuthenticationProvider>();
 
-    return Expanded(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -52,6 +107,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                 Expanded(
                   child: TextField(
                     onTap: () async{
+                      if(isUpdate) return;
                       date = await showDatePicker(
                         // fieldHintText: "mm/dd/YYYY",
                         fieldLabelText: "Enter Date (DD-MM-YYYY)", // defalut "Enter Date"
@@ -82,111 +138,113 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
               ]
             )
           ),
+            
+          if(memberData.isEmpty) Expanded(
+            child: Center(
+              child: IconButton(
+                onPressed: (){
+                  setData(isUpdate: isUpdate);
+                }, 
+                icon: Icon(Icons.replay_outlined),
+              )
+            )
+          ),
+          
           Expanded(
-            child: FutureBuilder(
-              future:messProvider.getMessData(
-                onFail: (message) { 
-                  showSnackber(context: context, content: message);
-                },
-                messId: authProvider.getUserModel!.currentMessId,
-                isDisposed: ()=> _isDisposed,
-                onSuccess: (){
-                  debugPrint("get mess data successfull.");
-                },
-              ),
-              builder: (context, AsyncSnapshot snapshot){
-              if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's save 
-                return Center(child: CircularProgressIndicator());
-              }
+            
+            
               
-              else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
-                return Center(child: Text('No member found.'));
-              }
-
-              List data = messProvider.getMessModel!.messMemberList;
-
-                
-              // // set here the list of meal.
-              listOfMeal = List.generate(data!.length,(_)=><String,dynamic>{Constants.meal:0});
-              listOfTexteditingController = List.generate(data!.length, (_) => TextEditingController());
-
-              return StatefulBuilder(
+              child: StatefulBuilder(
                 builder: (context, setLocalState) {
                 
               return Padding(
               padding: EdgeInsets.all(10),
                 child: ListView.builder(
-                  itemCount: data!.length+1,
+                  itemCount: memberData!.length+1,
                   itemBuilder: (context, index){
-
+            
                     // the button will be shown in last when we reach in last 
-                    if(index==data.length){
+                    if(index==memberData.length){
                       return  getMenuItems(
-                        label: "submit", 
+                        label: isUpdate?"Update":"Submit", 
                         ontap: ()async{
                           if(date == null){
                             showSnackber(context: context, content: "Date Was not Selected");
                             return;
-                          }
-                          MealModel? m;
-                          bool failed = false;
-                          m = await mealProvider.checkMealModelExist(
-                            messId: authProvider.getUserModel!.currentMessId, 
-                            date: DateFormat("dd-MM-yyyy").format(date!), 
-                            onFail: (message){
-                              showSnackber(context: context, content: message);
-                              failed = true;                              
-                            },
-                            onSuccess: (){
-                              debugPrint("success");
-                            }
-                          );
-                          if(failed){
-                            return;
-                          }
-
-                          if(m!=null){
-                            showSnackber(context: context, content: "Already Exist in the given date");
-                            return;
-                          }
-                          bool submit = await showConfirmDialog(context: context, title: "Do you want to submit?");
+                          }                         
+                          bool submit = await showConfirmDialog(context: context, title: "Do you want to ${isUpdate? "Update" :"submit"}?");
                           if(submit ?? false){
-                            // up to dateabase
-                            MealModel mealModel = MealModel(
-                              date: DateFormat("dd-MM-yyyy").format(date!),
-                              listOfMeal: listOfMeal, 
-                              totalMeal: totalMeal,
-                            );
-                            print(mealModel.toMap());
-
-                            mealProvider.addAMeal(
-                              mealModel: mealModel, 
-                              messId: authProvider.getUserModel!.currentMessId, 
-                              onFail: (message){
-                                showSnackber(context: context, content: message);
-                              },
-                              onSuccess: (){
-                                //al done, clear all
-                                listOfMeal.forEach((x){
-                                  x[Constants.meal] = 0;
-                                });
-                                listOfTexteditingController.forEach((x){
-                                  x.text = "";
-                                });
-                                totalMeal = 0;
-
-                                showSnackber(context: context, content: "Meal Add Success");
-                                setLocalState(() {
-                                  
-                                });
-                              }
-                            );
+                            if(isUpdate){
+                              // up to dateabase
+                              MealModel mealModel = MealModel(
+                                date: widget.preMealModel!.date,
+                                listOfMeal: listOfMeal, 
+                                totalMeal: getTotalMeal(),
+                              );
+            
+                              print(mealModel.toMap());
+            
+                              mealProvider.updateAMeal(
+                                mealModel: mealModel, 
+                                extraMeal: mealModel.totalMeal - widget.preMealModel!.totalMeal,
+                                messId: authProvider.getUserModel!.currentMessId, 
+                                onFail: (message){
+                                  showSnackber(context: context, content: message);
+                                },
+                                onSuccess: (){
+                                  //al done, clear all
+                                  listOfMeal.forEach((x){
+                                    x[Constants.meal] = 0;
+                                  });
+                                  listOfTexteditingController.forEach((x){
+                                    x.text = "";
+                                  });
+            
+                                  showSnackber(context: context, content: "Meal Update Success");
+                                  setLocalState(() {
+                                    
+                                  });
+                                }, 
+                              );
+                            }
+                            else{
+                              // update to dateabase
+                              MealModel mealModel = MealModel(
+                                date: DateFormat("dd-MM-yyyy").format(date!),
+                                listOfMeal: listOfMeal, 
+                                totalMeal: getTotalMeal(),
+                              );
+                              print(mealModel.toMap());
+            
+                              mealProvider.addAMeal(
+                                mealModel: mealModel, 
+                                messId: authProvider.getUserModel!.currentMessId, 
+                                onFail: (message){
+                                  showSnackber(context: context, content: message);
+                                },
+                                onSuccess: (){
+                                  //al done, clear all
+                                  listOfMeal.forEach((x){
+                                    x[Constants.meal] = 0;
+                                  });
+                                  listOfTexteditingController.forEach((x){
+                                    x.text = "";
+                                  });
+                                  showSnackber(context: context, content: "Meal Add Success");
+                                  setLocalState(() {
+                                    
+                                  });
+                                }
+                              );
+            
+                            }
+                            
                           }
                         }
                       );
                     }
-
-                    final member = data[index];
+            
+                    final member = memberData[index];
                     listOfMeal[index][Constants.uId] = member[Constants.uId];
                     listOfMeal[index][Constants.fname] = member[Constants.fname];
                     // listOfTexteditingController[index].text = listOfMeal[index].toString();
@@ -215,22 +273,14 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                               onTapOutside: (event) {// close keyboard
                                 FocusScope.of(context).unfocus();
                               },
-                              enabled: member[Constants.status]==Constants.enable,
+                              enabled: isUpdate? true :  member[Constants.status]==Constants.enable,
                               onChanged: (value){
                                 try{
                                   double d = double.parse(value.toString());
                                   listOfMeal[index][Constants.meal] = d;
-                                  totalMeal = 0;
-                                  listOfMeal.forEach((x){
-                                    totalMeal += x[Constants.meal];
-                                  });
                                 }catch(e){
                                   listOfTexteditingController[index].text = "";
                                   listOfMeal[index][Constants.meal] = 0;
-                                  totalMeal = 0;
-                                  listOfMeal.forEach((x){
-                                    totalMeal += x[Constants.meal];
-                                  });
                                 }
                                 debugPrint(listOfMeal[index].toString());
                               },
@@ -238,7 +288,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                               ],
-                              textInputAction: index==data!.length-1? TextInputAction.done : TextInputAction.next,
+                              textInputAction: index==memberData!.length-1? TextInputAction.done : TextInputAction.next,
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder()
@@ -251,10 +301,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                   }
                 ),
               );
-              },);
               },
-            ),
-          ),
+              ),
+          )
         ],
       ),
     );

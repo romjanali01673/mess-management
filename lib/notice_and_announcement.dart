@@ -98,10 +98,29 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
                                           icon: Icon(Icons.more_vert),
                                           itemBuilder: (context) =>[
                                             PopupMenuItem(
+                                              value: 3,
+                                              child: ListTile(
+                                                title: Text("Pin To Home"),
+                                                leading: Icon(Icons.push_pin_sharp,),
+                                              ), 
+                                              onTap: () {
+                                                noticeProvider.pinToHome(
+                                                  noticeModel: noticeModel, 
+                                                  messId: authProvider.getUserModel!.currentMessId,
+                                                  onFail: (p0) {
+                                                    showSnackber(context: context, content: "Action Failed!\n$p0");
+                                                  },
+                                                  onSuccess: (){
+                                                    showSnackber(context: context, content: "Pinded, Look AT Home.");
+                                                  }
+                                                );
+                                              },
+                                            ),
+                                            PopupMenuItem(
                                               value: 0,
                                               child: ListTile(
                                                 title: Text("Edit"),
-                                                leading: Icon(Icons.edit),
+                                                leading: Icon(Icons.edit, color: Colors.green,),
                                               ), 
                                               onTap: () {
                                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>AddNotice(preNoticeModel: noticeModel,)));
@@ -115,7 +134,7 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
                                               // },
                                               child: ListTile(
                                                 title: Text("Delete"),
-                                                leading: Icon(Icons.delete),
+                                                leading: Icon(Icons.delete, color: Colors.red,),
                                                 onTap: ()async{
                                                   Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
                                                   bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(

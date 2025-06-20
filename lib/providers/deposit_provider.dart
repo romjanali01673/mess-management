@@ -163,14 +163,8 @@ class DepositProvider extends ChangeNotifier{
   // add a fand transaction to database 
   Future<void> addADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-
-    // fatch deposit
-    await getDepositAmount(
-      messId: messId, 
-      uId: uId,
-      onFail: onFail,
-      onSuccess: ()async{
         try {
+
           // add member diposite transaction
           batch.set(
             firebaseFirestore.collection(Constants.deposit)
@@ -182,27 +176,28 @@ class DepositProvider extends ChangeNotifier{
             
             depositModel.toMap()
           );
+
           // add total diposite
-          batch.set( // we can't use update here because initially the document was not exist
+          batch.update( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
             .collection(Constants.member)
             .doc(uId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : (getTotalDeposit + depositModel.amount)}
+            {Constants.deposit : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : (getTotalDeposit - depositModel.amount)},
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
           );
           
-          batch.set(
+          batch.update(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : (getTotalDepositOfMess+depositModel.amount)}
+            {Constants.deposit : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : (getTotalDepositOfMess - depositModel.amount)}
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
           );
 
           await batch.commit();
@@ -210,8 +205,107 @@ class DepositProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         } 
-      }
-    );
+  }
+
+  // update a deposit transaction to database 
+  Future<void> updateADepositTransaction({required DepositModel depositModel, required String uId,required double extraAmount, required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+        try {
+          
+          // add new data data 
+          batch.set(
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId)
+            .collection(Constants.member)
+            .doc(uId)
+            .collection(Constants.listOfDepositTransactions)
+            .doc(depositModel.transactionId),
+            
+            depositModel.toMap(),
+
+            SetOptions(
+              mergeFields: [
+                Constants.amount, 
+                Constants.description, 
+              ]
+            )
+          );
+
+          // increment my total diposite
+          batch.update( // we can't use update here because initially the document was not exist
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId)
+            .collection(Constants.member)
+            .doc(uId),
+            
+            depositModel.type==Constants.deposit? 
+            {Constants.deposit : FieldValue.increment(extraAmount)}
+            :
+            {Constants.deposit : FieldValue.increment(-extraAmount)}
+          );
+          
+          // increment mess total diposite
+          batch.update(
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId),
+            
+            depositModel.type==Constants.deposit? 
+            {Constants.deposit : FieldValue.increment( extraAmount)}
+            :
+            {Constants.deposit : FieldValue.increment(-extraAmount)}
+          );
+
+          await batch.commit();
+          onSuccess!=null? onSuccess() : (){};
+        } catch (e) {
+          onFail(e.toString());
+        } 
+  }
+
+  // delete a deposit transaction to database 
+  Future<void> deleteADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+        try {
+
+          // delete the pre data 
+          batch.delete(
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId)
+            .collection(Constants.member)
+            .doc(uId)
+            .collection(Constants.listOfDepositTransactions)
+            .doc(depositModel.transactionId)
+          );
+
+          // decrement my total diposite
+          batch.update( // we can't use update here because initially the document was not exist
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId)
+            .collection(Constants.member)
+            .doc(uId),
+            
+            depositModel.type==Constants.deposit? 
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            :
+            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+          );
+          
+          // decrement mess total diposite
+          batch.update(
+            firebaseFirestore.collection(Constants.deposit)
+            .doc(messId),
+            
+            depositModel.type==Constants.deposit? 
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            :
+            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+          );
+
+          await batch.commit();
+          onSuccess!=null? onSuccess() : (){};
+        } catch (e) {
+          onFail(e.toString());
+        } 
   }
 
 

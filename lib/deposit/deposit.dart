@@ -4,7 +4,6 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/Deposit/add_deposit.dart';
 import 'package:meal_hisab/deposit/history_of_deposit.dart';
 import 'package:meal_hisab/deposit/my_deposit.dart';
-import 'package:meal_hisab/deposit/add_refund.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 
 class DepositScreen extends StatefulWidget {
@@ -15,7 +14,7 @@ class DepositScreen extends StatefulWidget {
 }
 
 class _DepositScreenState extends State<DepositScreen> {
-  int blance = 999999;
+  int blance = 0;
   Deposit DepositItemGroup = Deposit.myDeposit;
 
   @override
@@ -56,27 +55,15 @@ class _DepositScreenState extends State<DepositScreen> {
                     ),
                     getMenuItems(
                       icon: Icons.add_box_rounded,
-                      label: "Add Deposit", 
+                      label: "Entry", 
                       ontap: (){
-                        DepositItemGroup = Deposit.addDeposit;
-                        setState(() {
+                        // DepositItemGroup = Deposit.addDeposit;
+                        // setState(() {
                           
-                        });
-                            
+                        // });
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddDeposit())); 
                       },
                       selected: DepositItemGroup == Deposit.addDeposit,
-                    ),
-                    getMenuItems(
-                      icon: FontAwesomeIcons.circleMinus,
-                      label: "Add Refund", 
-                      ontap: (){
-                        DepositItemGroup = Deposit.refund;
-                        setState(() {
-                          
-                        });
-                            
-                      },
-                      selected: DepositItemGroup == Deposit.refund,
                     ),
                   ],
                 ),
@@ -85,8 +72,6 @@ class _DepositScreenState extends State<DepositScreen> {
             DepositItemGroup==Deposit.historyOfDeposit? DepositHistory() 
             :
             DepositItemGroup==Deposit.addDeposit? AddDeposit()
-            :
-            DepositItemGroup==Deposit.refund? AddRefund()
             :
             MyDeposit(),
           ],     

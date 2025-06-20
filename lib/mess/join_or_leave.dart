@@ -93,12 +93,6 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
       child: Column(
         spacing: 10,
         children: [
-          Card(
-            child: ListTile(
-              titleAlignment: ListTileTitleAlignment.center,
-              title: Text("The Invaitations Offer Will be validate for 3 days. if you didn't accept the profosal within the spacify date you can't join later.",textAlign: TextAlign.justify,),
-            ),
-          ),
           
           messProvider.isLoading? SizedBox.square(dimension: 50,child: CircularProgressIndicator(),)
           :

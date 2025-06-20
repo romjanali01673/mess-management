@@ -6,76 +6,46 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
+import 'package:meal_hisab/model/fand_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
-class AddDeposit extends StatefulWidget {
-  final DepositModel? preDepositModel;
-  final Map<String,dynamic> ? preMemberData;
-  const AddDeposit({super.key, this.preDepositModel,this.preMemberData });
+class AddFand extends StatefulWidget {
+  final FandModel? preFandModel;
+  const AddFand({super.key, this.preFandModel, });
 
   @override
-  State<AddDeposit> createState() => _AddDepositState();
+  State<AddFand> createState() => _AddFandState();
 }
 
-class _AddDepositState extends State<AddDeposit> {
+class _AddFandState extends State<AddFand> {
   bool isUpdate = false;
   final formKey = GlobalKey<FormState>();
-  final dropdownKey = GlobalKey<DropdownSearchState>();
 
   FocusNode focusDiscreption = FocusNode();
   FocusNode focusAmount = FocusNode();
+  FocusNode focusTitle = FocusNode();
 
+  TextEditingController titleController = TextEditingController(); 
   TextEditingController descriptionController = TextEditingController(); 
   TextEditingController amountController = TextEditingController();
   bool isAdd = true;
 
-  List<String > list =[];
-  String selectedItem = "Select Member";
-  Set<String> disabledItems ={};
 
-
-  Future<List<String>> _getAllMemberData()async{
-    list.clear();
-    disabledItems.clear();
-    final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    final messProvider = context.read<MessProvider>();
-    final authProvider = context.read<AuthenticationProvider>();
-    await messProvider.getMessData(
-      onFail: (message){
-
-      }, 
-      messId:authProvider.getUserModel!.currentMessId,
-    );
-
-    if(messProvider.getMessModel==null) return list;
-    for(dynamic member in messProvider.getMessModel!.messMemberList){
-      try {
-        
-          list.add("${member[Constants.fname]}\n${member[Constants.uId]}");
-          if(member[Constants.status]==Constants.disable){
-            disabledItems.add("${member[Constants.fname]}\n${member[Constants.uId]}");
-          }
-        
-      } catch (e) {
-        showSnackber(context: context, content: e.toString());
-      }
-    }
-    return list;
-  }
 
   void setPreData(){
     isUpdate = true;
-    selectedItem = widget.preMemberData![Constants.fname].toString()+"\n"+widget.preMemberData![Constants.uId].toString();
-    descriptionController.text = widget.preDepositModel!.description;
-    amountController.text = widget.preDepositModel!.amount.toString();
+    titleController.text = widget.preFandModel!.title;
+    descriptionController.text = widget.preFandModel!.description;
+    amountController.text = widget.preFandModel!.amount.toString();
   }
 
   @override
   void initState() {
-    if(widget.preDepositModel != null && widget.preMemberData!=null){
+    if(widget.preFandModel != null){
       setPreData();
     }
     
@@ -85,6 +55,7 @@ class _AddDepositState extends State<AddDeposit> {
 
   @override
   void dispose() {
+    titleController.dispose();
     descriptionController.dispose();
     amountController.dispose();
     // TODO: implement dispose
@@ -95,8 +66,7 @@ class _AddDepositState extends State<AddDeposit> {
 
   @override
   Widget build(BuildContext context) {
-    final depositProvider = context.watch<DepositProvider>();
-    final messProvider = context.watch<MessProvider>();
+    final fandProvider = context.watch<FandProvider>();
     final authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
@@ -112,7 +82,7 @@ class _AddDepositState extends State<AddDeposit> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Refund"),
+                  Text("Cost"),
                   Switch(
                     
                     value: isAdd, 
@@ -131,65 +101,7 @@ class _AddDepositState extends State<AddDeposit> {
                 ],
               ),
 
-              Container(
-                margin: EdgeInsets.all(10),
-                // child: FutureBuilder(
-                //   future: future, 
-                //   builder: builder,
-                // ),
-                child: DropdownSearch<String>(
-                  enabled: (!isUpdate),
-                  key: dropdownKey, // Needed for reset
-                  asyncItems: (String filter) => _getAllMemberData(),
-                  selectedItem: selectedItem,
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(
-                      labelText: "Select Member",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  popupProps: PopupProps.menu(
-                    showSearchBox: true,
-                        
-                    // Disable specific item visually and functionally
-                    itemBuilder: (context, item, isSelected) {
-                      bool isDisabled = disabledItems.contains(item);
-                      return IgnorePointer(
-                        ignoring: isDisabled,
-                        child: ListTile(
-                          title: Text(
-                            item,
-                            style: TextStyle(
-                              color: isDisabled ? Colors.grey : Colors.black,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  // always use this function it's tested
-                  // otherwise we get error because there are few bug here
-                  onChanged: (value) {
-                    if (value != null && disabledItems.contains(value)) {
-                    // Reset visually and logically
-                      dropdownKey.currentState?.clear(); // clears the selection
-                      debugPrint("Selected disable: $selectedItem");                    
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("This Member is disabled.")),
-                      );
-                    } 
-                    else {
-                      if(value!=null){
-                        // here we receive only enabled value.
-                        setState(() {
-                          selectedItem = value.toString();
-                        });
-                        debugPrint("Selected enable: $value");
-                      }
-                    }
-                  },
-                ),
-              ),
+             
         
               Form(
                 key: formKey,
@@ -198,11 +110,33 @@ class _AddDepositState extends State<AddDeposit> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        controller: titleController,
+                        onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                        maxLines: 5,
+                        textInputAction: TextInputAction.next,
+                        autofocus: true,
+                        focusNode: focusTitle,
+                        onFieldSubmitted: (value){
+                          FocusScope.of(context).requestFocus(focusDiscreption);
+                        },
+                        validator: (value) {
+                          return titleValidator(value.toString());
+                        },
+
+                        decoration: FromFieldDecoration(
+                          hintText: "Write here...",
+                          label: "Title",
+                        )
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
                         controller: descriptionController,
                         onTapOutside: (event) => FocusScope.of(context).unfocus(),
                         maxLines: 5,
                         textInputAction: TextInputAction.newline,
-                        autofocus: true,
+                        autofocus: false,
                         focusNode: focusDiscreption,
                         onFieldSubmitted: (value){
                           FocusScope.of(context).requestFocus(focusAmount);
@@ -257,19 +191,19 @@ class _AddDepositState extends State<AddDeposit> {
                 label: isUpdate?"Update":"Submit", 
                 ontap: ()async{
 
-                  bool valided  = (formKey.currentState!.validate() && selectedItem!="Select Member");
+                  bool valided  = (formKey.currentState!.validate());
                   
                   if(valided){
                     if(isUpdate){
-                      await depositProvider.updateADepositTransaction(
-                        depositModel: DepositModel(
-                          transactionId: widget.preDepositModel!.transactionId, 
-                          amount: double.parse(amountController.text.toString()), 
+                      await fandProvider.updateAFandTransaction(
+                        fandModel : FandModel(
+                          transactionId: widget.preFandModel!.transactionId, 
+                          title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 
-                          type: widget.preDepositModel!.type, 
+                          amount: double.parse(amountController.text.toString()), 
+                          type: widget.preFandModel!.type, 
                         ), 
-                        extraAmount: double.parse(amountController.text.toString()) - widget.preDepositModel!.amount ,
-                        uId: widget.preMemberData![Constants.uId].toString(), 
+                        extraAmount: double.parse(amountController.text.toString()) - widget.preFandModel!.amount ,
                         messId: authProvider.getUserModel!.currentMessId, 
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Updaate Failed! \n$message");
@@ -277,40 +211,40 @@ class _AddDepositState extends State<AddDeposit> {
                         onSuccess: (){ 
                           formKey.currentState!.reset();
                           showSnackber(context: context, content: "Update Success!");
-                        }
+                        }, 
                       );
                       // we should clear pre data other wise pre grabage data can make wrong submesion
                       isUpdate = false;
+                      titleController.clear();
                       amountController.clear();
                       descriptionController.clear();
-                      dropdownKey.currentState!.clear();
 
                       setState(() {
                             
                       });
                     }
                     else{
-                      await depositProvider.addADepositTransaction(
-                        depositModel: DepositModel(
+                      await fandProvider.addAFandTransaction(
+                        fandModel : FandModel(
                           transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
-                          amount: double.parse(amountController.text.toString()), 
+                          title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 
-                          type: isAdd? Constants.deposit : Constants.refund, 
+                          amount: double.parse(amountController.text.toString()), 
+                          type: isAdd? Constants.add : Constants.sub, 
                         ), 
-                        uId: selectedItem.split("\n")[1], 
                         messId: authProvider.getUserModel!.currentMessId, 
                         onFail: (message ) { 
-                          showSnackber(context: context, content: "Deposit Failed! \n$message");
+                          showSnackber(context: context, content: "Entry Failed! \n$message");
                         },
                         onSuccess: (){ 
                           formKey.currentState!.reset();
-                          showSnackber(context: context, content: "Deposit Successed!");
-                        }
+                          showSnackber(context: context, content: "Entry Success!");
+                        }, 
                       );
                       isUpdate = false;
+                      titleController.clear();
                       amountController.clear();
                       descriptionController.clear();
-                      dropdownKey.currentState!.clear();
 
                       setState(() {
                             

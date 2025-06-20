@@ -22,6 +22,7 @@ class NoticeModel{
       title: data[Constants.title]?? "", 
       description: data[Constants.description]?? "",
       CreatedAt: data[Constants.createdAt], 
+      
     );
   }
 

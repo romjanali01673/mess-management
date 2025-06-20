@@ -3,8 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/fand/add_cost.dart';
-import 'package:meal_hisab/fand/add_deposit.dart';
+import 'package:meal_hisab/fand/fand_entry.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/fand_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
@@ -49,36 +48,21 @@ class _FandScreenState extends State<FandScreen> {
                     ),
                     getMenuItems(
                       icon: Icons.add_box_rounded,
-                      label: "Add Deposit", 
+                      label: "Entry", 
                       ontap: (){
-                        fandItemGroup = Fand.addDeposit;
-                        setState(() {
+                        // fandItemGroup = Fand.addDeposit;
+                        // setState(() {
                           
-                        });
-                            
+                        // });
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddFand()));
                       },
                       selected: fandItemGroup == Fand.addDeposit,
                     ),
-                    getMenuItems(
-                      icon: FontAwesomeIcons.circleMinus,
-                      label: "Add Cost", 
-                      ontap: (){
-                        fandItemGroup = Fand.addCost;
-                        setState(() {
-                          
-                        });
-                            
-                      },
-                      selected: fandItemGroup == Fand.addCost,
-                    ),
+                   
                   ],
                 ),
               ),
             ),
-            fandItemGroup==Fand.addDeposit? AddDeposit() 
-            :
-            fandItemGroup==Fand.addCost? AddCost()
-            :
             FandHome(),
           ],     
         ),
@@ -196,7 +180,7 @@ class _FandHomeState extends State<FandHome> {
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${fandmodel.amount%1==0? fandmodel.amount.toInt().toString() : fandmodel.amount.toString()}", style: TextStyle(fontSize: 18),),// amount
+                                    showPrice(value: fandmodel.amount),
                                     PopupMenuButton(
                                       icon: Icon(Icons.more_vert),
                                       itemBuilder: (context) =>[
@@ -204,8 +188,12 @@ class _FandHomeState extends State<FandHome> {
                                         PopupMenuItem(
                                           value: 0,
                                           child: ListTile(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddFand(preFandModel: fandmodel,)));
+                                            },
                                             title: Text("Edit"),
-                                            leading: Icon(Icons.edit),
+                                            leading: Icon(Icons.edit, color: Colors.green,),
                                             ), 
                                         ),
                               
@@ -216,7 +204,7 @@ class _FandHomeState extends State<FandHome> {
                                           // },
                                           child: ListTile(
                                             title: Text("Delete"),
-                                            leading: Icon(Icons.delete),
+                                            leading: Icon(Icons.delete, color: Colors.red,),
                                             onTap: ()async{
                                               Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
                                               bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
@@ -232,7 +220,20 @@ class _FandHomeState extends State<FandHome> {
                                                 ],
                                               ));
                                               if(confirm!=null && confirm){
-                                                debugPrint("Confirmed ------------");
+                                                fandProvider.deleteAFandTransaction(
+                                                  messId: authProvider.getUserModel!.currentMessId, 
+                                                  tnxId: fandmodel.transactionId, 
+                                                  extraAmount: fandmodel.type==Constants.add? (-fandmodel.amount) : fandmodel.amount, 
+                                                  onSuccess: () {
+                                                    showSnackber(context: context, content: "Deletion Successed.");
+                                                    setState(() {
+                                                      
+                                                    });
+                                                  },
+                                                  onFail: (message){
+                                                    showSnackber(context: context, content: "Deletion Failed!\n$message");
+                                                  },
+                                                );
                                               }
                                               else{
                                                   debugPrint("Confirmed false ------------");

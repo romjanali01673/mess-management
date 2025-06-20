@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
@@ -106,7 +107,12 @@ class _MyDepositState extends State<MyDeposit> {
                                 backgroundColor: Colors.red,
                                 child: Text("${index+1}"),
                               ),
-                              title: Text("Type: ${depositModel.type}"),
+                              title: Row(
+                                children: [
+                                  Text("Type: ",),
+                                  Text("${depositModel.type}", style: TextStyle(color:depositModel.type==Constants.deposit?Colors.green:Colors.red ),),
+                                ],
+                              ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

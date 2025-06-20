@@ -131,6 +131,62 @@ class FandProvider extends ChangeNotifier{
     );
   }
 
-  //
+  // update a fand transaction to database 
+  Future<void> updateAFandTransaction({required FandModel fandModel,required String messId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+
+    try {
+
+      batch.set(
+        firebaseFirestore.collection(Constants.fand)
+        .doc(messId)
+        .collection(Constants.listOfFandTransaction)
+        .doc(fandModel.transactionId),
+        fandModel.toMap(),
+        SetOptions(
+          mergeFields: [
+            Constants.amount, 
+            Constants.title,  
+            Constants.description,
+          ]
+        )
+      );
+
+      batch.update(
+        firebaseFirestore.collection(Constants.fand)
+        .doc(messId),
+        {Constants.blance: FieldValue.increment(extraAmount)}
+      );
+        
+      await batch.commit();
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      onFail(e.toString());
+    } 
+  }
+    
+  
+
+
+
+  // delete a fand transaction
+  Future<void> deleteAFandTransaction({required String messId, required String tnxId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+    try {
+      batch.delete(
+        firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTransaction).doc(tnxId),
+      );
+
+      batch.update(firebaseFirestore.
+        collection(Constants.fand)
+        .doc(messId),
+        {Constants.blance : FieldValue.increment(extraAmount)}
+      );
+      onSuccess!=null? onSuccess(): (){};
+      await batch.commit();
+    } catch (e) {
+      onFail(e.toString());
+    }
+  }
   
 }
