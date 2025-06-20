@@ -100,6 +100,11 @@ class Constants {
   static const String listOfBazerMeal = "listOfBazerMeal";
   static const String listOfMeal = "listOfMeal";
 
+  // notice
+  static const String notice = "notice";
+  static const String noticeId = "noticeId";
+  static const String listOfNotice = "listOfNotice";
+
   
   static const String entryTime = "entryTime";
   static const String userData = "userData";

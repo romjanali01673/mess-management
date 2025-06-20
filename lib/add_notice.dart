@@ -1,0 +1,194 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
+import 'package:meal_hisab/home.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/model/notice_model.dart';
+import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:meal_hisab/providers/notice_provider.dart';
+import 'package:provider/provider.dart';
+
+class AddNotice extends StatefulWidget {
+  final NoticeModel? preNoticeModel;
+  const AddNotice({super.key, this.preNoticeModel});
+
+  @override
+  State<AddNotice> createState() => _AddNoticeState();
+}
+
+class _AddNoticeState extends State<AddNotice> {
+  final formKey = GlobalKey<FormState>();
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+
+@override
+  void initState() {
+    if(widget.preNoticeModel!=null){
+      titleController.text = widget.preNoticeModel!.title;
+      descController.text = widget.preNoticeModel!.description;
+    }
+    // TODO: implement 
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    bool isUpdate = (widget.preNoticeModel!=null);
+
+    NoticeProvider noticeProvider = context.watch<NoticeProvider>();
+    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+    MessProvider messProvider = context.read<MessProvider>();
+
+    
+    return Scaffold(
+      appBar: AppBar(),
+      body: Container(
+        height: double.infinity,
+        color: Colors.green.shade50,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: titleController,
+                        onTapOutside: (event) {// close keyboard
+                          FocusScope.of(context).unfocus();
+                        },
+                        
+                        textInputAction: TextInputAction.next,
+                        autofocus: true,
+                        validator: (value) {
+                          return titleValidator(value.toString());
+                        },
+                        decoration: FromFieldDecoration(
+                          hintText: "Title",
+                          label: "Title",
+                        )
+                      ),
+                    ),
+              
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: descController,
+                        onTapOutside: (event) {// close keyboard
+                          FocusScope.of(context).unfocus();
+                        },
+                        maxLines: 10,
+                        textInputAction: TextInputAction.newline,
+                        validator: (value) {
+                          return descValidator(value.toString());
+                        },
+                        decoration: FromFieldDecoration(
+                          hintText: "Write Details about",
+                          label: "Description ",
+                        )
+                      ),
+                    ),
+         
+                  ],
+                ),
+              ),
+        
+              SizedBox(
+                height: 50,
+              ),
+
+              noticeProvider.isLoading? 
+              SizedBox.square(
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                ),
+              )
+              :
+              getButton(
+                label: isUpdate ? "Update":"Submit", 
+                ontap: ()async{
+                  bool valided  = formKey.currentState!.validate();
+                  if(valided){
+                    if(amIAdmin(messProvider: messProvider, authProvider: authProvider)||amIactmenager(messProvider: messProvider, authProvider: authProvider)){
+                      // add a transaction to datebase 
+                      if(isUpdate){
+                        await noticeProvider.updateANotice(
+                          noticeModel: NoticeModel(
+                            noticeId: widget.preNoticeModel!.noticeId, 
+                            title: titleController.text.toString(), 
+                            description: descController.text.toString(),
+                            CreatedAt: widget.preNoticeModel!.CreatedAt,
+                          ), 
+                          currentMessMemberUidList: messProvider.
+                            getMessModel!.
+                            messMemberList.map((x){
+                               return x[Constants.uId].toString();
+                            }).toList(),
+                          messId: authProvider.getUserModel!.currentMessId, 
+                          onFail: (message) {  
+                            showSnackber(context: context, content: "Sonthing Wrong, Try Again!\n$message");
+                          },
+                          onSuccess: (){
+                            showSnackber(context: context, content: "Notice Added Successfully");
+                            Navigator.pop(context);
+                          }
+                        );
+                      }
+                      else{
+                        await noticeProvider.addANotice(
+                          noticeModel: NoticeModel(
+                            noticeId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                            title: titleController.text.toString(), 
+                            description: descController.text.toString()
+                          ), 
+                          currentMessMemberUidList: messProvider.
+                            getMessModel!.
+                            messMemberList.map((x){
+                               return x[Constants.uId].toString();
+                            }).toList(),                          messId: authProvider.getUserModel!.currentMessId, 
+                          onFail: (message) {  
+                            showSnackber(context: context, content: "Sonthing Wrong, Try Again!\n$message");
+                          },
+                          onSuccess: (){
+                            showSnackber(context: context, content: "Notice Added Successfully");
+                            Navigator.pop(context);
+                          }
+                        );
+                      }
+                    }
+                    else{
+                      showSnackber(context: context, content: "required meneger power");
+                    }
+                  }
+                  else{
+                    showSnackber(context: context, content: "please, fill add required field!");
+                  }
+                },
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// fand -> mess_id -> transactions -> transaction_id ->  {id, amount, title, description, time, type{"add", "sub"}, }

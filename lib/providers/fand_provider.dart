@@ -38,6 +38,23 @@ class FandProvider extends ChangeNotifier{
 
   // function -----------
 
+  Future<double> getFandBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    print("called total fand");
+    double blance = 0.0;
+    try {
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).get();
+      if(snapshot.exists && snapshot.data() != null){
+        blance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
+        setBlance(amount: blance);
+      }
+        print(blance);
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      onFail(e.toString());
+    }  
+    return blance;
+  }
+
   // get all fand transaction list 
   Future<List<FandModel>?> getFandTransactions({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     List<FandModel>? list;
@@ -83,11 +100,20 @@ class FandProvider extends ChangeNotifier{
             fandModel.toMap()
           );
 
-          batch.set(
-            firebaseFirestore.collection(Constants.fand)
-            .doc(messId),
-            {Constants.blance:getBlance+fandModel.amount}
-          );
+          if(fandModel.type ==Constants.add){
+            batch.set(
+              firebaseFirestore.collection(Constants.fand)
+              .doc(messId),
+              {Constants.blance:getBlance+fandModel.amount}
+            );
+          }
+          else{
+            batch.set(
+              firebaseFirestore.collection(Constants.fand)
+              .doc(messId),
+              {Constants.blance:getBlance-fandModel.amount}
+            );
+          }
 
           await batch.commit();
 

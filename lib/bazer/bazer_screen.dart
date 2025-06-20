@@ -52,10 +52,11 @@ class _BazerScreenState extends State<BazerScreen> {
                   getMenuItems(
                     label: "Bazer Entry", 
                     ontap: (){
-                      setState(() {
+                      // setState(() {
                         
-                      });
-                      bazerScreenMenuGroup = BazerScreenMenu.bazerEntry;
+                      // });
+                      // bazerScreenMenuGroup = BazerScreenMenu.bazerEntry;
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>BazerEntryScreen(preBazerModel: null)));
                       
                     }, 
                     selected: bazerScreenMenuGroup == BazerScreenMenu.bazerEntry,
@@ -64,7 +65,7 @@ class _BazerScreenState extends State<BazerScreen> {
                 ],
               ),
             ),
-            bazerScreenMenuGroup == BazerScreenMenu.bazerEntry ? BazerEntryScreen():SizedBox.shrink(),
+            bazerScreenMenuGroup == BazerScreenMenu.bazerEntry ? BazerEntryScreen(preBazerModel: null,):SizedBox.shrink(),
             bazerScreenMenuGroup == BazerScreenMenu.bazerList ? BazerListScreen():SizedBox.shrink(),
           ],
         ),

@@ -120,19 +120,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // get a spacific user data
-  Future<UserModel?> getMemberData({required String uId})async{
-    try {
-        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
-      if(snapshot.exists && snapshot.data()!=null){
-        _userModel = UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
-        return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
-      }
-    } catch (e) {
-      e.toString();
-    }
-    return null;
-  }
 
   // set session key to firestore
   Future<void> setSessionKey({required Function(String) onFail,Function()? onSuccess})async{
@@ -223,6 +210,19 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  // get a spacific user data
+  Future<UserModel?> getMemberData({required String uId})async{
+    try {
+        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(uId).get();
+      if(snapshot.exists && snapshot.data()!=null){
+        return UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+      }
+    } catch (e) {
+      e.toString();
+    }
+    return null;
+  }
+  
   // signIn with email and password
   Future<UserCredential?> signInWithEmailAndPassword({required String email, required String password,required Function(String) onFail, Function()? onSuccess})async{
     UserCredential? userCredential;

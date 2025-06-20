@@ -2,10 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:meal_hisab/add_notice.dart';
+import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/notice_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:meal_hisab/providers/notice_provider.dart';
 import 'package:provider/provider.dart';
 
 class NoticeAndAnnouncementScreen extends StatefulWidget {
@@ -32,360 +37,164 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    bool show_comment = false;
+    final noticeProvider = context.read<NoticeProvider>();
     final messProvider = context.read<MessProvider>();
     final authProvider = context.read<AuthenticationProvider>();
 
     return Scaffold(
       body: Stack(
-        children: [
-          Container(
-            // color: Colors.grey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
+            children: [
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: Colors.green,
+                child: Expanded(
                   child: Container(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        children: [
-                          Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  title: Text("MD ROMJAN ALI"),
-                                  subtitle: Row(children:[ Text("40m"), Icon(Icons.group)]),
-                                  trailing: 
-                                  // Text("data"),
-                                  Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(onPressed: (){} , icon: Icon(Icons.more_horiz), iconSize: 30,),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                                  child: Text("Caption.. askldfksdj l;ksdjf sdfoi l;sdf od\n\su lsjf ds oiaw klsdjf asd; lkjkasjfs klasdf sadj asdf f  ls jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.......", textAlign: TextAlign.start, style: TextStyle(fontSize: 18),),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text("5.6M"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.thumbsUp),
-                                              SizedBox(width: 10,),
-                                              Text("Like"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("1.3k"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          onTap: (){show_comment = (!show_comment==true); setState(() {
-                                        
-                                            });
-                                          },
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.comment),
-                                              SizedBox(width: 10,),
-                                              Text("Comment"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("989"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.share),
-                                              SizedBox(width: 10,),
-                                              Text("Share"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                
-                                show_comment==true?
-                                
-                                Divider(
-                                  thickness: 2,
-                                  height: 20,
-                                ) 
-                                :
-                                SizedBox(
-                                  height: 5,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  title: Text("MD ROMJAN ALI"),
-                                  subtitle: Row(children:[ Text("40m"), Icon(Icons.group)]),
-                                  trailing: 
-                                  // Text("data"),
-                                  Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(onPressed: (){} , icon: Icon(Icons.more_horiz), iconSize: 30,),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                                  child: Text("Caption.. askldfksdj হেল্ল জানে মন কেমন আছ?  l;ksdjf sdfoi l;sdf od\n\n\n\su lsjf ds oiaw klsdjf asd; lkjkasjfs klasdf sadj asdf f  ls jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.......", textAlign: TextAlign.start, style: TextStyle(fontSize: 18),),
-                                ),
-                                Stack(
-                                  children: [
-                                    Container(
-                                      color: Colors.red,
-                                      height: 400,
-                                    ),
-                                                
-                                    Positioned(
-                                      bottom: 2,
-                                      right: 2,
-                                      child: Column(
-                                        children: [
-                                          Text("+5", style: TextStyle(fontSize: 30),),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text("5.6M"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.thumbsUp),
-                                              SizedBox(width: 10,),
-                                              Text("Like"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("1.3k"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          onTap: (){show_comment = (!show_comment==true); setState(() {
-                                        
-                                            });
-                                          },
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.comment),
-                                              SizedBox(width: 10,),
-                                              Text("Comment"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("989"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.share),
-                                              SizedBox(width: 10,),
-                                              Text("Share"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                
-                                show_comment==true?
-                                
-                                Divider(
-                                  thickness: 2,
-                                  height: 20,
-                                ) 
-                                :
-                                SizedBox(
-                                  height: 5,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  title: Text("MD ROMJAN ALI"),
-                                  subtitle: Row(children:[ Text("40m"), Icon(Icons.group)]),
-                                  trailing: 
-                                  // Text("data"),
-                                  Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(onPressed: (){} , icon: Icon(Icons.more_horiz), iconSize: 30,),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                                  child: Text("Caption.. askldfksdj l;ksdjf sdfoi l;sdf od\n\n\n\n\n\n\n\n\n\n\nn\n\n\n\n\nn\n\n\n\n\nn\n\n\n\n\nn\n\n\n\n\n\n\n\\n\su lsjf ds oiaw klsdjf asd; lkjkasjfs klasdf sadj asdf f  ls jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj.......", textAlign: TextAlign.start, style: TextStyle(fontSize: 18),),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text("5.6M"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.thumbsUp),
-                                              SizedBox(width: 10,),
-                                              Text("Like"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("1.3k"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          onTap: (){show_comment = (!show_comment==true); setState(() {
-                                        
-                                            });
-                                          },
-                                          child: Row(
-                                            children: [
-                                              FaIcon(FontAwesomeIcons.comment),
-                                              SizedBox(width: 10,),
-                                              Text("Comment"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text("989"),
-                                        SizedBox(height: 10,),
-                                        GestureDetector(
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.share),
-                                              SizedBox(width: 10,),
-                                              Text("Share"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                
-                                show_comment==true?
-                                
-                                Divider(
-                                  thickness: 2,
-                                  height: 20,
-                                ) 
-                                :
-                                SizedBox(
-                                  height: 5,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text("All Done"),
-                        ],
+                    child: FutureBuilder(
+                      future : noticeProvider.getNoticeList(
+                        messId: authProvider.getUserModel!.currentMessId, 
+                        onFail: (_ ) {},
+                        uId: authProvider.getUserModel!.uId
                       ),
+                      // future : Future.delayed(Duration(seconds: 1)),
+                      builder: (context, AsyncSnapshot<List<NoticeModel>?> snapshot) {
+                        bool showDesc = false;
+                        if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                          return Center(child: showCircularProgressIndicator());
+                        }
+                        else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } 
+                        else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                          return Center(child: Text('No Data Found'));
+                        }
+                        return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            NoticeModel noticeModel = snapshot.data![index];
+                            return StatefulBuilder(
+                              builder: (context, setLocalState) {
+                                return Card(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ListTile(
+                                        contentPadding: EdgeInsets.only(left: 8),
+                                        onTap: () {
+                                          setLocalState((){
+                                            showDesc = !showDesc;
+                                          });
+                                        },
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.red,
+                                        ),
+                                        title: Text(noticeModel.title.toString()),
+                                        subtitle: Text(DateFormat("hh:mm a dd-MM-yyyy").format(noticeModel.CreatedAt!.toDate().toLocal())),
+                                        trailing: PopupMenuButton(
+                                          icon: Icon(Icons.more_vert),
+                                          itemBuilder: (context) =>[
+                                            PopupMenuItem(
+                                              value: 0,
+                                              child: ListTile(
+                                                title: Text("Edit"),
+                                                leading: Icon(Icons.edit),
+                                              ), 
+                                              onTap: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>AddNotice(preNoticeModel: noticeModel,)));
+                                              },
+                                            ),
+                                  
+                                            PopupMenuItem(
+                                              value: 1,
+                                              // onTap: (){
+                                              //   // if i use this function. we don't need to Navigator.pop()
+                                              // },
+                                              child: ListTile(
+                                                title: Text("Delete"),
+                                                leading: Icon(Icons.delete),
+                                                onTap: ()async{
+                                                  Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
+                                                  bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
+                                                    title: Text("Do you want to delete?"),
+                                                    actionsAlignment: MainAxisAlignment.start,
+                                                    actions: [
+                                                      TextButton(child: Text("No"), onPressed: (){
+                                                        Navigator.pop(context, false);
+                                                      },),
+                                                      TextButton(child: Text("Yes") , onPressed: (){
+                                                      Navigator.pop(context, true);
+                                                      },),
+                                                    ],
+                                                  ));
+                                                  if(confirm!=null && confirm){
+                                                    debugPrint("Confirmed ------------");
+                                                    await noticeProvider.deleteANotice(
+                                                      messId: authProvider.getUserModel!.currentMessId, 
+                                                      noticeId: noticeModel.noticeId, 
+                                                      onFail: (message ) {
+                                                        print("failed");
+                                                        showSnackber(context: context, content: "Deletion Failed!\n$message");
+                                                      },
+                                                      onSuccess: (){
+                                                        print("success");
+                                                        setState(() {
+                                                          showSnackber(context: context, content: "Deletion Successed.");
+                                                        });
+                                                      }
+                                                    );
+                                                  }
+                                                },
+                                              ), 
+                                            ),
+                                          ]
+                                        ),
+                                      ),
+                                
+                                      if(showDesc) Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(noticeModel.description),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            );
+                          }, 
+                        );
+                      }
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-          (amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))?
-          Positioned(
-            left: posX,
-            top: posY,
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  posX += details.delta.dx;
-                  posY += details.delta.dy;
-                });
-              },
-              child: FloatingActionButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('FAB tapped')),
-                  );
-                },
-                child: Icon(Icons.add),
               ),
-            ),
+              
+              (amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))?
+              Positioned(
+                left: posX,
+                top: posY,
+                child: GestureDetector(
+                  onPanUpdate: (details) {
+                    setState(() {
+                      posX += details.delta.dx;
+                      posY += details.delta.dy;
+                    });
+                  },
+                  child: FloatingActionButton(
+                    onPressed: () async{
+                      Navigator.push( context ,MaterialPageRoute(builder: (context)=>AddNotice()));
+                    },
+                    child: Icon(Icons.add),
+                  )
+                ),
+              )
+              :
+              SizedBox.shrink(),
+            ]
           )
-          :
-          SizedBox.shrink(),
-        ]
-      ),
     );
   }
+
 }

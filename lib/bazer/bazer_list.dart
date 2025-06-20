@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:meal_hisab/bazer/bazer_entry.dart';
 import 'package:meal_hisab/bazer/bazer_update.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
@@ -104,7 +105,8 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                         leading: Icon(Icons.edit),
                                         onTap: ()async{
                                           Navigator.pop(context);
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> BazerListUpdateScreen(preBazerModel: bazerModel)));
+                                          
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> BazerEntryScreen(preBazerModel: bazerModel)));
                                         },
                                       ),
                                     ),

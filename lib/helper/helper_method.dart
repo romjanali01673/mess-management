@@ -142,6 +142,25 @@ String? nameValidator(String value) {
   return null; // valid
 }
 
+String? titleValidator(String value) {
+  value = value.trim();
+  if (value.trim().isEmpty) {
+    return 'Title are required';
+  }
+  return null; // valid
+}
+String? descValidator(String value) {
+  value = value.trim();
+  if (value.trim().isEmpty) {
+    return 'Description are required';
+  }
+  if(value.length<14){
+    return "Description shouldcontain  at least 14 character!";
+  }
+
+  return null; // valid
+}
+
 String? passValidator(String value) {
   if (value.trim().isEmpty) {
     return 'Password are required';
@@ -170,6 +189,9 @@ String? addressValidator(String value) {
 String? validateUid(String value){
   value = value.trim();
   final regex = RegExp(r'[^0-9]');
+  if(value.length<5){
+    return  "invalid uid";
+  }
   return !regex.hasMatch(value)? null : "invalid uid";
 }
 

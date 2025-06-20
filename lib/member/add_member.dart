@@ -99,6 +99,10 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                         userModel = null;
                       });
 
+                      print(messProvider.getMessModel!.toMap().toString());
+                      print(authProvider.getUserModel!.toMap().toString());
+                      print(amIAdmin(messProvider: messProvider, authProvider: authProvider));
+
                       if(amIAdmin(messProvider: messProvider, authProvider: authProvider)){
                         if(fromKey.currentState!.validate()){
                           messProvider.setIsloading(true);
@@ -218,9 +222,11 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                             messProvider.setIsloading(false);
                             userModel = null;
                             found=false;
-
                             showSnackber(context: context, content: "Invaitations Message has send Successfully");
-                          }
+                          },
+                          onFail: (message) {
+                            showSnackber(context: context, content: message);
+                          },
                         );
                         messProvider.setIsloading(false);
                       }

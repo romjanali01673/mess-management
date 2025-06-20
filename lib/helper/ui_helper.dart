@@ -175,3 +175,16 @@ Widget showPrice({required dynamic value , int maxWidth = 100}) {
     ),
   );
 }
+
+String getFormatedPrice({required dynamic value}) {
+  double? number;
+  
+  try {
+    number = double.parse(value.toString());
+  } catch (_) {
+    return "Invalid";
+  }
+
+  bool isWhole = number == number.toInt();
+  return isWhole ? number.toInt().toString() : number.toStringAsFixed(2);
+}

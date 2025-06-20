@@ -11,8 +11,10 @@ import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/bazer_provider.dart';
 import 'package:meal_hisab/providers/deposit_provider.dart';
 import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/firstScreen_provider.dart';
 import 'package:meal_hisab/providers/meal_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:meal_hisab/providers/notice_provider.dart';
 import 'package:provider/provider.dart';
 
 // void main() {
@@ -28,6 +30,8 @@ void main()async{
     MultiProvider(
       providers: [
         // add all provider here
+        ChangeNotifierProvider(create: (_) => NoticeProvider()),
+        ChangeNotifierProvider(create: (_) => FirstScreenProvider()),
         ChangeNotifierProvider(create: (_) => FandProvider()),
         ChangeNotifierProvider(create: (_) => DepositProvider()),
         ChangeNotifierProvider(create: (_) => MealProvider()),
