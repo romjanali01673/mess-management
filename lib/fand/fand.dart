@@ -37,6 +37,7 @@ class _FandScreenState extends State<FandScreen> {
                   children: [
                     getMenuItems(
                       label: "Fand", 
+                      icon: FontAwesomeIcons.bangladeshiTakaSign,
                       ontap: (){
                         fandItemGroup = Fand.fand;
                         setState(() {
@@ -47,7 +48,7 @@ class _FandScreenState extends State<FandScreen> {
                       selected: fandItemGroup == Fand.fand,
                     ),
                     getMenuItems(
-                      icon: Icons.add_box_rounded,
+                      icon: Icons.create,
                       label: "Entry", 
                       ontap: (){
                         // fandItemGroup = Fand.addDeposit;
@@ -114,7 +115,7 @@ class _FandHomeState extends State<FandHome> {
                             
                           });
                         }, 
-                        icon: showBlance? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+                        icon: showBlance?  Icon(Icons.visibility) : Icon(Icons.visibility_off),
                       ),
                       title: 
                       showBlance? Text("Current Blance: ${fandProvider.getBlance}",)

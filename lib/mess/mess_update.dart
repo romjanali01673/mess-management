@@ -256,7 +256,7 @@ class _MessUpdateState extends State<MessUpdate> {
                       child: ListTile(
                         title: Text(
                           item,
-                          style: TextStyle(
+                          style : getTextStyleForTitleM().copyWith(
                             color: isDisabled ? Colors.grey : Colors.black,
                           ),
                         ),

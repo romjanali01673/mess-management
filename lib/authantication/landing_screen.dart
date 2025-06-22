@@ -104,9 +104,9 @@ class _LandingScreenState extends State<LandingScreen> {
         color: Colors.white10,
         child: Center(
           child: CircleAvatar(
-            radius: 100,
+            radius: 120,
             backgroundColor: Colors.black45,
-            backgroundImage: AssetImage(AssetsManager.bbpiLogo),
+            backgroundImage: AssetImage(AssetsManager.splashLogo),
           ),
         ),
       ),

@@ -1,29 +1,22 @@
-import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/home.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/fand_model.dart';
-import 'package:meal_hisab/model/notice_model.dart';
+import 'package:meal_hisab/model/rule_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/fand_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/providers/notice_provider.dart';
 import 'package:provider/provider.dart';
 
-class AddNotice extends StatefulWidget {
-  final NoticeModel? preNoticeModel;
-  const AddNotice({super.key, this.preNoticeModel});
+class AddRule extends StatefulWidget {
+  final RuleModel? preRuleModel;
+  const AddRule({super.key, this.preRuleModel});
 
   @override
-  State<AddNotice> createState() => _AddNoticeState();
+  State<AddRule> createState() => _AddRuleState();
 }
 
-class _AddNoticeState extends State<AddNotice> {
+class _AddRuleState extends State<AddRule> {
   final formKey = GlobalKey<FormState>();
 
   TextEditingController titleController = TextEditingController();
@@ -31,9 +24,9 @@ class _AddNoticeState extends State<AddNotice> {
 
 @override
   void initState() {
-    if(widget.preNoticeModel!=null){
-      titleController.text = widget.preNoticeModel!.title;
-      descController.text = widget.preNoticeModel!.description;
+    if(widget.preRuleModel!=null){
+      titleController.text = widget.preRuleModel!.title;
+      descController.text = widget.preRuleModel!.description;
     }
     // TODO: implement 
 
@@ -48,14 +41,11 @@ class _AddNoticeState extends State<AddNotice> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
 
-    bool isUpdate = (widget.preNoticeModel!=null);
+    bool isUpdate = (widget.preRuleModel!=null);
 
-    NoticeProvider noticeProvider = context.watch<NoticeProvider>();
     AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
     MessProvider messProvider = context.read<MessProvider>();
 
@@ -89,9 +79,10 @@ class _AddNoticeState extends State<AddNotice> {
                         decoration: InputDecoration(
                           label: Text("Title"),
                           border: OutlineInputBorder(
-                          
+
                           )
                         )
+                        
                       ),
                     ),
               
@@ -122,7 +113,7 @@ class _AddNoticeState extends State<AddNotice> {
                 height: 50,
               ),
 
-              noticeProvider.isLoading? 
+              messProvider.isLoading? 
               SizedBox.square(
                 child: CircularProgressIndicator(
                   color: Colors.green,
@@ -137,18 +128,13 @@ class _AddNoticeState extends State<AddNotice> {
                     if(amIAdmin(messProvider: messProvider, authProvider: authProvider)||amIactmenager(messProvider: messProvider, authProvider: authProvider)){
                       // add a transaction to datebase 
                       if(isUpdate){
-                        await noticeProvider.updateANotice(
-                          noticeModel: NoticeModel(
-                            noticeId: widget.preNoticeModel!.noticeId, 
+                        await messProvider.updateAMessRule(
+                          ruleModel: RuleModel(
+                            transactionId: widget.preRuleModel!.transactionId, 
                             title: titleController.text.toString(), 
                             description: descController.text.toString(),
-                            CreatedAt: widget.preNoticeModel!.CreatedAt,
+                            CreatedAt: widget.preRuleModel!.CreatedAt,
                           ), 
-                          currentMessMemberUidList: messProvider.
-                            getMessModel!.
-                            messMemberList.map((x){
-                               return x[Constants.uId].toString();
-                            }).toList(),
                           messId: authProvider.getUserModel!.currentMessId, 
                           onFail: (message) {  
                             showSnackber(context: context, content: "Sonthing Wrong, Try Again!\n$message");
@@ -160,29 +146,24 @@ class _AddNoticeState extends State<AddNotice> {
                         );
                       }
                       else{
-                        await noticeProvider.addANotice(
-                          noticeModel: NoticeModel(
-                            noticeId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                        await messProvider.addAMessRule(
+                          ruleModel: RuleModel(
+                            transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
                             title: titleController.text.toString(), 
                             description: descController.text.toString()
                           ), 
-                          currentMessMemberUidList: messProvider.
-                            getMessModel!.
-                            messMemberList.map((x){
-                               return x[Constants.uId].toString();
-                            }).toList(),                          messId: authProvider.getUserModel!.currentMessId, 
+                          messId: authProvider.getUserModel!.currentMessId, 
                           onFail: (message) {  
                             showSnackber(context: context, content: "Sonthing Wrong, Try Again!\n$message");
                           },
                           onSuccess: (){
-                            showSnackber(context: context, content: "Notice Added Successfully");
-                            Navigator.pop(context);
+                            showSnackber(context: context, content: "New Mess Rule Added Successfully");
                           }
                         );
                       }
                     }
                     else{
-                      showSnackber(context: context, content: "required meneger power");
+                      showSnackber(context: context, content: "Required Administrator Power");
                     }
                   }
                   else{
@@ -203,4 +184,3 @@ class _AddNoticeState extends State<AddNotice> {
 }
 
 
-// fand -> mess_id -> transactions -> transaction_id ->  {id, amount, title, description, time, type{"add", "sub"}, }

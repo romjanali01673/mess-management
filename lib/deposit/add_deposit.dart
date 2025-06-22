@@ -256,6 +256,10 @@ class _AddDepositState extends State<AddDeposit> {
               getButton(
                 label: isUpdate?"Update":"Submit", 
                 ontap: ()async{
+                  if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                    showSnackber(context: context, content: "Required Administrator Power");
+                    return;
+                  }
 
                   bool valided  = (formKey.currentState!.validate() && selectedItem!="Select Member");
                   

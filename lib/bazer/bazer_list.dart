@@ -42,12 +42,12 @@ class _BazerListScreenState extends State<BazerListScreen> {
                     
                   });
                 }, 
-                icon: showCost? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+                icon: showCost?  Icon(Icons.visibility) : Icon(Icons.visibility_off),
               ),
               title: 
-              showCost? Text("Current Blance: ${bazerProvider.getCost}",)
+              showCost? Text("Total Cost: ${bazerProvider.getCost}",)
               :
-              Text("tap to see blance"),
+              Text("tap to see Cost"),
             ),
           ),
       
@@ -89,7 +89,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                               backgroundColor: Colors.red,
                               child: Text("$index"),
                             ),
-                            title: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(bazerModel.CreatedAt!.toDate().toLocal())}"), // entry time 
+                            title: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(bazerModel.CreatedAt!.toDate().toLocal())}",style : getTextStyleForTitleM()), // entry time 
                             subtitle: Text(bazerModel.byWho[Constants.fname]),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -101,7 +101,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                     PopupMenuItem(
                                       value: 0,
                                       child: ListTile(
-                                        title: Text("Edit"),
+                                        title: Text("Edit",style : getTextStyleForTitleM()),
                                         leading: Icon(Icons.edit),
                                         onTap: ()async{
                                           Navigator.pop(context);
@@ -117,22 +117,14 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                       //   // if i use this function. we don't need to Navigator.pop()
                                       // },
                                       child: ListTile(
-                                        title: Text("Delete"),
+                                        title: Text("Delete",style : getTextStyleForTitleM()),
                                         leading: Icon(Icons.delete),
                                         onTap: ()async{
                                           Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
-                                          bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
-                                            title: Text("Do you want to delete?"),
-                                            actionsAlignment: MainAxisAlignment.start,
-                                            actions: [
-                                              TextButton(child: Text("No"), onPressed: (){
-                                                Navigator.pop(context, false);
-                                              },),
-                                              TextButton(child: Text("Yes") , onPressed: (){
-                                                Navigator.pop(context, true);
-                                              },),
-                                            ],
-                                          ));
+                                          bool? confirm = await showConfirmDialog(
+                                            context: context, 
+                                            title: "Do you want to delete?",
+                                          );
                                           if(confirm!=null && confirm){
                                             debugPrint("Confirmed ------------");
                                             await bazerProvider.deleteABazerTransaction(

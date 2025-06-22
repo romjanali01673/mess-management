@@ -421,6 +421,15 @@ class AuthenticationProvider extends ChangeNotifier {
     setLoading(val: false);
   }
 
+  // forget password
+  Future<void> forgetPassword({required String email})async{
+    debugPrint("pass rest called");
+    try {
+      firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   // update user data from Firestore database
   // and update user name to current mess in member list.

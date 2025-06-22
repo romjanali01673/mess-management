@@ -32,7 +32,8 @@ class _DepositScreenState extends State<DepositScreen> {
                   spacing: 10,
                   children: [
                     getMenuItems(
-                      label: "My Deposits", 
+                      label: "My Deposits",
+                      icon: Icons.format_list_numbered_outlined, 
                       ontap: (){
                         DepositItemGroup = Deposit.myDeposit;
                         setState(() {
@@ -44,6 +45,7 @@ class _DepositScreenState extends State<DepositScreen> {
                     ),
                     getMenuItems(
                       label: "Deposit History", 
+                      icon: Icons.h_mobiledata_sharp,
                       ontap: (){
                         DepositItemGroup = Deposit.historyOfDeposit;
                         setState(() {
@@ -54,7 +56,7 @@ class _DepositScreenState extends State<DepositScreen> {
                       selected: DepositItemGroup == Deposit.historyOfDeposit,
                     ),
                     getMenuItems(
-                      icon: Icons.add_box_rounded,
+                      icon: Icons.create,
                       label: "Entry", 
                       ontap: (){
                         // DepositItemGroup = Deposit.addDeposit;

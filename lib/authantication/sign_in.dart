@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meal_hisab/authantication/Sign_up.dart';
+import 'package:meal_hisab/authantication/rest_pass.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
@@ -203,9 +204,17 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 30,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 60, bottom: 20),
+                            child: TextButton(
+                              onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RestPass()));
+                              }, 
+                              child: Text("Forgot Passwprd?", style: TextStyle(color: Colors.blue, fontSize: 16),
+                              ),
+                            ),
                           ),
+
                           FadeInUp(duration: Duration(milliseconds:2200),
                             child: !authProvider.isLoading? SizedBox(
                               width: 200,

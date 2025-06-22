@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meal_hisab/authantication/rest_pass.dart';
+import 'package:meal_hisab/authantication/sign_in.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
@@ -188,11 +190,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 ),
                                 TextButton(
                                   onPressed: (){
-                                    // show input Dialog. if given email address are valid send a forget email.
-                                    // if("givenEmail"== authProvider.getUserModel!.email){
-                                    //   // send email with forgot pass options.
-      
-                                    // }
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RestPass()));
                                   }, 
                                   child: Text("Forgot Passwprd?", style: TextStyle(color: Colors.blue, fontSize: 16),
                                   ),

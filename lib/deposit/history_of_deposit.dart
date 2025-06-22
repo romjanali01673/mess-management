@@ -44,7 +44,12 @@ class _DepositHistoryState extends State<DepositHistory> {
   Widget build(BuildContext context) {
     final authProvider = context.read<AuthenticationProvider>();
     final depositProvider = context.read<DepositProvider>();
+    final messProvider = context.read<MessProvider>();
 
+    if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+      return Center(child: Text("Required Administrator Power"),);
+    }
+    
     return Expanded(
       child: Column(
         children: [
@@ -60,7 +65,7 @@ class _DepositHistoryState extends State<DepositHistory> {
 
                          });
                        }, 
-                       icon: showTotalDepositOfMess? Icon(Icons.remove_red_eye_sharp) : FaIcon(FontAwesomeIcons.arrowsToEye),
+                       icon: showTotalDepositOfMess? Icon(Icons.visibility) : Icon(Icons.visibility_off),
                      ),
                      title: 
                      showTotalDepositOfMess? 
@@ -106,6 +111,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                   children: [
                     getMenuItems(
                       label: "All History", 
+                      icon: FontAwesomeIcons.a,
                       ontap: (){
                         historyOfDepositItemGroup = HistoryOfDeposit.allHostory;
                         setState(() {
@@ -116,7 +122,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                       selected: historyOfDepositItemGroup == HistoryOfDeposit.allHostory,
                     ),
                     getMenuItems(
-                      icon: Icons.add_box_rounded,
+                      icon: Icons.group,
                       label: "Member Wise", 
                       ontap: (){
                         historyOfDepositItemGroup = HistoryOfDeposit.memberWise;

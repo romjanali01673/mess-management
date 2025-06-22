@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/member/add_member.dart';
 import 'package:meal_hisab/model/user_model.dart';
@@ -160,7 +161,7 @@ class _MemberScreenState extends State<MemberScreen> {
                       child: Text(index.toString()),
                       backgroundColor: memberType==Constants.member? Colors.amber :Colors.red,
                     ),
-                    title: Text(memberData[Constants.fname]),
+                    title: Text(memberData[Constants.fname],style : getTextStyleForTitleM()),
                     subtitle: Text("${memberData[Constants.uId]}   ($memberType)"),
                     trailing: PopupMenuButton(
                       icon: Icon(Icons.more_vert),
@@ -168,6 +169,10 @@ class _MemberScreenState extends State<MemberScreen> {
                         return [
                             PopupMenuItem(
                               onTap: ()async{
+                                if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                                  showSnackber(context: context, content: "Required Administrator Power");
+                                  return;
+                                }
                                 UserModel? userModel =  await authProvider.getMemberData(uId: memberData[Constants.uId]);
                                 // show details in a dialog box.
                                 if(userModel!=null){
@@ -183,12 +188,16 @@ class _MemberScreenState extends State<MemberScreen> {
                               child: Row(
                                 children: [
                                   Icon(FontAwesomeIcons.user),
-                                  Text("See Details"),
+                                  Text("See Details",style: getTextStyleForTitleS(),),
                                 ],
                               ),
                             ),
                             PopupMenuItem(
                               onTap: ()async{
+                                if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                                  showSnackber(context: context, content: "Required Administrator Power");
+                                  return;
+                                }
                                 await messProvider.change2ndMessOwnership(
                                   secondAdimnName: memberData[Constants.fname], 
                                   secondAdminId: memberData[Constants.uId], 
@@ -206,41 +215,44 @@ class _MemberScreenState extends State<MemberScreen> {
                               child: Row(
                                 children: [
                                   Icon(Icons.transfer_within_a_station_sharp),
-                                  Text("make Act Menager"),
+                                  Text("make Act Menager", style: getTextStyleForTitleS(),),
                                 ],
                               ),
                             ),
                             PopupMenuItem(
                               value: 2,
                               onTap: ()async{
+                                if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                                  showSnackber(context: context, content: "Required Administrator Power");
+                                  return;
+                                }
                                 bool? a = await showConfirmDialog(context: context, title: "Do You Want to Transfer The Ownership?");
                                 if(a??false){
-                                  debugPrint("YES--------------");
                                   // remove from mess
                                   await messProvider.kickMemberFromMess(member: memberData);
-                                }
-                                else{
-                                  debugPrint("NO--------------");
                                 }
                               },
                               child: Row(
                                 children: [
                                   Icon(Icons.highlight_remove_outlined),
-                                  Text("kick"),
+                                  Text("kick", style: getTextStyleForTitleS(),),
                                 ],
                               ),
                             ),
               
-                            memberData[Constants.status]==Constants.enable?
                             PopupMenuItem(
                               value: 3,
                               child: Row(
                                 children: [
                                   Icon(Icons.do_not_disturb_alt_outlined),
-                                  Text("disable"),
+                                  Text( memberData[Constants.status]==Constants.enable? "Disable" : "Enable", style: getTextStyleForTitleS(),),
                                 ],
                               ),
                               onTap: ()async{
+                                if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                                  showSnackber(context: context, content: "Required Administrator Power");
+                                  return;
+                                }
                                 // change member status
                                 memberData[Constants.status] = Constants.disable;
                                 final list = messProvider.getMessModel!.messMemberList;
@@ -250,25 +262,7 @@ class _MemberScreenState extends State<MemberScreen> {
                                 
                               },
                             )
-                            :
-                            PopupMenuItem(
-                              value: 3,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.offline_bolt),
-                                  Text("enable"),
-                                ],
-                              ),
-                              onTap: ()async{
-                                // change member status
-                                memberData[Constants.status] = Constants.enable;
-                                final list = messProvider.getMessModel!.messMemberList;
-                                list[index] = memberData;
-                                messProvider.setMessModel(messMemberList: list);
-                                await messProvider.changeMemberStatus();
-                                
-                              },
-                            ),
+                            
                         ];
                       },
                     ),

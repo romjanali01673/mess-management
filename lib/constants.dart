@@ -55,6 +55,11 @@ class Constants {
   static const String messAuthorityEmail="messAuthorityEmail";
   static const String messMemberList="messMemberList";
   static const String disabledMemberList="disabledMemberList";
+  
+  static const String inSide = "inSide";
+  static const String rules = "rules";
+
+
 
 
   // fand

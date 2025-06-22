@@ -41,6 +41,7 @@ class _BazerScreenState extends State<BazerScreen> {
                 children: [
                   getMenuItems(
                     label: "Bazer List", 
+                    icon: Icons.format_list_numbered_rounded,
                     ontap: (){
                       setState(() {
                         
@@ -51,6 +52,7 @@ class _BazerScreenState extends State<BazerScreen> {
                   ),
                   getMenuItems(
                     label: "Bazer Entry", 
+                    icon: Icons.create,
                     ontap: (){
                       // setState(() {
                         

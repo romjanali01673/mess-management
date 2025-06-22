@@ -95,10 +95,16 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
   Widget build(BuildContext context) {
     final mealProvider  = context.watch<MealProvider>();
     final authProvider  = context.watch<AuthenticationProvider>();
+    final messProvider  = context.read<MessProvider>();
 
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
+      body: 
+      !(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))
+      ?
+      Center(child: Text("Required Administrator Power"))
+      :
+      Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),

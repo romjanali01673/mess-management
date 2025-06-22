@@ -82,6 +82,7 @@ class NoticeProvider extends ChangeNotifier{
 
   // get all notice transaction list 
   Future<List<NoticeModel>?> getNoticeList({required String messId,String? uId , required Function(String) onFail, Function()? onSuccess,})async{
+      print("getNoticeList called");
     List<NoticeModel>? list;
     _isLoading = true;
     try {

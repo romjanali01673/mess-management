@@ -9,6 +9,7 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/model/joining_model.dart';
 import 'package:meal_hisab/model/mess_model.dart';
 import 'package:meal_hisab/model/notice_model.dart';
+import 'package:meal_hisab/model/rule_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
 
 
@@ -493,6 +494,92 @@ class MessProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  // set Mess Rules
+  Future<void> addAMessRule({required String messId,required RuleModel ruleModel, required Function(String) onFail, Function()? onSuccess})async{
+    debugPrint("set a Mess Rule called");
+    try {
+      await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId)
+        .collection(Constants.rules)
+        .doc(ruleModel.transactionId)
+        .set(
+          ruleModel.toMap(),
+        );
+
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString());
+    }
+  }
+
+  // set Mess Rules
+  Future<void> updateAMessRule({required String messId,required RuleModel ruleModel, required Function(String) onFail, Function()? onSuccess})async{
+    debugPrint("set a Mess Rule called");
+    try {
+      await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId)
+        .collection(Constants.rules)
+        .doc(ruleModel.transactionId)
+        .set(
+          ruleModel.toMap(),
+          SetOptions(
+            mergeFields: [
+              Constants.title, 
+              Constants.description
+            ]
+          )
+        );
+
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString());
+    }
+  }
+
+  // delete Mess Rules
+  Future<void> deleteAMessRule({required String messId, required String transactionId, required Function(String) onFail, Function()? onSuccess})async{
+    debugPrint("delete A Mess Rule called");
+    try {
+      await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId)
+        .collection(Constants.rules)
+        .doc(transactionId)
+        .delete();
+
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString());
+    }
+  }
+
+  // get getMessRules
+  Future<List<RuleModel>?> getMessRules({required String messId,required Function(String) onFail, Function()? onSuccess})async{
+    debugPrint("get getMessRules called");
+    List<RuleModel>? list ;
+    try {
+      QuerySnapshot qSnapshot  = await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId)
+        .collection(Constants.rules)
+        .get();
+
+      list =  qSnapshot.docs.map((snapshot){
+        return  RuleModel.fromMap(snapshot.data() as Map<String,dynamic>);
+      }).toList();
+      onSuccess!=null? onSuccess():(){};
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString());
+    }
+    return list;
   }
 }
 

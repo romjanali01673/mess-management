@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 
 import 'package:provider/provider.dart';
 
@@ -48,6 +50,7 @@ class _MemberMealListState extends State<MemberMealList> {
   Widget getMealList(){
     final mealProvider = context.read<MealProvider>();
     final authProvider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
 
     return Expanded(
       child: Column(
@@ -80,13 +83,18 @@ class _MemberMealListState extends State<MemberMealList> {
               ),
               ElevatedButton(
                 onPressed: ()async{
+                  if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                    showSnackber(context: context, content: "Required Administrator Power");
+                    return;
+                  }
                   memberMealData = null;
-                  debugPrint(userId);
                   memberMealData = await mealProvider.getAllMealListOfAMember(
                     messId: authProvider.getUserModel!.currentMessId, 
                     uId: userId, 
                     onFail: (message){showSnackber(context: context, content: "somthing Wrong \n $message");},
                   );
+                  if(memberMealData == null) showSnackber(context: context, content: "The Member Meal List Are Empty!");
+
                   setState(() {
                     
                   });
@@ -137,8 +145,6 @@ class _MemberMealListState extends State<MemberMealList> {
               ],
             ),
           )
-
-          
           :
           SizedBox.shrink(),
         ],

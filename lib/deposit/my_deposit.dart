@@ -39,7 +39,7 @@ class _MyDepositState extends State<MyDeposit> {
                         
                       });
                     }, 
-                    icon: showTotalDeposit? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+                    icon: showTotalDeposit? Icon(Icons.visibility) : Icon(Icons.visibility_off),
                   ),
                   title: 
                   showTotalDeposit? 

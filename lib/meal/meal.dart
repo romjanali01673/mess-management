@@ -54,15 +54,15 @@ class _MealScreenState extends State<MealScreen> {
                     });
                   },
                   selected: mealGroup == Meal.mealList,
-                  icon: FontAwesomeIcons.list
+                  icon: Icons.format_list_numbered_rtl_outlined
                 ),
                 getMenuItems(
-                  label: "Meal Entry", 
+                  label:  "Entry", 
                   ontap: (){
                    Navigator.push(context, MaterialPageRoute(builder: (context)=> MealEntryScreen()));
                   },
                   selected: mealGroup == Meal.mealEntry,
-                  icon: Icons.add,
+                  icon: Icons.create,
                 ),
                 getMenuItems(
                   label: "Group Meal List", 
@@ -84,7 +84,7 @@ class _MealScreenState extends State<MealScreen> {
                     });
                   },
                   selected: mealGroup == Meal.memberMealList,
-                  icon: FontAwesomeIcons.list,
+                  icon: Icons.line_weight_sharp,
                 ),
               ],
             ),
@@ -123,7 +123,7 @@ class _MealScreenState extends State<MealScreen> {
                     
                   });
                 }, 
-                icon: showTotalMeal? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+                icon: showTotalMeal? Icon(Icons.visibility) : Icon(Icons.visibility_off),
               ),
               title: 
               showTotalMeal? 

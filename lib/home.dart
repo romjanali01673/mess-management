@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Stack(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.notifications, color: Colors.black,),
+                    icon: Icon(Icons.notifications, color: Colors.black,size: 35,),
                     onPressed: () {
                       // Go to notifications page
                       // Optional: mark notifications seen
@@ -118,6 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ]
               );
             }
+          ),
+          GestureDetector(
+            onTap: (){
+              showSnackber(context: context, content: "Currently Unavailable");
+            },
+            child: FaIcon(FontAwesomeIcons.facebookMessenger,color: Colors.black,size: 35,)),
+          SizedBox(
+            width: 5,
           )
         ],
       ),
@@ -181,7 +189,17 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             getItems(
-              icon: FontAwesomeIcons.a, 
+              icon: FontAwesomeIcons.facebookMessenger, 
+              label: "Chat",
+              selected: false,
+              // selected: DrawerItemGroup==DrawerItem.Messenger, 
+              ontap: () {
+                Navigator.pop(context);
+                showSnackber(context: context, content: "Currently Unavailable");
+              }, 
+            ),
+            getItems(
+              icon: FontAwesomeIcons.m, 
               label: "Meal",
               selected: DrawerItemGroup==DrawerItem.Meal,
               ontap: () {
@@ -205,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             getItems(
-              icon: Icons.assessment, 
+              icon: FontAwesomeIcons.bangladeshiTakaSign, 
               label: "Fand",
               selected: DrawerItemGroup==DrawerItem.Fand, 
               ontap: () {

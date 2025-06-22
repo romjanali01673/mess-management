@@ -178,7 +178,7 @@ class DepositProvider extends ChangeNotifier{
           );
 
           // add total diposite
-          batch.update( // we can't use update here because initially the document was not exist
+          batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
             .collection(Constants.member)
@@ -187,17 +187,27 @@ class DepositProvider extends ChangeNotifier{
             depositModel.type==Constants.deposit? 
             {Constants.deposit : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)},
+            SetOptions(
+              mergeFields: [
+                Constants.deposit
+              ]
+            )
           );
           
-          batch.update(
+          batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
             {Constants.deposit : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            {Constants.deposit : FieldValue.increment(-depositModel.amount)},
+            SetOptions(
+              mergeFields: [
+                Constants.deposit
+              ]
+            )
           );
 
           await batch.commit();
@@ -232,7 +242,7 @@ class DepositProvider extends ChangeNotifier{
           );
 
           // increment my total diposite
-          batch.update( // we can't use update here because initially the document was not exist
+          batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
             .collection(Constants.member)
@@ -241,18 +251,29 @@ class DepositProvider extends ChangeNotifier{
             depositModel.type==Constants.deposit? 
             {Constants.deposit : FieldValue.increment(extraAmount)}
             :
-            {Constants.deposit : FieldValue.increment(-extraAmount)}
+            {Constants.deposit : FieldValue.increment(-extraAmount)},
+            SetOptions(
+              mergeFields: [
+                Constants.deposit
+              ]
+            )
           );
           
           // increment mess total diposite
-          batch.update(
+          batch.set(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
             {Constants.deposit : FieldValue.increment( extraAmount)}
             :
-            {Constants.deposit : FieldValue.increment(-extraAmount)}
+            {Constants.deposit : FieldValue.increment(-extraAmount)},
+            SetOptions(
+              mergeFields: [
+                Constants.deposit
+              ]
+            )
+
           );
 
           await batch.commit();

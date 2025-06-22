@@ -8,6 +8,7 @@ import 'package:meal_hisab/meal/meal_entry.dart';
 import 'package:meal_hisab/model/meal_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class GroupMealList extends StatefulWidget {
@@ -51,11 +52,19 @@ class _GroupMealListState extends State<GroupMealList> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    
     return Expanded(
       // color: Colors.red,
       // width: double.infinity,
       // height: double.infinity,
-      child: Column(
+      child: 
+      !(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))
+      ?
+      Center(child: Text("Required Administrator Power"))
+      :
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -82,7 +91,7 @@ class _GroupMealListState extends State<GroupMealList> {
                     
                   });
                 }, 
-                icon: showTotalMeal? Icon(Icons.remove_red_eye_sharp) : Icon(Icons.remove_red_eye_outlined),
+                icon: showTotalMeal? Icon(Icons.visibility) : Icon(Icons.visibility_off),
               ),
               title: 
               showTotalMeal? 

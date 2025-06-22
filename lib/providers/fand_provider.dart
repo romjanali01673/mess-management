@@ -86,11 +86,6 @@ class FandProvider extends ChangeNotifier{
   Future<void> addAFandTransaction({required FandModel fandModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
 
-    // fatch blance
-    await getFandTransactions(
-      messId: messId, 
-      onFail: onFail,
-      onSuccess: ()async{
         try {
           batch.set(
             firebaseFirestore.collection(Constants.fand)
@@ -104,31 +99,34 @@ class FandProvider extends ChangeNotifier{
             batch.set(
               firebaseFirestore.collection(Constants.fand)
               .doc(messId),
-              {Constants.blance:getBlance+fandModel.amount}
+              
+              {Constants.blance:FieldValue.increment(fandModel.amount)},
+              SetOptions(
+                mergeFields: [
+                  Constants.blance
+                ]
+              )            
             );
           }
           else{
             batch.set(
               firebaseFirestore.collection(Constants.fand)
               .doc(messId),
-              {Constants.blance:getBlance-fandModel.amount}
+              {Constants.blance:FieldValue.increment(-fandModel.amount)},
+              SetOptions(
+                mergeFields: [
+                  Constants.blance
+                ]
+              )
             );
           }
 
           await batch.commit();
 
-        // await firebaseFirestore
-        //   .collection(Constants.fand)
-        //   .doc(messId)
-        //   .collection(Constants.listOfFandTransaction)
-        //   .doc(fandModel.transactionId)
-        //   .set(fandModel.toMap());
           onSuccess!=null? onSuccess() : (){};
         } catch (e) {
           onFail(e.toString());
         } 
-      }
-    );
   }
 
   // update a fand transaction to database 
@@ -152,10 +150,17 @@ class FandProvider extends ChangeNotifier{
         )
       );
 
+      fandModel.type==Constants.add?
       batch.update(
         firebaseFirestore.collection(Constants.fand)
         .doc(messId),
         {Constants.blance: FieldValue.increment(extraAmount)}
+      )
+      :
+      batch.update(
+        firebaseFirestore.collection(Constants.fand)
+        .doc(messId),
+        {Constants.blance: FieldValue.increment(-extraAmount)}
       );
         
       await batch.commit();

@@ -68,6 +68,7 @@ class _AddFandState extends State<AddFand> {
   Widget build(BuildContext context) {
     final fandProvider = context.watch<FandProvider>();
     final authProvider = context.watch<AuthenticationProvider>();
+    final messProvider = context.watch<MessProvider>();
 
     return Scaffold(
       appBar: AppBar(),
@@ -112,7 +113,6 @@ class _AddFandState extends State<AddFand> {
                       child: TextFormField(
                         controller: titleController,
                         onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                        maxLines: 5,
                         textInputAction: TextInputAction.next,
                         autofocus: true,
                         focusNode: focusTitle,
@@ -190,6 +190,10 @@ class _AddFandState extends State<AddFand> {
               getButton(
                 label: isUpdate?"Update":"Submit", 
                 ontap: ()async{
+                if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider)||amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                  showSnackber(context: context, content: "required Administrator power");
+                  return;
+                }
 
                   bool valided  = (formKey.currentState!.validate());
                   

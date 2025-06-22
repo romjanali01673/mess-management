@@ -93,12 +93,12 @@ class _EditInfoState extends State<EditInfo> {
   // this function just show wanted dialog box
   void showImagePickerDialog(){
     showDialog(context: context, builder: (context)=>AlertDialog(
-      title: Text("Choos From:"),
+      title: Text("Choos From:",style : getTextStyleForTitleL()),
       scrollable: true,
       content: Column(
         children: [
           ListTile(
-            title: Text("Camera"),
+            title: Text("Camera",style : getTextStyleForTitleM()),
             leading: FaIcon(FontAwesomeIcons.camera),
             onTap: () {
               selectImage(fromCamera: true);
@@ -106,7 +106,7 @@ class _EditInfoState extends State<EditInfo> {
             },
           ),
           ListTile(
-            title: Text("Gellary"),
+            title: Text("Gellary",style : getTextStyleForTitleM()),
             leading: FaIcon(FontAwesomeIcons.images),
             onTap: () {
               selectImage(fromCamera: false);

@@ -84,9 +84,10 @@ void showSnackber({required BuildContext context, required String content}){
     );
   }
 
-  Future<bool> showConfirmDialog({required BuildContext context, required String title}) async{
+  Future<bool> showConfirmDialog({required BuildContext context, required String title, String subTitle=""}) async{
     bool? res =  await showDialog(context: context, builder: (context) => AlertDialog(
-      title: Text(title),
+      title: Text(title,style : getTextStyleForTitleL()),
+      content: Text(subTitle,style : getTextStyleForTitleL()),
       actions: [
         TextButton(
           onPressed: (){
@@ -187,4 +188,27 @@ String getFormatedPrice({required dynamic value}) {
 
   bool isWhole = number == number.toInt();
   return isWhole ? number.toInt().toString() : number.toStringAsFixed(2);
+}
+
+TextStyle getTextStyleForTitleS(){
+  return TextStyle(fontSize: 16);
+}
+TextStyle getTextStyleForTitleM(){
+  return TextStyle(fontSize: 18);
+}
+TextStyle getTextStyleForTitleL(){
+  return TextStyle(fontSize: 20);
+}
+TextStyle getTextStyleForTitleXL(){
+  return TextStyle(fontSize: 24);
+}
+
+TextStyle getTextStyleForSubTitleM(){
+  return TextStyle(fontSize: 14);
+}
+TextStyle getTextStyleForSubTitleL(){
+  return TextStyle(fontSize: 16);
+}
+TextStyle getTextStyleForSubTitleXL(){
+  return TextStyle(fontSize: 18);
 }

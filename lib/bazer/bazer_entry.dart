@@ -21,6 +21,7 @@ class BazerEntryScreen extends StatefulWidget {
 }
 
 class _BazerEntryScreenState extends State<BazerEntryScreen> {
+  bool isUpdate = false;
   TimeOfDay? time;
   DateTime? date;
 
@@ -39,6 +40,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
 
   void setPreData(){
+    isUpdate = (widget.preBazerModel!=null);
     if((widget.preBazerModel==null)) return;
     bazerList = (widget.preBazerModel!.bazerList as List<dynamic>).map((x)=> Map<String, dynamic> .from(x as Map)).toList();
     
@@ -89,8 +91,8 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
     setPreData();
+    super.initState();
   }
 
   @override
@@ -105,7 +107,6 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isUpdate = (widget.preBazerModel!=null);
 
     final messProvider = context.read<MessProvider>();
     final authProvider = context.read<AuthenticationProvider>();
@@ -148,9 +149,9 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       child: ListTile(
                         title: Text(
                           item,
-                          style: TextStyle(
+                          style : getTextStyleForTitleM().copyWith(
                             color: isDisabled ? Colors.grey : Colors.black,
-                          ),
+                          )
                         ),
                       ),
                     );
@@ -295,7 +296,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                                     backgroundColor: Colors.grey.shade500,
                                     child: Text("${index}", style: TextStyle(fontSize: 20)),
                                   ),
-                                  title: Text(value[Constants.product], style: TextStyle(fontSize: 16), textAlign: TextAlign.center,),
+                                  title: Text(value[Constants.product], style : getTextStyleForTitleM(), textAlign: TextAlign.center,),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -421,10 +422,16 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
                       onFail: (message ) { 
-                        showSnackber(context: context, content: "Bazer Entry Failed!\n$message");
+                        showSnackber(context: context, content: "Failed!\n$message");
                       },
                       onSuccess: (){
-                        showSnackber(context: context, content: "Bazer Entry Successed!");
+                        isUpdate = false;
+                        dropdownKey.currentState?.clear();
+                        date =null;
+                        time =null;
+                        dateController.clear();
+                        timeController.clear();
+                        showSnackber(context: context, content: "Updated!");
                       }, 
                       extraAdd: (bazerModel.amount - widget.preBazerModel!.amount) ,
                     )
@@ -452,7 +459,9 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                 }
               }
             ),
-        
+            SizedBox(
+              height: 30,
+            )
           ],
         ),
       ),
@@ -477,7 +486,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
         priceController.text = price;
         
         return AlertDialog(
-        title: Text("Add Product-"),
+        title: Text("Add Product-",style : getTextStyleForTitleL()),
         scrollable: true,
         content: Form(
           key: formKey,

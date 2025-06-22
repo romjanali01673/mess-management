@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class MessModel {
@@ -11,6 +12,7 @@ class MessModel {
   String messAuthorityNumber;
   String messAuthorityEmail;
   List<Map<String,dynamic>> messMemberList;
+  Timestamp? createdAt;
 
   MessModel({
     required this.messId,
@@ -28,6 +30,7 @@ class MessModel {
     //   Constants.status: Constants.enable,
     // }
     required this.messMemberList, 
+    this.createdAt,
   });
 
   Map<String, dynamic> toMap(){
@@ -42,6 +45,7 @@ class MessModel {
       Constants.messAuthorityNumber: messAuthorityNumber,
       Constants.messAuthorityEmail: messAuthorityEmail,
       Constants.messMemberList: messMemberList,
+      Constants.createdAt : FieldValue.serverTimestamp(),
     };
   }
 
@@ -59,6 +63,7 @@ class MessModel {
       messMemberList: (data[Constants.messMemberList] as List<dynamic>?)
         ?.map((e) => Map<String, dynamic>.from(e as Map))
         .toList() ?? [],
+      createdAt: data[Constants.createdAt]
     );
   }
 }
