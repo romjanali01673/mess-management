@@ -51,7 +51,10 @@ class _AddRuleState extends State<AddRule> {
 
     
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Add Rule", style: getTextStyleForTitleXL(),),
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,
@@ -157,6 +160,8 @@ class _AddRuleState extends State<AddRule> {
                             showSnackber(context: context, content: "Sonthing Wrong, Try Again!\n$message");
                           },
                           onSuccess: (){
+                            titleController.clear();
+                            descController.clear();
                             showSnackber(context: context, content: "New Mess Rule Added Successfully");
                           }
                         );

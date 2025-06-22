@@ -18,7 +18,10 @@ class _RestPassState extends State<RestPass> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Reset Password"),
+        backgroundColor: Colors.grey,
+      ),
       body: Column(
         children: [
           SizedBox(
@@ -72,7 +75,7 @@ class _RestPassState extends State<RestPass> {
                                       showMessageDialog(context: context, title: "Rest Message", Discreption: "Password Rest message has send to your given email address, please check in spam folder if not found in primary email section.");
                                     }
                                   }, 
-                                  label: "Rest" ,
+                                  label: "Reset" ,
                                 ),
                                 SizedBox(
                                   height: 20,

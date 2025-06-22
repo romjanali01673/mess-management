@@ -115,7 +115,10 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Bazer Entry", style: getTextStyleForTitleXL(),),
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         // color: Colors.amber,
         height: double.infinity,

@@ -98,7 +98,10 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
     final messProvider  = context.read<MessProvider>();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Add Meal",style: getTextStyleForTitleXL(),),
+        backgroundColor: Colors.grey,
+      ),
       body: 
       !(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))
       ?

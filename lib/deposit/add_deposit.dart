@@ -100,7 +100,10 @@ class _AddDepositState extends State<AddDeposit> {
     final authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Deposit Entry", style: getTextStyleForTitleXL(),),
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,

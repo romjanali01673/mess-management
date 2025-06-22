@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meal_hisab/authantication/Sign_up.dart';
-import 'package:meal_hisab/authantication/rest_pass.dart';
+import 'package:meal_hisab/authantication/reset_pass.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';

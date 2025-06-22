@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/authantication/rest_pass.dart';
+import 'package:meal_hisab/authantication/reset_pass.dart';
 import 'package:meal_hisab/authantication/sign_in.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
@@ -54,7 +54,10 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Change Password"),
+        backgroundColor: Colors.grey,
+      ),      
       body: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),

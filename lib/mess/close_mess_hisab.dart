@@ -11,7 +11,9 @@ class _MessCloseScreenState extends State<MessCloseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+      ),
       body: Container(
         color: Colors.green.shade100,
         child: Center(

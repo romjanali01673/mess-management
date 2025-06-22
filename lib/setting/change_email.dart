@@ -82,9 +82,10 @@ class _ChangeEmailState extends State<ChangeEmail> {
   Widget build(BuildContext context) {
     final authProvider = context.read<AuthenticationProvider>();
     return Scaffold(
-        appBar: AppBar(
-
-        ),
+      appBar: AppBar(
+        title: Text("Change Email"),
+        backgroundColor: Colors.grey,
+      ),
         
         body: FutureBuilder(
           future: authProvider.getMemberData(uId: authProvider.getUserModel!.uId),

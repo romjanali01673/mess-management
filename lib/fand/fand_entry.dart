@@ -71,7 +71,10 @@ class _AddFandState extends State<AddFand> {
     final messProvider = context.watch<MessProvider>();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Fand Entry", style: getTextStyleForTitleXL(),),
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,

@@ -123,9 +123,10 @@ class _EditInfoState extends State<EditInfo> {
   Widget build(BuildContext context) {
     final authProvider = context.read<AuthenticationProvider>();
     return Scaffold(
-        appBar: AppBar(
-
-        ),
+      appBar: AppBar(
+        title: Text("Edit Info"),
+        backgroundColor: Colors.grey,
+      ),
         
         body: FutureBuilder(
           future: authProvider.getMemberData(uId: authProvider.getUserModel!.uId),

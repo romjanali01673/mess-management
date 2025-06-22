@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/bazer/bazer_entry.dart';
-import 'package:meal_hisab/bazer/bazer_update.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
@@ -51,7 +50,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
             ),
           ),
       
-          amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)?
+          // amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)?
           Expanded(
                child: FutureBuilder(
                 future: bazerProvider.getBazerTransactions(
@@ -200,8 +199,8 @@ class _BazerListScreenState extends State<BazerListScreen> {
                 },
                ),
           )
-          :
-          Text("required menager/Act menager power"),
+          // :
+          // Text("required menager/Act menager power"),
         ],
       ),
     );

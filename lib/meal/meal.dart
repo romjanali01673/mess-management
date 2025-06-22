@@ -182,7 +182,7 @@ class _MealScreenState extends State<MealScreen> {
                             ),
                             title: Text("Date: "+mealData[Constants.date].toString()),
                             subtitle: Text("Entry Time: "+"${DateFormat("hh:mm a dd-MM-yyyy").format(mealData[Constants.createdAt].toDate().toLocal())}"),
-                            trailing: Text(mealData[Constants.meal].toString()),
+                            trailing: showPrice(value: mealData[Constants.meal].toString()),
                           ),
                         );
                       }

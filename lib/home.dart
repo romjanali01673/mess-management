@@ -92,9 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       // Go to notifications page
                       // Optional: mark notifications seen
-                      setState(() {
-                        DrawerItemGroup=DrawerItem.Notice_And_Announcements;
-                      });
+                      // setState(() {
+                      //   DrawerItemGroup=DrawerItem.Notice_And_Announcements;
+                      // });
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>NoticeAndAnnouncementScreen()));
                     },
                   ),
                   if (noticeProvider.getHasUnseen)Positioned(
@@ -255,10 +256,11 @@ class _HomeScreenState extends State<HomeScreen> {
               selected: DrawerItemGroup ==DrawerItem.Notice_And_Announcements,
               ontap: () {
                 Navigator.pop(context);
-                DrawerItemGroup =DrawerItem.Notice_And_Announcements;
-                setState(() {
+                // DrawerItemGroup =DrawerItem.Notice_And_Announcements;
+                // setState(() {
                 
-                });
+                // });
+                Navigator.push(context, MaterialPageRoute( builder:(context)=> NoticeAndAnnouncementScreen()));
               },
             ),
             getItems(
@@ -279,10 +281,11 @@ class _HomeScreenState extends State<HomeScreen> {
               selected: DrawerItemGroup == DrawerItem.Mess,
               ontap: () {
                 Navigator.pop(context);
-                DrawerItemGroup=DrawerItem.Mess;
-                setState(() {
+                // DrawerItemGroup=DrawerItem.Mess;
+                // setState(() {
                 
-                });
+                // });
+                Navigator.push(context, MaterialPageRoute( builder:(context)=> MessScreen()));
               },
             ),
             getItems(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/mess/add_rule.dart';
 import 'package:meal_hisab/mess/close_mess_hisab.dart';
 import 'package:meal_hisab/mess/join_or_leave.dart';
 import 'package:meal_hisab/mess/mess_create.dart';
@@ -25,8 +26,7 @@ class MessScreen extends StatefulWidget{
 class _MessScreenState extends State<MessScreen>{
   Mess messScreemItemGrpup = Mess.mess;
   bool showComment = false;
-  double posX = -50;
-  double posY = -50;
+
 
   @override
   void initState() {
@@ -34,105 +34,121 @@ class _MessScreenState extends State<MessScreen>{
     // Delay getting screen size until layout is built
     WidgetsBinding.instance.addPostFrameCallback((_)async {
       await Future.delayed(Duration(milliseconds: 100));
-      final size = MediaQuery.of(context).size;
-      setState(() {
-        posX = (size.width - 56) / 2; // Center horizontally (56 = FAB size)
-        posY = size.height - 200; // Near bottom (adjust for AppBar & padding)
-      });
     });
   }
 
   @override
   Widget build(BuildContext context){
-    return Container(
-      color: Colors.green.shade50,
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-                spacing: 10,
-                children: [
-                  getMenuItems(
-                    label: "About Mess", 
-                    ontap: (){
-                      setState(() {
-                        messScreemItemGrpup = Mess.mess;
-                      });
-                    },
-                    selected: messScreemItemGrpup==Mess.mess,
-                    icon: Icons.info_outline_rounded
-                  ),
-                  getMenuItems(
-                    label: "Join/leave", 
-                    ontap: (){
-                      setState(() {
-                        messScreemItemGrpup = Mess.joinOrleave;
-                        
-                      });
-                    },
-                    selected: messScreemItemGrpup==Mess.joinOrleave,
-                    icon: (Icons.library_add),
-                  ),
-                  getMenuItems(
-                    label: "Pre Data", 
-                    ontap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>PreDataScreen()));
-                    },
-                    icon: Icons.preview
-                  ),
-                  getMenuItems(
-                    label: "Close Mess Estimate", 
-                    ontap: (){
-                      // navigate "Close Mess Estimate" page
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>MessCloseScreen()));
-
-                    },
-                    icon: Icons.settings_power_outlined
-                  ),
-                  getMenuItems(
-                    label: "Update Mess", 
-                    ontap: (){
-                      setState(() {
-                        messScreemItemGrpup = Mess.messUpdate;
-                      });
-                    },
-                    selected: messScreemItemGrpup==Mess.messUpdate,
-                    icon: Icons.update_sharp
-                  ),
-                  getMenuItems(
-                    label: "Delete Mess", 
-                    ontap: (){
-                      setState(() {
-                        messScreemItemGrpup = Mess.messDelete;
-                      });
-                    },
-                    selected: messScreemItemGrpup==Mess.messDelete,
-                    icon: Icons.delete
-                  ),
-                  getMenuItems(
-                    label: "Create Mess", 
-                    ontap: (){
-                      setState(() {
-                        messScreemItemGrpup = Mess.messCreate;
-                      });
-                    },
-                    selected: messScreemItemGrpup==Mess.messCreate,
-                    icon: Icons.create
-                  ),
-                ],
-              ),
+    MessProvider messProvider = context.read<MessProvider>();
+    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+    
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey,
+        actions: [
+          if(messScreemItemGrpup==Mess.mess)
+          IconButton(
+            onPressed: () {
+              if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                showSnackber(context: context, content: "Required Administrator Power");
+                return;
+              }
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule()));
+            },
+            icon: Icon(Icons.add, color: Colors.black, size: 35,)
           ),
-          messScreemItemGrpup==Mess.messCreate? MessCreate()
-          :
-          messScreemItemGrpup==Mess.messDelete? MessDelete()
-          :
-          messScreemItemGrpup==Mess.messUpdate? MessUpdate()
-          :
-          messScreemItemGrpup==Mess.joinOrleave? JoinOrLeave()
-          :
-          getMessInSideData()
         ],
+      ),
+      body: Container(
+        color: Colors.green.shade50,
+        child: Column(
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  spacing: 10,
+                  children: [
+                    getMenuItems(
+                      label: "About Mess", 
+                      ontap: (){
+                        setState(() {
+                          messScreemItemGrpup = Mess.mess;
+                        });
+                      },
+                      selected: messScreemItemGrpup==Mess.mess,
+                      icon: Icons.info_outline_rounded
+                    ),
+                    getMenuItems(
+                      label: "Pre Data", 
+                      ontap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>PreDataScreen()));
+                      },
+                      icon: Icons.preview
+                    ),
+                    getMenuItems(
+                      label: "Close Mess Estimate", 
+                      ontap: (){
+                        // navigate "Close Mess Estimate" page
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MessCloseScreen()));
+        
+                      },
+                      icon: Icons.settings_power_outlined
+                    ),
+                    getMenuItems(
+                      label: "Join/leave", 
+                      ontap: (){
+                        setState(() {
+                          messScreemItemGrpup = Mess.joinOrleave;
+                          
+                        });
+                      },
+                      selected: messScreemItemGrpup==Mess.joinOrleave,
+                      icon: (Icons.library_add),
+                    ),
+                    getMenuItems(
+                      label: "Update Mess", 
+                      ontap: (){
+                        setState(() {
+                          messScreemItemGrpup = Mess.messUpdate;
+                        });
+                      },
+                      selected: messScreemItemGrpup==Mess.messUpdate,
+                      icon: Icons.update_sharp
+                    ),
+                    getMenuItems(
+                      label: "Delete Mess", 
+                      ontap: (){
+                        setState(() {
+                          messScreemItemGrpup = Mess.messDelete;
+                        });
+                      },
+                      selected: messScreemItemGrpup==Mess.messDelete,
+                      icon: Icons.delete
+                    ),
+                    getMenuItems(
+                      label: "Create Mess", 
+                      ontap: (){
+                        setState(() {
+                          messScreemItemGrpup = Mess.messCreate;
+                        });
+                      },
+                      selected: messScreemItemGrpup==Mess.messCreate,
+                      icon: Icons.create
+                    ),
+                  ],
+                ),
+            ),
+            messScreemItemGrpup==Mess.messCreate? MessCreate()
+            :
+            messScreemItemGrpup==Mess.messDelete? MessDelete()
+            :
+            messScreemItemGrpup==Mess.messUpdate? MessUpdate()
+            :
+            messScreemItemGrpup==Mess.joinOrleave? JoinOrLeave()
+            :
+            getMessInSideData()
+          ],
+        ),
       ),
     );
   }
@@ -273,7 +289,7 @@ class _MessScreenState extends State<MessScreen>{
                                     leading: Icon(Icons.edit, color: Colors.green,),
                                   ), 
                                   onTap: () {
-                                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule(preRuleModel: ruleModel,)));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule(preRuleModel: ruleModel,)));
                                   },
                                 ),
                               
@@ -325,8 +341,9 @@ class _MessScreenState extends State<MessScreen>{
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 3.0),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("ID: ${ruleModel.transactionId}\n\n"),
+                                Text("ID: ${ruleModel.transactionId}\n"),
                                 Text("${ruleModel.description}"),
                               ],
                             ),

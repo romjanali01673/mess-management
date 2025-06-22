@@ -11,7 +11,9 @@ class _PreDataScreenState extends State<PreDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         color: Colors.green.shade100,
         child: Center(
