@@ -1,18 +1,15 @@
-# chess_game
+# Project Name: Mess Management
 
-the game user can play online and offline 
-and single with computer 
+in this application user can manage there meal, diposite, fand, meal rate, bazer, total member data, Administrator Power,
+In this app has managed user Privacy, security with Confidentiallity, Integrity, Availability
 
-here wec can set given chess standerd time and custom time also.
-we can select our own player color.
-player can see time count-down 
-
-save login status locally
+user can read and write online or offline.
 
 backend : firebase
 
-#preview: 
 
+
+# preview : ------
 
 
 # Authentication 
@@ -123,6 +120,11 @@ All Deposit History
 
 # Meal 
 
+Add Meal
+![add_meal](ss/add_meal.png)
+![add_meal2](ss/add_meal2.png)
+
+
 Group Meal List 
 ![](ss/group_meal_list.png)
 
@@ -131,16 +133,16 @@ My Meal List
 ![](ss/my_meal_list.png)
 
 
+Member Meal List 
+![](ss/member_meal_list.png)
+
+
 
 # Fand 
 
 Add Fand
 ![add_fand](ss/add_fand.png)
 
-
-Add Meal
-![add_meal](ss/add_meal.png)
-![add_meal2](ss/add_meal2.png)
 
 
 Fand Transaction List
@@ -174,5 +176,4 @@ Change Pass
 
 Logout
 ![](ss/logout.png)
-![](ss/member_meal_list.png)
 
