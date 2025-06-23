@@ -23,7 +23,7 @@ class DepositModel{
       transactionId: data[Constants.transactionId]?? "", 
       amount: data[Constants.amount]?? 0, 
       description: data[Constants.description]?? "",
-      CreatedAt: data[Constants.createdAt], 
+      CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
       type: data[Constants.type]?? Constants.add,
     );
   }

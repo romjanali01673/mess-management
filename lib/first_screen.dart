@@ -270,7 +270,7 @@ class _FirstScreenState extends State<FirstScreen> {
                                 children: [
                                   Text("Notice Id:${firstScreenProvider.getPindedNoticeForHome!.noticeId}",),
                                   Text("Title: ${firstScreenProvider.getPindedNoticeForHome!.title}"),
-                                  Text("Description ${firstScreenProvider.getPindedNoticeForHome!.description}",),
+                                  Text("Description: ${firstScreenProvider.getPindedNoticeForHome!.description}",),
                                   Text("Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(firstScreenProvider.getPindedNoticeForHome!.CreatedAt!.toDate().toLocal())}",),
                                 ],
                               )

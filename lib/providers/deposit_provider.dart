@@ -189,9 +189,7 @@ class DepositProvider extends ChangeNotifier{
             :
             {Constants.deposit : FieldValue.increment(-depositModel.amount)},
             SetOptions(
-              mergeFields: [
-                Constants.deposit
-              ]
+              merge: true
             )
           );
           
@@ -204,9 +202,7 @@ class DepositProvider extends ChangeNotifier{
             :
             {Constants.deposit : FieldValue.increment(-depositModel.amount)},
             SetOptions(
-              mergeFields: [
-                Constants.deposit
-              ]
+              merge: true
             )
           );
 
@@ -253,9 +249,7 @@ class DepositProvider extends ChangeNotifier{
             :
             {Constants.deposit : FieldValue.increment(-extraAmount)},
             SetOptions(
-              mergeFields: [
-                Constants.deposit
-              ]
+              merge: true
             )
           );
           
@@ -269,9 +263,7 @@ class DepositProvider extends ChangeNotifier{
             :
             {Constants.deposit : FieldValue.increment(-extraAmount)},
             SetOptions(
-              mergeFields: [
-                Constants.deposit
-              ]
+              merge: true
             )
 
           );

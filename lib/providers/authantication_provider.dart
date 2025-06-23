@@ -365,22 +365,26 @@ class AuthenticationProvider extends ChangeNotifier {
 
       _userModel = currentUser;
 
+
       // get my current data in my mess
       Map<String, dynamic> myCurrentDataInMess = {};
       Map<String, dynamic> myWantedDataInMess = {
         Constants.fname : currentUser.fname,
         Constants.uId : currentUser.uId,
       };
-      DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.mess).doc(currentUser.currentMessId).get(); 
-      if(snapshot.exists && snapshot.data()!= null){
-        (((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]) as List<dynamic>).map((x){
-          if(x[Constants.uId]==currentUser.uId){
-      debugPrint(((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]).toString());
+      if(currentUser.currentMessId != ""){ // update if i am connected to any mess
+      
+        DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.mess).doc(currentUser.currentMessId).get(); 
+        if(snapshot.exists && snapshot.data()!= null){
+          (((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]) as List<dynamic>).map((x){
+            if(x[Constants.uId]==currentUser.uId){
+        debugPrint(((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList]).toString());
 
-            myWantedDataInMess[Constants.status] = x[Constants.status];
-            myCurrentDataInMess = x ;
-          }
-        }).toList();
+              myWantedDataInMess[Constants.status] = x[Constants.status];
+              myCurrentDataInMess = x ;
+            }
+          }).toList();
+        }
       }
 
       // update data to firestore
@@ -392,21 +396,28 @@ class AuthenticationProvider extends ChangeNotifier {
         currentUser.toMap()
       );
 
-      // delete current data from mess
-      batch.update(
-        firebaseFirestore
-        .collection(Constants.mess)
-        .doc(currentUser.currentMessId),        
-        {Constants.messMemberList : FieldValue.arrayRemove([myCurrentDataInMess])}
-      );
+      if(currentUser.currentMessId != ""){ // update if i am connected to any mess
+        // delete current data from mess
+        batch.set(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(currentUser.currentMessId),        
+          {Constants.messMemberList : FieldValue.arrayRemove([myCurrentDataInMess])},
+          SetOptions(
+            mergeFields: [
+              Constants.messMemberList
+            ]
+          )
+        );
 
-      // add new data to mess
-      batch.update(
-        firebaseFirestore
-        .collection(Constants.mess)
-        .doc(currentUser.currentMessId),        
-        {Constants.messMemberList : FieldValue.arrayUnion([myWantedDataInMess])}
-      );
+        // add new data to mess
+        batch.update(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(currentUser.currentMessId),        
+          {Constants.messMemberList : FieldValue.arrayUnion([myWantedDataInMess])}
+        );
+      }
 
 
       await batch.commit();

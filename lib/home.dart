@@ -167,9 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
               currentAccountPicture: CircleAvatar(
                 
                 backgroundColor: Colors.blue,
-                backgroundImage: NetworkImage(
-                  "https://scontent.fdac80-1.fna.fbcdn.net/v/t39.30808-6/490295869_1342466350336950_1132803492906371083_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHIbKvKiEjuSiifxz4S-T6tNVr7432uvrU1Wvvjfa6-tbMkCjKUjhLieukD-hKVHQVy_HFqvTb9rPwSGiAuSoHV&_nc_ohc=Otwk__7-HVAQ7kNvwGvWAAK&_nc_oc=AdnRGR44kqFf_okZBdFDtCo469hJ9y1JncDNOkfuEhLo-3Yg2rKq0U7dfujLTPo8KZw&_nc_zt=23&_nc_ht=scontent.fdac80-1.fna&_nc_gid=OfKQKXnlSFdmuZM58inpWw&oh=00_AfP5G7Oin4ltgLTKmHkOb6oO-JJGH10FnlVTAE4teDP-Iw&oe=6858DE47"
-                ),
+                // backgroundImage: NetworkImage(
+                //   "https://scontent.fdac80-1.fna.fbcdn.net/v/t39.30808-6/490295869_1342466350336950_1132803492906371083_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHIbKvKiEjuSiifxz4S-T6tNVr7432uvrU1Wvvjfa6-tbMkCjKUjhLieukD-hKVHQVy_HFqvTb9rPwSGiAuSoHV&_nc_ohc=Otwk__7-HVAQ7kNvwGvWAAK&_nc_oc=AdnRGR44kqFf_okZBdFDtCo469hJ9y1JncDNOkfuEhLo-3Yg2rKq0U7dfujLTPo8KZw&_nc_zt=23&_nc_ht=scontent.fdac80-1.fna&_nc_gid=OfKQKXnlSFdmuZM58inpWw&oh=00_AfP5G7Oin4ltgLTKmHkOb6oO-JJGH10FnlVTAE4teDP-Iw&oe=6858DE47"
+                // ),
+                child: Text("Paid"),
               ),
               decoration: BoxDecoration(
                 

@@ -58,6 +58,9 @@ class Constants {
   
   static const String inSide = "inSide";
   static const String rules = "rules";
+  
+  static const String preMessList = "preMessList";
+
 
 
 

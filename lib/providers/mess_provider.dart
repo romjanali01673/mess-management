@@ -28,6 +28,7 @@ class MessProvider extends ChangeNotifier {
   
   }
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  StreamSubscription? _messSubscription;
 
 
   // set ------------------------------
@@ -78,8 +79,41 @@ class MessProvider extends ChangeNotifier {
   bool get isOnline => _isOnline;
   bool get isLoading => _isLoading;
 
-  // function --------------
+  
+  
+  @override
+  void dispose() {
+    _messSubscription?.cancel();
+    super.dispose();
+  }
 
+
+  // function --------------
+  
+  
+  
+  
+  
+  
+
+  void listenToMess({required String messId}) {
+    _messSubscription?.cancel(); // পুরানো subscription থাকলে বন্ধ করো
+
+    _messSubscription = firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        _messModel = MessModel.fromMap(data);
+        notifyListeners();
+        debugPrint("listenToMess-1" +"notifyListener called");
+      }
+    });
+  }
+
+ 
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initConnectivity() async {
@@ -185,17 +219,35 @@ class MessProvider extends ChangeNotifier {
 
   // remove from Mess- Id To Member Profile
   Future<void> removeMessIdFromMemberProfile({required Function(String) onFail, Function()? onSuccess,required String memberUid})async{
+     final batch = firebaseFirestore.batch();
     try{
-      firebaseFirestore
-      .collection(Constants.users)
-      .doc(memberUid)
-      .set(
+      batch.set( 
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(memberUid),
+      
         {
           Constants.currentMessId : "",
         },
-        SetOptions(merge: true),
         
+        SetOptions(merge: true),
       );
+
+            // add pre match id 
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(memberUid)
+        .collection(Constants.preMessList)
+        .doc(getMessModel!.messId),
+        {
+          Constants.messId : getMessModel!.messId,
+          Constants.createdAt: FieldValue.serverTimestamp(),
+          Constants.messName: getMessModel!.messName,
+        },        
+      );
+
+      await batch.commit();
       _messModel= null;
       notifyListeners();
       onSuccess!=null? onSuccess():(){};
@@ -237,7 +289,7 @@ class MessProvider extends ChangeNotifier {
 
     }catch (e){
       if(!(isDisposed==null || !isDisposed())) return;
-        onFail(e.toString()+"get mess data");
+        onFail("No Data Found.\n${e.toString()}");
     }
     if(!(isDisposed==null || !isDisposed())) return;
     // for any kind of error we gat null.
@@ -246,10 +298,6 @@ class MessProvider extends ChangeNotifier {
       _messModel = MessModel.fromMap(documentSnapshot!.data() as Map<String,dynamic>);
       notifyListeners();
       onSuccess!=null?onSuccess():(){};
-    }
-    else{
-      // we fatch data successfully but there has no data
-      onFail("No Data found");
     }
   }
 
@@ -483,6 +531,20 @@ class MessProvider extends ChangeNotifier {
         .doc(member[Constants.uId]),
         {
           Constants.currentMessId : "",
+        },        
+      );
+
+      // add pre match id 
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.users)
+        .doc(member[Constants.uId])
+        .collection(Constants.preMessList)
+        .doc(getMessModel!.messId),
+        {
+          Constants.messId : getMessModel!.messId,
+          Constants.createdAt: FieldValue.serverTimestamp(),
+          Constants.messName: getMessModel!.messName,
         },        
       );
 

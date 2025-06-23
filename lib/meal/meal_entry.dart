@@ -24,8 +24,8 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
   DateTime? date;
 
   var dateController  = TextEditingController();
-  late List<TextEditingController> listOfTexteditingController;
-  late List<Map<String, dynamic>> listOfMeal;
+  List<TextEditingController> listOfTexteditingController=[];
+  List<Map<String, dynamic>> listOfMeal=[];
   List<Map<String,dynamic>> memberData =[];
 
   double getTotalMeal(){
@@ -57,13 +57,15 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
     }
     else{
       final messProvider  = context.read<MessProvider>();
-      memberData = messProvider.getMessModel!.messMemberList;           
-      // set here the list of meal.
-      listOfMeal = List.generate(memberData!.length,(_)=><String,dynamic>{Constants.meal:0});
-      listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
-      setState(() {
-        
-      });
+      if(messProvider.getMessModel != null){
+        memberData = messProvider.getMessModel!.messMemberList;           
+        // set here the list of meal.
+        listOfMeal = List.generate(memberData!.length,(_)=><String,dynamic>{Constants.meal:0});
+        listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
+        setState(() {
+          
+        });
+      }
     }
   }
 
@@ -107,71 +109,72 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
       ?
       Center(child: Text("Required Administrator Power"))
       :
-      Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    onTap: () async{
-                      if(isUpdate) return;
-                      date = await showDatePicker(
-                        // fieldHintText: "mm/dd/YYYY",
-                        fieldLabelText: "Enter Date (DD-MM-YYYY)", // defalut "Enter Date"
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate : DateTime(2000,12,30,12,59,59),
-                        lastDate: DateTime(2050),
-                        initialDatePickerMode: DatePickerMode.day,
-                        initialEntryMode:DatePickerEntryMode.calendar,
-                        // helpText: "Set Date", // default "Select date"
-                      );
-                      if(date!=null){
-                        dateController.text = DateFormat("dd-MM-yyyy").format(date!);
-                      }
-                    },
-                    controller: dateController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        
-                      ),
-                      label: Text("Date(dd-MM-yyyy)"),
-                      hintText: "Select date",
-      
-                    ),
-                  ),
-                ),
-              ]
-            )
-          ),
-            
-          if(memberData.isEmpty) Expanded(
-            child: Center(
-              child: IconButton(
-                onPressed: (){
-                  setData(isUpdate: isUpdate);
-                }, 
-                icon: Icon(Icons.replay_outlined),
-              )
-            )
-          ),
+      Container(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onTap: () async{
+                          if(isUpdate) return;
+                          date = await showDatePicker(
+                            // fieldHintText: "mm/dd/YYYY",
+                            fieldLabelText: "Enter Date (DD-MM-YYYY)", // defalut "Enter Date"
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate : DateTime(2000,12,30,12,59,59),
+                            lastDate: DateTime(2050),
+                            initialDatePickerMode: DatePickerMode.day,
+                            initialEntryMode:DatePickerEntryMode.calendar,
+                            // helpText: "Set Date", // default "Select date"
+                          );
+                          if(date!=null){
+                            dateController.text = DateFormat("dd-MM-yyyy").format(date!);
+                          }
+                        },
+                        controller: dateController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            
+                          ),
+                          label: Text("Date(dd-MM-yyyy)"),
+                          hintText: "Select date",
           
-          Expanded(
-            
-            
+                        ),
+                      ),
+                    ),
+                  ]
+                )
+              ),
+                
+              if(memberData.isEmpty) Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: (){
+                      setData(isUpdate: isUpdate);
+                    }, 
+                    icon: Icon(Icons.replay_outlined),
+                  )
+                )
+              ),
               
-              child: StatefulBuilder(
+              StatefulBuilder(
                 builder: (context, setLocalState) {
                 
               return Padding(
               padding: EdgeInsets.all(10),
                 child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: memberData!.length+1,
                   itemBuilder: (context, index){
-            
+                              
                     // the button will be shown in last when we reach in last 
                     if(index==memberData.length){
                       return  getMenuItems(
@@ -190,9 +193,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 listOfMeal: listOfMeal, 
                                 totalMeal: getTotalMeal(),
                               );
-            
+                              
                               print(mealModel.toMap());
-            
+                              
                               mealProvider.updateAMeal(
                                 mealModel: mealModel, 
                                 extraMeal: mealModel.totalMeal - widget.preMealModel!.totalMeal,
@@ -208,7 +211,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                   listOfTexteditingController.forEach((x){
                                     x.text = "";
                                   });
-            
+                              
                                   showSnackber(context: context, content: "Meal Update Success");
                                   setLocalState(() {
                                     
@@ -224,7 +227,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 totalMeal: getTotalMeal(),
                               );
                               print(mealModel.toMap());
-            
+                              
                               mealProvider.addAMeal(
                                 mealModel: mealModel, 
                                 messId: authProvider.getUserModel!.currentMessId, 
@@ -245,14 +248,14 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                   });
                                 }
                               );
-            
+                              
                             }
                             
                           }
                         }
                       );
                     }
-            
+                              
                     final member = memberData[index];
                     listOfMeal[index][Constants.uId] = member[Constants.uId];
                     listOfMeal[index][Constants.fname] = member[Constants.fname];
@@ -311,9 +314,10 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                 ),
               );
               },
-              ),
-          )
-        ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

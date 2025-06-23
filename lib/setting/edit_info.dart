@@ -64,7 +64,7 @@ class _EditInfoState extends State<EditInfo> {
           });
         }, 
         onFail: (message){
-          showSnackber(context: context, content: "Update Failed!\nTry Again.");
+          showSnackber(context: context, content: "Update Failed!\nTry Again.\n$message");
         }
       );
     }
@@ -145,217 +145,227 @@ class _EditInfoState extends State<EditInfo> {
             nameContriller.text = snapshot.data!.fname;
             addressContriller.text = snapshot.data!.fullAddress;
 
-            return Column(
-              children: [
-                Form(
-                  key: FormKey,
-                  child: Column(
-                    children: [
-              
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
-                          ),
-                          Checkbox(
-                            value: checked, 
-                            onChanged: (val){
-                            setState(() {
-                              checked = !checked;
-                            });
-                          }),
-                        ],
-                      ),
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Form(
+                    key: FormKey,
+                    child: Column(
+                      children: [
                 
-                      finalFileImage!=null?
-                      Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.black,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border : Border.all(color: Colors.white, width: 2),
-                                    color: Colors.lightBlue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    onPressed: () {
-                                      // pick image from camera or galery
-                                        showImagePickerDialog();
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                            )
-                            :
-                            Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.black,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border : Border.all(color: Colors.white, width: 2),
-                                    color: Colors.lightBlue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    onPressed: () {
-                                      // pick image from camera or galery
-                                      setState(() {
-                                        showImagePickerDialog();
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
                             ),
-                      
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: nameContriller,
-                                            enabled: checked,
-                                            
-                                            
-                                            validator: (value) {
-                                              return nameValidator(value.toString());
-                                            },
-                                            keyboardType: TextInputType.text,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Full Name"),
-                                              border: InputBorder.none,
-                                
+                            Checkbox(
+                              value: checked, 
+                              onChanged: (val){
+                              setState(() {
+                                checked = !checked;
+                              });
+                            }),
+                          ],
+                        ),
+                  
+                        finalFileImage!=null?
+                        Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.black,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border : Border.all(color: Colors.white, width: 2),
+                                      color: Colors.lightBlue,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      onPressed: () {
+                                        // pick image from camera or galery
+                                          showImagePickerDialog();
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              )
+                              :
+                              Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  foregroundImage: finalFileImage==null? AssetImage(AssetsManager.userIcon) : FileImage(File(finalFileImage!.path)),
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.black,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border : Border.all(color: Colors.white, width: 2),
+                                      color: Colors.lightBlue,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      onPressed: () {
+                                        // pick image from camera or galery
+                                        setState(() {
+                                          showImagePickerDialog();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              ),
+                        
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: nameContriller,
+                                              enabled: checked,
+                                              onTapOutside: (event) {// close keyboard
+                                                FocusScope.of(context).unfocus();
+                                              },
+                                                                  
+                                              validator: (value) {
+                                                return nameValidator(value.toString());
+                                              },
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Full Name"),
+                                                border: InputBorder.none,
+                                  
+                                              ),
                                             ),
                                           ),
-                                        ),
-                          
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: emailController,
-                                            enabled: false,
-                                            
-                                            validator: (value) {
-                                              return emailValidator(value.toString());
-                                            },
-                                            keyboardType: TextInputType.text,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Email"),
-                                              border: InputBorder.none,
-                                
+                            
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: emailController,
+                                              enabled: false,
+                                              onTapOutside: (event) {// close keyboard
+                                                FocusScope.of(context).unfocus();
+                                              },
+                                              validator: (value) {
+                                                return emailValidator(value.toString());
+                                              },
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Email"),
+                                                border: InputBorder.none,
+                                  
+                                              ),
                                             ),
                                           ),
-                                        ),
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: phoneContriller,
-                                            enabled: checked,
-                                            
-                                            validator: (value) {
-                                              // ^(?:\+88|88)? → allows optional country code +88 or 88.
-                                              // 01[2-9] → valid operator codes (e.g., 013 to 019).
-                                              // \d{8}$ → exactly 8 digits after the operator code (total 11 digits).
-                                              final pattern = RegExp(r'^(?:\+88|88)?01[2-9]\d{8}$');
-                                              if (value == null || value.isEmpty) {
-                                                return 'Phone number is required';
-                                              }
-                                              if(!pattern.hasMatch(value.toString())){
-                                                return "Enter Valid Phone Number";
-                                              }
-                                              return null;
-                                            },
-                                            keyboardType: TextInputType.number,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Phone"),
-                                              border: InputBorder.none,
-                                              hintText: "Enter Your Phone With Country Code"
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: phoneContriller,
+                                              enabled: checked,
+                                              onTapOutside: (event) {// close keyboard
+                                                FocusScope.of(context).unfocus();
+                                              },
+                                              validator: (value) {
+                                                // ^(?:\+88|88)? → allows optional country code +88 or 88.
+                                                // 01[2-9] → valid operator codes (e.g., 013 to 019).
+                                                // \d{8}$ → exactly 8 digits after the operator code (total 11 digits).
+                                                final pattern = RegExp(r'^(?:\+88|88)?01[2-9]\d{8}$');
+                                                if (value == null || value.isEmpty) {
+                                                  return 'Phone number is required';
+                                                }
+                                                if(!pattern.hasMatch(value.toString())){
+                                                  return "Enter Valid Phone Number";
+                                                }
+                                                return null;
+                                              },
+                                              keyboardType: TextInputType.number,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Phone"),
+                                                border: InputBorder.none,
+                                                hintText: "Enter Your Phone With Country Code"
+                                              ),
                                             ),
                                           ),
-                                        ),
-                      
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: addressContriller,
-                                            enabled: checked,
-                                           
-                                            validator: (value) {
-                                              return addressValidator(value.toString());
-                                            },
-                                            keyboardType: TextInputType.text,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Full Address"),
-                                              border: InputBorder.none,
-                                
+                        
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: addressContriller,
+                                              enabled: checked,
+                                              onTapOutside: (event) {// close keyboard
+                                                FocusScope.of(context).unfocus();
+                                              },
+                                              validator: (value) {
+                                                return addressValidator(value.toString());
+                                              },
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Full Address"),
+                                                border: InputBorder.none,
+                                  
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          height: 40,
-                                        ),
-                    ],
+                                          SizedBox(
+                                            height: 40,
+                                          ),
+                      ],
+                    ),
                   ),
-                ),
-                getButton(label: "Update", ontap: (){
-                  updateInfo();
-                }),
-              ],
+                  getButton(label: "Update", ontap: (){
+                    updateInfo();
+                  }),
+                ],
+              ),
             );
           }
         ),

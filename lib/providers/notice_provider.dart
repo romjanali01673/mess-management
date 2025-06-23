@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meal_hisab/constants.dart';
@@ -7,7 +9,7 @@ import 'package:meal_hisab/model/notice_model.dart';
 class NoticeProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
+  StreamSubscription? _noticeSubscription;
   bool _isLoading = false;
   bool _hasUnseen = false;
   NoticeModel? _noticeModel;
@@ -37,7 +39,36 @@ class NoticeProvider extends ChangeNotifier{
   }
 
 
+  @override
+  void dispose() {
+    _noticeSubscription?.cancel();
+    super.dispose();
+  }
+
   // function -----------
+
+  void listenToNotice({required String messId}){
+      _noticeSubscription?.cancel();// cancle pre if have
+
+      _noticeSubscription = firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .collection(Constants.rules)
+        .orderBy(Constants.createdAt, descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          final data = change.doc.data();
+          if (data != null) {
+            final notice = NoticeModel.fromMap(data);
+            
+            notifyListeners();
+          }
+        }
+      }
+    });
+  }
 
   Future<void> checkHasNoticeUnseen({required String uid, required String messId})async{
     print("has notice called");

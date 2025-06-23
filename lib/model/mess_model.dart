@@ -63,7 +63,7 @@ class MessModel {
       messMemberList: (data[Constants.messMemberList] as List<dynamic>?)
         ?.map((e) => Map<String, dynamic>.from(e as Map))
         .toList() ?? [],
-      createdAt: data[Constants.createdAt]
+      createdAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now())
     );
   }
 }

@@ -133,7 +133,10 @@ class BazerProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId),
-            {Constants.cost:(getCost+extraAdd)}
+            {Constants.cost: FieldValue.increment(extraAdd)},
+            SetOptions(
+              merge: true
+            )
           );
 
           await batch.commit();

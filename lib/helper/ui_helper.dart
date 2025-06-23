@@ -145,9 +145,11 @@ Widget getButton({required String label, required Function() ontap, Icon? icon})
 }
 
 Widget showCircularProgressIndicator(){
-  return SizedBox.square(
-    dimension: 50,
-    child: CircularProgressIndicator(),
+  return Center(
+    child: SizedBox.square(
+      dimension: 50,
+      child: CircularProgressIndicator(),
+    ),
   );
 }
    

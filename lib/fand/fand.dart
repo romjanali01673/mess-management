@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
@@ -83,83 +85,170 @@ class FandHome extends StatefulWidget {
 class _FandHomeState extends State<FandHome> {
 
   bool showBlance = false;
+    ScrollController  _scrollController = ScrollController();
+
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+    
+    final fandProvider = context.read<FandProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
+    
+    fandProvider.listenFand(messId: authProvider.getUserModel!.currentMessId);
+    fandProvider.listenFandDocChanges(messId: authProvider.getUserModel!.currentMessId);
+    fandProvider.loadInitial(messId: authProvider.getUserModel!.currentMessId);
+
+    // _scrollController.addListener(_handleScroll);
+  });
+}
+
+void _handleScroll() {
+  // In async operations, the widget might dispose while data is loading. safty check
+  if (!_scrollController.hasClients) return;
+  
+  final fandProvider = context.read<FandProvider>();
+  final authProvider = context.read<AuthenticationProvider>();
+
+  final maxScroll = _scrollController.position.maxScrollExtent;
+  final currentScroll = _scrollController.position.pixels;
+  final scrollDirection = _scrollController.position.userScrollDirection;
+
+  // Load more when scrolled to bottom
+  if (currentScroll >= maxScroll && 
+      scrollDirection == ScrollDirection.reverse) {
+    if (!fandProvider.getHasMoreForword || fandProvider.isLoading) return;
+    
+    fandProvider.loadNext(messId: authProvider.getUserModel!.currentMessId)
+      .then((_) {
+        // Small delay to allow list to rebuild
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (_scrollController.hasClients) {
+            // Maintain position near bottom
+            // _scrollController.jumpTo(
+            //   _scrollController.position.maxScrollExtent - 50
+            // );
+          }
+        });
+      });
+  }
+
+  // Load previous when scrolled to top
+  if (currentScroll <= _scrollController.position.minScrollExtent && 
+      scrollDirection == ScrollDirection.forward) {
+    if (!fandProvider.getHasMoreBackword || fandProvider.isLoading) return;
+    
+    final previousLength = fandProvider.getFandModelList.length;
+    
+    fandProvider.loadPrevious(messId: authProvider.getUserModel!.currentMessId)
+      .then((_) {
+        if (_scrollController.hasClients) {
+          // Adjust scroll position to maintain view
+          final newLength = fandProvider.getFandModelList.length;
+          final positionChange = (newLength - previousLength) * 100.0;
+          // _scrollController.jumpTo(positionChange);
+        }
+      });
+  }
+}
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  void dispose() {
+  _scrollController.removeListener(_handleScroll);
+  _scrollController.dispose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
 
 
   @override
   Widget build(BuildContext context) {
-    FandProvider fandProvider = context.read<FandProvider>();
+        debugPrint(context.read<FandProvider>().currentDocs.length.toString()+"h");
+
     AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+    FandProvider fandProvider = context.read<FandProvider>();
 
     return Expanded(
-      child: Column(
-        children: [
-          StatefulBuilder(
-            builder: (context, setLocalState) {
-              return FutureBuilder(
-                future: fandProvider.getFandBlance(messId: authProvider.getUserModel!.currentMessId, onFail: (_){}),
-                builder: (context, AsyncSnapshot snapshot) {
-                  return Card(
-                    color: Colors.green.shade500,
-                    child: ListTile(
-                      trailing: IconButton(
-                        onPressed: (){
-                          setLocalState(() {
-                          showBlance = !showBlance;
-                            
+
+      child: Consumer<FandProvider>(
+        child: StatefulBuilder(
+          builder: (context, setLocalState) {
+                return Card(
+                  color: Colors.green.shade500,
+                  child: ListTile(
+                    trailing: IconButton(
+                      onPressed: (){
+                        setLocalState(() {
+                        showBlance = !showBlance;
+                              
                           });
                         }, 
                         icon: showBlance?  Icon(Icons.visibility) : Icon(Icons.visibility_off),
                       ),
                       title: 
-                      showBlance? Text("Current Blance: ${fandProvider.getBlance}",)
+                      showBlance? Text("Current Blance: ${getFormatedPrice(value: fandProvider.getBlance)}",)
                       :
                       Text("tap to see blance"),
                     ),
                   );
+          
+            }),
+          
+        builder: (context, value, child) => Column(
+        children: [
+          child!,     // the child will not rebuild        
+          if (fandProvider.getFandModelList.isEmpty)  Center(child: Text('No Transaction found.'))
+          else Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              controller: _scrollController,
+              itemCount:fandProvider.getFandModelList.length+1,
+              itemBuilder: (context , index){
+                if(index==fandProvider.getFandModelList.length){
+                 return Center(
+                   child: Padding(
+                     padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 20),
+                     child: fandProvider.isLoading? showCircularProgressIndicator() :Row(
+                      mainAxisAlignment:(fandProvider.getHasMoreBackword && fandProvider.getHasMoreForword)? MainAxisAlignment.spaceBetween:MainAxisAlignment.center,
+                      children: [
+                         if(fandProvider.getHasMoreBackword) ElevatedButton(
+                           onPressed: (){fandProvider.loadPrevious(messId: authProvider.getUserModel!.currentMessId).then((_){
+                             if(_scrollController.hasClients){
+                               // _scrollController.jumpTo(
+                               //   _scrollController.position.minScrollExtent,
+                               // );
+                             }
+                             });},
+                             child: Text("Prev")
+                           ),
+                     
+                        if(fandProvider.getHasMoreForword) ElevatedButton(
+                          onPressed: (){fandProvider.loadNext(messId: authProvider.getUserModel!.currentMessId).then((_){
+                            if(_scrollController.hasClients){
+                              _scrollController.jumpTo(
+                                _scrollController.position.minScrollExtent,
+                              );
+                            }
+                            });},
+                            child: Text(  "Next" )
+                          ),
+                        ]
+                      ),
+                   ),
+                 );
                 }
-              );
-            }
-          ),
-          Expanded(
-            child: Container(
-              child: FutureBuilder(
-                future: fandProvider.getFandTransactions(
-                  messId: authProvider.getUserModel!.currentMessId, 
-                  onFail: (message) { 
-                    showSnackber(context: context, content: "");
-                  }, 
-                  onSuccess: () {
-                    
-                  }
-                ),
-                builder: (BuildContext context, AsyncSnapshot<List<FandModel>?> snapshot) { 
-                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
-                    return Center(child: showCircularProgressIndicator());
-                  }
-                  else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } 
-                  else if (!snapshot.hasData || snapshot.data == null) {
-                    return Center(child: Text('No Transaction found.'));
-                  }
-                  return ListView.builder(
-                    itemCount:snapshot.data!.length,
-                    itemBuilder: (context , index){
-                    bool showDetails = false;
-                    final fandmodel = snapshot.data![index]; 
-                    
-                    return StatefulBuilder(
-                      builder: (context, setLocalState) {
-                        return Card(
-                          color: fandmodel.type==Constants.add? Colors.green.shade50:Colors.red.shade50,
-                          child: Column(
+
+                bool showDetails = false;
+                final fandmodel = fandProvider.getFandModelList[index]; 
+
+
+                return StatefulBuilder(
+                        builder: (context, setLocalState) {
+                          return Card(
+                            color: fandmodel.type==Constants.add? Colors.green.shade50:Colors.red.shade50,
+                            child: Column(
                             children: [
                               ListTile(
                                 onTap: () {
@@ -198,68 +287,67 @@ class _FandHomeState extends State<FandHome> {
                                             ), 
                                         ),
                               
-                                        PopupMenuItem(
-                                          value: 1,
-                                          // onTap: (){
-                                          //   // if i use this function. we don't need to Navigator.pop()
-                                          // },
-                                          child: ListTile(
-                                            title: Text("Delete"),
-                                            leading: Icon(Icons.delete, color: Colors.red,),
-                                            onTap: ()async{
-                                              Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
-                                              bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
-                                                title: Text("Do you want to delete?"),
-                                                actionsAlignment: MainAxisAlignment.start,
-                                                actions: [
-                                                  TextButton(child: Text("No"), onPressed: (){
-                                                    Navigator.pop(context, false);
-                                                  },),
-                                                  TextButton(child: Text("Yes") , onPressed: (){
-                                                  Navigator.pop(context, true);
-                                                  },),
-                                                ],
-                                              ));
-                                              if(confirm!=null && confirm){
-                                                fandProvider.deleteAFandTransaction(
-                                                  messId: authProvider.getUserModel!.currentMessId, 
-                                                  tnxId: fandmodel.transactionId, 
-                                                  extraAmount: fandmodel.type==Constants.add? (-fandmodel.amount) : fandmodel.amount, 
-                                                  onSuccess: () {
-                                                    showSnackber(context: context, content: "Deletion Successed.");
-                                                    setState(() {
-                                                      
-                                                    });
-                                                  },
-                                                  onFail: (message){
-                                                    showSnackber(context: context, content: "Deletion Failed!\n$message");
-                                                  },
-                                                );
-                                              }
-                                              else{
-                                                  debugPrint("Confirmed false ------------");
-                                              }
-                                            },
-                                          ), 
-                                        ),
-                                      ]
-                                    )
-                                  ],
-                                ),
+                                      PopupMenuItem(
+                                        value: 1,
+                                        // onTap: (){
+                                        //   // if i use this function. we don't need to Navigator.pop()
+                                        // },
+                                        child: ListTile(
+                                          title: Text("Delete"),
+                                          leading: Icon(Icons.delete, color: Colors.red,),
+                                          onTap: ()async{
+                                            Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
+                                            bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
+                                              title: Text("Do you want to delete?"),
+                                              actionsAlignment: MainAxisAlignment.start,
+                                              actions: [
+                                                TextButton(child: Text("No"), onPressed: (){
+                                                  Navigator.pop(context, false);
+                                                },),
+                                                TextButton(child: Text("Yes") , onPressed: (){
+                                                Navigator.pop(context, true);
+                                                },),
+                                              ],
+                                            ));
+                                            if(confirm!=null && confirm){
+                                              fandProvider.deleteAFandTransaction(
+                                                messId: authProvider.getUserModel!.currentMessId, 
+                                                tnxId: fandmodel.transactionId, 
+                                                extraAmount: fandmodel.type==Constants.add? (-fandmodel.amount) : fandmodel.amount, 
+                                                onSuccess: () {
+                                                  showSnackber(context: context, content: "Deletion Successed.");
+                                                  setState(() {
+                                                    
+                                                  });
+                                                },
+                                                onFail: (message){
+                                                  showSnackber(context: context, content: "Deletion Failed!\n$message");
+                                                },
+                                              );
+                                            }
+                                            else{
+                                                debugPrint("Confirmed false ------------");
+                                            }
+                                          },
+                                        ), 
+                                      ),
+                                    ]
+                                  )
+                                ],
                               ),
-                              if(showDetails)Text("${fandmodel.description}"),
-                        
-                            ],
-                          ),
-                        );
-                      }
-                    );
-                  });
-                },
+                            ),
+                            if(showDetails)Text("${fandmodel.description}"),
+                            
+                          ],
+                        ),
+                      );
+                    }
+                  );
+                }
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

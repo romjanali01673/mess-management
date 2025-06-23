@@ -21,7 +21,7 @@ class NoticeModel{
       noticeId: data[Constants.noticeId]?? "", 
       title: data[Constants.title]?? "", 
       description: data[Constants.description]?? "",
-      CreatedAt: data[Constants.createdAt], 
+      CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
       
     );
   }

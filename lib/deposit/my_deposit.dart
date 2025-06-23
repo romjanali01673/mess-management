@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/constants.dart';
@@ -48,7 +49,9 @@ class _MyDepositState extends State<MyDeposit> {
                       messId: authProvider.getUserModel!.currentMessId,
                       uId: authProvider.getUserModel!.uId,
                       onFail: (message){
-                        showSnackber(context: context, content: "somthing Wrong! \n$message");
+                        SchedulerBinding.instance.addPostFrameCallback((_){
+                          showSnackber(context: context, content: "somthing Wrong! \n$message");
+                        });
                       },
                     ),
                     builder: (context, AsyncSnapshot snapshot) {
@@ -78,7 +81,9 @@ class _MyDepositState extends State<MyDeposit> {
                 messId: authProvider.getUserModel!.currentMessId, 
                 uId: authProvider.getUserModel!.uId,
                 onFail: (message ) { 
-                  showSnackber(context: context, content: "somthing Wrong! \n$message");
+                  SchedulerBinding.instance.addPostFrameCallback((_){
+                    showSnackber(context: context, content: "somthing Wrong! \n$message");
+                  });
                 },
               ), 
               builder: (context, AsyncSnapshot<List<DepositModel>?> snapshot){

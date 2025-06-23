@@ -100,93 +100,98 @@ class _ChangeEmailState extends State<ChangeEmail> {
               return Center(child: Text('Data Not Found'));
             }
             emailController.text = snapshot.data!.email;
-            return Column(
-              children: [
-                Form(
-                  key: FormKey,
-                  child: Column(
-                    children: [
-              
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
-                          ),
-                          Checkbox(
-                            value: checked, 
-                            onChanged: (val){
-                            setState(() {
-                              checked = !checked;
-                            });
-                          }),
-                        ],
-                      ),
-                
-                      
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: emailController,
-                                            enabled: checked,
-                                            
-                                            
-                                            validator: (value) {
-                                              return emailValidator(value.toString());
-                                            },
-                                            keyboardType: TextInputType.text,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Email"),
-                                              border: InputBorder.none,
-                                
-                                            ),
-                                          ),
-                                        ),
-                      
-                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: Colors.grey.shade300,
-                                            border: Border(bottom: BorderSide(color: Colors.black))
-                                          ),
-                                          margin: EdgeInsets.all(10),
-                                          child: TextFormField(
-                                            controller: passController,
-                                            enabled: checked,
-                                            
-                                            
-                                            validator: (value) {
-                                              return passValidator(value.toString());
-                                            },
-                                            keyboardType: TextInputType.text,
-                                            textInputAction: TextInputAction.next,
-                                            decoration: InputDecoration(
-                                              label: Text("Current Password"),
-                                              border: InputBorder.none,
-                                
-                                            ),
-                                          ),
-                                        ),
-                          
-                     
-                                        SizedBox(
-                                          height: 40,
-                                        ),
-                    ],
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 20,
                   ),
-                ),
-                getButton(label: "Update", ontap: (){
-                  updateInfo();
-                }),
-              ],
+                  Form(
+                    key: FormKey,
+                    child: Column(
+                      children: [
+                
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
+                            ),
+                            Checkbox(
+                              value: checked, 
+                              onChanged: (val){
+                              setState(() {
+                                checked = !checked;
+                              });
+                            }),
+                          ],
+                        ),
+                  
+                        
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: emailController,
+                                              enabled: checked,
+                                              
+                                              
+                                              validator: (value) {
+                                                return emailValidator(value.toString());
+                                              },
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Email"),
+                                                border: InputBorder.none,
+                                  
+                                              ),
+                                            ),
+                                          ),
+                        
+                       Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.grey.shade300,
+                                              border: Border(bottom: BorderSide(color: Colors.black))
+                                            ),
+                                            margin: EdgeInsets.all(10),
+                                            child: TextFormField(
+                                              controller: passController,
+                                              enabled: checked,
+                                              
+                                              
+                                              validator: (value) {
+                                                return passValidator(value.toString());
+                                              },
+                                              keyboardType: TextInputType.text,
+                                              textInputAction: TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                label: Text("Current Password"),
+                                                border: InputBorder.none,
+                                  
+                                              ),
+                                            ),
+                                          ),
+                            
+                       
+                                          SizedBox(
+                                            height: 40,
+                                          ),
+                      ],
+                    ),
+                  ),
+                  getButton(label: "Update", ontap: (){
+                    updateInfo();
+                  }),
+                ],
+              ),
             );
           }
         ),

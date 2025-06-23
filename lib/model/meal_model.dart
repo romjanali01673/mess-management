@@ -23,7 +23,7 @@ class MealModel{
       listOfMeal: (data[Constants.listOfMeal] as List<dynamic>?)
         ?.map((e) => Map<String, dynamic>.from(e as Map))
         .toList() ?? [], 
-      CreatedAt: data[Constants.createdAt], 
+      CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
     );
   }
 

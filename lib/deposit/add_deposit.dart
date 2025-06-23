@@ -290,6 +290,7 @@ class _AddDepositState extends State<AddDeposit> {
                       isUpdate = false;
                       amountController.clear();
                       descriptionController.clear();
+                      selectedItem = "Select Member"; // importent because dropdown key was rest but variable still hold pre value
                       dropdownKey.currentState!.clear();
 
                       setState(() {
@@ -317,6 +318,7 @@ class _AddDepositState extends State<AddDeposit> {
                       isUpdate = false;
                       amountController.clear();
                       descriptionController.clear();
+                      selectedItem = "Select Member";
                       dropdownKey.currentState!.clear();
 
                       setState(() {

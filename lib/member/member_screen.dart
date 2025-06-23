@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
@@ -22,6 +23,7 @@ class _MemberScreenState extends State<MemberScreen> {
   Member memberScreemItemGrpup = Member.members;
   @override
   void initState(){
+    
     super.initState();
     // final messProvider = context.read<MessProvider>();
     // final authProvider = context.read<AuthenticationProvider>();
@@ -122,7 +124,9 @@ class _MemberScreenState extends State<MemberScreen> {
       child: FutureBuilder(
         future:messProvider.getMessData(
           onFail: (message) { 
-            showSnackber(context: context, content: message);
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              showSnackber(context: context, content: message);
+            });
           },
           messId: authProvider.getUserModel!.currentMessId,
           isDisposed: ()=> _isDisposed,
