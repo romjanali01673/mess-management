@@ -35,11 +35,13 @@ class AuthenticationProvider extends ChangeNotifier {
 
 
   Future<void> setSignedIn ({required bool val, })async{
+    print("s1");
     SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
+    print("s2");
+
+    await sharedPreferences.setBool(Constants.isSignedIn, val);
     _isSignedIn = val;
-    if(val){
-      await sharedPreferences.setBool(Constants.isSignedIn, true);
-    }
+    
     notifyListeners();
   }
 
@@ -56,6 +58,8 @@ class AuthenticationProvider extends ChangeNotifier {
     String ? number,
     String ? sessionKey,
     String ? currentMessId,
+    String ? mealHisabId,
+    Timestamp ? createdAt,
   }){
 
     _userModel!.uId = uId?? _userModel!.uId;
@@ -65,6 +69,8 @@ class AuthenticationProvider extends ChangeNotifier {
     _userModel!.number = number?? _userModel!.number;
     _userModel!.sessionKey = sessionKey??  _userModel!.sessionKey;
     _userModel!.currentMessId = currentMessId??  _userModel!.currentMessId;
+    _userModel!.mealHisabId = mealHisabId??  _userModel!.mealHisabId;
+    _userModel!.createdAt = createdAt??  _userModel!.createdAt;
     
     notifyListeners();
   }
@@ -110,7 +116,12 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       String StringUserModel =  await sharedPreferences.getString(Constants.userModel).toString();
-      UserModel userM = UserModel.fromMap(jsonDecode(StringUserModel));
+      // get from firestore
+      Map<String,dynamic> mp = jsonDecode(StringUserModel);
+      // convart datetime.tostringiso to timestarp
+      mp[Constants.createdAt]=  Timestamp.fromDate(DateTime.parse(mp[Constants.createdAt]));
+
+      UserModel userM = UserModel.fromMap(mp);
 
       onSuccess(userM.sessionKey == getUserModel!.sessionKey);
       print(getUserModel!.sessionKey+"firestore");
@@ -146,15 +157,22 @@ class AuthenticationProvider extends ChangeNotifier {
     final SharedPreferences sharedPreferences =await SharedPreferences.getInstance();
     _isSignedIn =  sharedPreferences.getBool(Constants.isSignedIn) ?? false;
     notifyListeners();
+    debugPrint(_isSignedIn.toString());
     return _isSignedIn;
+
   }
 
   // store userprofile data to shared preference
   Future<bool> saveUserDataToSharedPref()async{
+    debugPrint("1");
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      await sharedPreferences.setString(Constants.userModel, jsonEncode(getUserModel!.toMap()));
+      Map<String,dynamic> mp = getUserModel!.toMap();
+      mp[Constants.createdAt] = getUserModel!.createdAt!.toDate().toIso8601String();
+      await sharedPreferences.setString(Constants.userModel, jsonEncode(mp));
+    debugPrint("2");
     } catch (e) {
+      debugPrint(e.toString());
       return false;
     }
     return true;
@@ -202,6 +220,7 @@ class AuthenticationProvider extends ChangeNotifier {
     if(documentSnapshot!=null &&  documentSnapshot!.exists){
       // user exist 
       _userModel = UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
+
     return true;
       
     }

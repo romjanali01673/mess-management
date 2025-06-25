@@ -58,7 +58,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
       messProvider.setIsloading(true);
 
       // remove assign mess id from user profile data.
-      await messProvider.removeMessIdFromMemberProfile(
+      await messProvider.leaveFromMess(
         onFail: (message) 
         {  
           // on failed show a "failed message"

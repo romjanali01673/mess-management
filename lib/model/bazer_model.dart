@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class BazerModel{
-  String transactionId;
+  String tnxId;
   double amount;
   dynamic bazerList; //List<Map<String,dynamic>>
   Map<String,dynamic> byWho; //{Constants.uId : "", Constants.fname:""}
@@ -12,7 +12,7 @@ class BazerModel{
 
   BazerModel(
     { 
-      required this.transactionId,
+      required this.tnxId,
       required this.amount,
       required this.bazerList,
       required this.byWho,
@@ -24,7 +24,7 @@ class BazerModel{
 
   factory BazerModel.fromMap(Map<String , dynamic>data){
     return BazerModel(
-      transactionId: data[Constants.transactionId]?? "", 
+      tnxId: data[Constants.tnxId]?? "", 
       amount: data[Constants.amount]?? 0, 
       bazerList: data[Constants.bazerList] ??[],
       CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
@@ -36,7 +36,7 @@ class BazerModel{
 
   Map<String,dynamic> toMap(){
     return{
-      Constants.transactionId: transactionId,
+      Constants.tnxId: tnxId,
       Constants.amount: amount,
       Constants.bazerList : bazerList,
       Constants.createdAt: FieldValue.serverTimestamp(),

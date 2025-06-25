@@ -213,7 +213,7 @@ String? validatePrice(String value){
 
 bool amIAdmin({required MessProvider messProvider,required AuthenticationProvider authProvider}){
   if(messProvider.getMessModel!=null){
-    if(messProvider.getMessModel!.messAuthorityId == authProvider.getUserModel!.uId){
+    if(messProvider.getMessModel!.menagerId == authProvider.getUserModel!.uId){
       return true;
     }
     else{
@@ -227,7 +227,7 @@ bool amIAdmin({required MessProvider messProvider,required AuthenticationProvide
 
 bool amIactmenager({required MessProvider messProvider,required AuthenticationProvider authProvider}){
   if(messProvider.getMessModel!=null){
-    if(messProvider.getMessModel!.messAuthorityId2nd == authProvider.getUserModel!.uId){
+    if(messProvider.getMessModel!.actMenagerId == authProvider.getUserModel!.uId){
       return true;
     }
     else{

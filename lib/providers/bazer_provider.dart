@@ -44,7 +44,7 @@ class BazerProvider extends ChangeNotifier{
     double cost=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.bazer).doc(messId).collection(Constants.listOfBazerTransaction).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.bazer).doc(messId).collection(Constants.listOfBazerTnx).get();
       list = snapshot.docs.map(
         (doc){
           BazerModel bazerModel = BazerModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -79,15 +79,15 @@ class BazerProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.listOfBazerTransaction)
-            .doc(bazerModel.transactionId),
+            .collection(Constants.listOfBazerTnx)
+            .doc(bazerModel.tnxId),
             bazerModel.toMap()
           );
          
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId),
-            {Constants.cost:getCost+bazerModel.amount}
+            {Constants.totalBazerCost:getCost+bazerModel.amount}
           );
 
           await batch.commit();
@@ -116,8 +116,8 @@ class BazerProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.listOfBazerTransaction)
-            .doc(bazerModel.transactionId),
+            .collection(Constants.listOfBazerTnx)
+            .doc(bazerModel.tnxId),
             bazerModel.toMap(),
             SetOptions(
               mergeFields: [
@@ -133,7 +133,7 @@ class BazerProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId),
-            {Constants.cost: FieldValue.increment(extraAdd)},
+            {Constants.totalBazerCost: FieldValue.increment(extraAdd)},
             SetOptions(
               merge: true
             )
@@ -166,14 +166,14 @@ class BazerProvider extends ChangeNotifier{
           batch.delete(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.listOfBazerTransaction)
+            .collection(Constants.tnxId)
             .doc(tnxId),
           );
          
           batch.set(
             firebaseFirestore.collection(Constants.bazer)
             .doc(messId),
-            {Constants.cost:(getCost+extraAdd)}
+            {Constants.totalBazerCost:(getCost+extraAdd)}
           );
 
           await batch.commit();

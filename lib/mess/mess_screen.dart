@@ -196,27 +196,27 @@ class _MessScreenState extends State<MessScreen>{
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Menager Name: ${messProvider.getMessModel!.messAuthorityName}",
+                          "Menager Name: ${messProvider.getMessModel!.menagerName}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Menager Id: ${messProvider.getMessModel!.messAuthorityId}",
+                          "Menager Id: ${messProvider.getMessModel!.menagerId}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Menager Email: ${messProvider.getMessModel!.messAuthorityEmail}",
+                          "Menager Email: ${messProvider.getMessModel!.menagerEmail}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Menager Phone: ${messProvider.getMessModel!.messAuthorityNumber}",
+                          "Menager Phone: ${messProvider.getMessModel!.menagerPhone}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Act Menager Name: ${messProvider.getMessModel!.messAuthorityName2nd}",
+                          "Act Menager Name: ${messProvider.getMessModel!.actMenagerName}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
-                          "Act Menager Id: ${messProvider.getMessModel!.messAuthorityId2nd}",
+                          "Act Menager Id: ${messProvider.getMessModel!.actMenagerId}",
                           style : getTextStyleForSubTitleL(),
                         ),
                         Text(
@@ -319,7 +319,7 @@ class _MessScreenState extends State<MessScreen>{
                                         debugPrint("Confirmed ------------");
                                         await messProvider.deleteAMessRule(
                                           messId: authProvider.getUserModel!.currentMessId, 
-                                          transactionId: ruleModel.transactionId, 
+                                          tnxId: ruleModel.tnxId, 
                                           onFail: (message ) {
                                             print("failed");
                                             showSnackber(context: context, content: "Deletion Failed!\n$message");
@@ -343,7 +343,7 @@ class _MessScreenState extends State<MessScreen>{
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("ID: ${ruleModel.transactionId}\n"),
+                                Text("ID: ${ruleModel.tnxId}\n"),
                                 Text("${ruleModel.description}"),
                               ],
                             ),

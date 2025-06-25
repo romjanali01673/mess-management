@@ -5,30 +5,32 @@ class MessModel {
   String messId;
   String messName;
   String messAddress;
-  String messAuthorityId;
-  String messAuthorityId2nd;
-  String messAuthorityName;
-  String messAuthorityName2nd;
-  String messAuthorityNumber;
-  String messAuthorityEmail;
+  String menagerId;
+  String menagerName;
+  String menagerPhone;
+  String menagerEmail;
+  String actMenagerId;
+  String actMenagerName;
   List<Map<String,dynamic>> messMemberList;
+  String mealHisabId;
   Timestamp? createdAt;
 
   MessModel({
     required this.messId,
     required this.messName,
     required this.messAddress,
-    required this.messAuthorityId,
-    required this.messAuthorityId2nd,
-    required this.messAuthorityName,
-    required this.messAuthorityName2nd,
-    required this.messAuthorityNumber,
-    required this.messAuthorityEmail,
+    required this.menagerId,
+    required this.menagerName,
+    required this.menagerPhone,
+    required this.menagerEmail,
+    required this.actMenagerId,
+    required this.actMenagerName,
     // {
     //   Constants.uId: authProvider.getUserModel!.uId.toString(),
     //   Constants.fname: authProvider.getUserModel!.fname.toString(),
     //   Constants.status: Constants.enable,
     // }
+    required this.mealHisabId,
     required this.messMemberList, 
     this.createdAt,
   });
@@ -38,13 +40,14 @@ class MessModel {
       Constants.messId: messId,
       Constants.messName: messName,
       Constants.messAddress: messAddress,
-      Constants.messAuthorityId: messAuthorityId,
-      Constants.messAuthorityId2nd: messAuthorityId2nd,
-      Constants.messAuthorityName: messAuthorityName,
-      Constants.messAuthorityName2nd: messAuthorityName2nd,
-      Constants.messAuthorityNumber: messAuthorityNumber,
-      Constants.messAuthorityEmail: messAuthorityEmail,
+      Constants.menagerId: menagerId,
+      Constants.actMenagerId: actMenagerId,
+      Constants.menagerName: menagerName,
+      Constants.actMenagerName: actMenagerName,
+      Constants.menagerPhone: menagerPhone,
+      Constants.menagerEmail: menagerEmail,
       Constants.messMemberList: messMemberList,
+      Constants.mealHisabId : mealHisabId,
       Constants.createdAt : FieldValue.serverTimestamp(),
     };
   }
@@ -54,15 +57,17 @@ class MessModel {
       messId: data[Constants.messId]?? "", 
       messName: data[Constants.messName]?? "", 
       messAddress: data[Constants.messAddress]?? "", 
-      messAuthorityId: data[Constants.messAuthorityId]?? "",
-      messAuthorityId2nd: data[Constants.messAuthorityId2nd]?? "", 
-      messAuthorityName: data[Constants.messAuthorityName]?? "", 
-      messAuthorityName2nd: data[Constants.messAuthorityName2nd]?? "", 
-      messAuthorityNumber: data[Constants.messAuthorityNumber]?? "", 
-      messAuthorityEmail: data[Constants.messAuthorityEmail]?? "",
+      actMenagerId: data[Constants.actMenagerId]?? "",
+      actMenagerName: data[Constants.actMenagerName]?? "", 
+      menagerEmail: data[Constants.menagerEmail]?? "", 
+      menagerId: data[Constants.menagerId]?? "", 
+      menagerName: data[Constants.menagerName]?? "", 
+      menagerPhone: data[Constants.menagerPhone]?? "",
       messMemberList: (data[Constants.messMemberList] as List<dynamic>?)
         ?.map((e) => Map<String, dynamic>.from(e as Map))
         .toList() ?? [],
+            
+      mealHisabId : data[Constants.mealHisabId]??"",
       createdAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now())
     );
   }

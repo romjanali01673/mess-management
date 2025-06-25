@@ -66,7 +66,7 @@ class MealProvider extends ChangeNotifier{
     double meal=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMeal).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
       list = snapshot.docs.map(
         (doc){
           MealModel mealModel = MealModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -93,7 +93,7 @@ class MealProvider extends ChangeNotifier{
     double meal=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMeal).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
       snapshot.docs.map(
         (doc){
           MealModel mealModel = MealModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -126,7 +126,7 @@ class MealProvider extends ChangeNotifier{
   // check already exist 
   Future<MealModel?> checkMealModelAlreadyExist({required String messId,required String date,required Function(String) onFail, Function()? onSuccess,})async{
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMeal).doc(date).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).doc(date).get();
 
       onSuccess!=null? onSuccess() : (){};
       if(!snapshot.exists){
@@ -151,7 +151,7 @@ class MealProvider extends ChangeNotifier{
         batch.set(
           firebaseFirestore.collection(Constants.meal)
           .doc(messId)
-          .collection(Constants.listOfMeal)
+          .collection(Constants.listOfMealTnx)
           .doc(mealModel.date),
           mealModel.toMap()
         );
@@ -185,7 +185,7 @@ class MealProvider extends ChangeNotifier{
       batch.set(
         firebaseFirestore.collection(Constants.meal)
         .doc(messId)
-        .collection(Constants.listOfMeal)
+        .collection(Constants.listOfMealTnx)
         .doc(mealModel.date),
         mealModel.toMap(),
         SetOptions(
@@ -218,7 +218,7 @@ class MealProvider extends ChangeNotifier{
         firebaseFirestore
           .collection(Constants.meal)
           .doc(messId)
-          .collection(Constants.listOfMeal)
+          .collection(Constants.listOfMealTnx)
           .doc(date),
       );
 

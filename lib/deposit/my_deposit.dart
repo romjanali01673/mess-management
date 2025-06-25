@@ -121,7 +121,7 @@ class _MyDepositState extends State<MyDeposit> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Tnx Id: ${depositModel.transactionId}"),
+                                  Text("Tnx Id: ${depositModel.tnxId}"),
                                   Text("Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(depositModel.CreatedAt!.toDate().toLocal())}"),
                                 ],
                               ),

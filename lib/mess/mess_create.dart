@@ -83,21 +83,19 @@ class _MessCreateState extends State<MessCreate> {
     
 
       // store mess created info to firestore
-      await messProvider.storeMessDataToFirestore(
-        onFail: (message){
-          showSnackber(context: context, content: message);
-          messProvider.setIsloading(false);
-        }, 
+      await messProvider.createMess(
+        uId: authProvider.getUserModel!.uId,
         messModel: MessModel(
-          messId: "", 
+          messId: DateTime.now().millisecondsSinceEpoch.toString(), 
+          mealHisabId: DateTime.now().millisecondsSinceEpoch.toString(),
           messName: messNameController.text.toString().trim(), 
           messAddress: messAddressController.text.toString().trim(), 
-          messAuthorityId: authProvider.getUserModel!.uId.toString(), 
-          messAuthorityId2nd: "", // secondary owner id will be published leter
-          messAuthorityName:authProvider.getUserModel!.fname.toString() , 
-          messAuthorityName2nd: "", // secondary owner name will be published leter
-          messAuthorityNumber: authorityPhoneController.text.toString().trim(), 
-          messAuthorityEmail: authorityEmailController.text.toString().trim(),
+          menagerId: authProvider.getUserModel!.uId.toString(), 
+          actMenagerId: "", // secondary owner id will be published leter
+          menagerName:authProvider.getUserModel!.fname.toString() , 
+          actMenagerName: "", // secondary owner name will be published leter
+          menagerPhone: authorityPhoneController.text.toString().trim(), 
+          menagerEmail: authorityEmailController.text.toString().trim(),
           messMemberList: [
             {
               Constants.uId: authProvider.getUserModel!.uId.toString(),
@@ -106,25 +104,16 @@ class _MessCreateState extends State<MessCreate> {
             }
           ],
         ),
-        onSuccess: ()async{
-          // mess has created so,
-          // assign mess id to to mess owner profile
-          await messProvider.assignMessIdToMemberProfile(
-            onFail: (message) {
-              messProvider.setIsloading(false);
-              showSnackber(context: context, content: message);
-            },
-            onSuccess: (){
-              // assign mess id to user model
-              authProvider.getUserModel!.currentMessId = messProvider.getMessModel!.messId; 
-              showSnackber(context: context, content: "Mess Has Created");
-              formKey.currentState!.reset();
-            },
-            memberUid: authProvider.getUserModel!.uId,
-            messId: messProvider.getMessModel!.messId,
-          );
+        onFail: (message){
+          showSnackber(context: context, content: "Mess Creation Failed.\n$message");
           messProvider.setIsloading(false);
-        }
+        }, 
+        onSuccess: (){
+          // assign mess id to user model
+          authProvider.getUserModel!.currentMessId = messProvider.getMessModel!.messId; 
+          showSnackber(context: context, content: "Mess Has Created");
+          formKey.currentState!.reset();
+        }, 
       );
 
     }

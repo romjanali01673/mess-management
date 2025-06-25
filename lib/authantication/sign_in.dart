@@ -60,13 +60,13 @@ class _SignInScreenState extends State<SignInScreen> {
           });
         }
 
-        
         if(isSuccess){
         // get user data, 
           isSuccess = await authProvider.saveUserDataToSharedPref();
         }
 
         if(isSuccess){
+          debugPrint("successed");
         
           // now try to save user data to local store
           await authProvider.setSignedIn(val: true);

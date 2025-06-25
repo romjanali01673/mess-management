@@ -51,20 +51,20 @@ class DepositProvider extends ChangeNotifier{
     double depositOfmess = 0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).get();
       List<QueryDocumentSnapshot> memberUidDocList = snapshot.docs;
       for(var memberUidDoc in memberUidDocList){
         
         // for hole mess
         if(memberUidDoc.exists && memberUidDoc.data()!=null){
-          depositOfmess += (memberUidDoc.data() as Map<String, dynamic> )[Constants.deposit];
+          depositOfmess += (memberUidDoc.data() as Map<String, dynamic> )[Constants.blance];
         }
 
         // for member 
         if(uId!=null){
           if(uId==memberUidDoc.id){
             if (memberUidDoc.exists && (memberUidDoc.data() != null)){
-              depositOfMember = (memberUidDoc.data() as Map<String,dynamic>)[Constants.deposit];
+              depositOfMember = (memberUidDoc.data() as Map<String,dynamic>)[Constants.blance];
             }
           }
         }
@@ -87,7 +87,7 @@ class DepositProvider extends ChangeNotifier{
     List<DepositModel>? list;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).doc(uId).collection(Constants.listOfDepositTransactions).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).doc(uId).collection(Constants.listOfDepositTnx).get();
       if(snapshot.docs.isNotEmpty){
         for(var x in snapshot.docs){
           list??=[];
@@ -110,9 +110,9 @@ class DepositProvider extends ChangeNotifier{
   Future<double> getTotalDepositOfAMember({required String messId, required String uId, required Function(String) onFail, Function()? onSuccess,})async{
     double amount = 0.0;
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).doc(uId).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).doc(uId).get();
       if(snapshot.exists && snapshot.data() != null){
-        amount = (snapshot.data() as Map<String, dynamic>)[Constants.deposit];
+        amount = (snapshot.data() as Map<String, dynamic>)[Constants.blance];
       }
       onSuccess!=null? onSuccess():(){};    
     } catch (e) {
@@ -129,16 +129,16 @@ class DepositProvider extends ChangeNotifier{
     List<Map<String, dynamic>>? list;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).get();
       for(var member in snapshot.docs){// here member contain uid doc
 
-        QuerySnapshot dipositListOfTheMember = await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).doc(member.id).collection(Constants.listOfDepositTransactions).get();
+        QuerySnapshot dipositListOfTheMember = await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).doc(member.id).collection(Constants.listOfDepositTnx).get();
         DocumentSnapshot userData = await firebaseFirestore.collection(Constants.users).doc(member.id).get();
         if(dipositListOfTheMember.docs.isNotEmpty){
           for(var x in dipositListOfTheMember.docs){
             list??=[];
             list.add({
-              Constants.deposit : DepositModel.fromMap(x.data() as Map<String, dynamic>),
+              Constants.blance : DepositModel.fromMap(x.data() as Map<String, dynamic>),
               Constants.userData : {
                 Constants.uId : (userData.data()as Map<String,dynamic>)[Constants.uId],
                 Constants.fname : (userData.data()as Map<String,dynamic>)[Constants.fname],
@@ -169,10 +169,10 @@ class DepositProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId)
-            .collection(Constants.listOfDepositTransactions)
-            .doc(depositModel.transactionId),
+            .collection(Constants.listOfDepositTnx)
+            .doc(depositModel.tnxId),
             
             depositModel.toMap()
           );
@@ -181,13 +181,13 @@ class DepositProvider extends ChangeNotifier{
           batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+            {Constants.blance : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)},
+            {Constants.blance : FieldValue.increment(-depositModel.amount)},
             SetOptions(
               merge: true
             )
@@ -198,9 +198,9 @@ class DepositProvider extends ChangeNotifier{
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+            {Constants.blance : FieldValue.increment( depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)},
+            {Constants.blance : FieldValue.increment(-depositModel.amount)},
             SetOptions(
               merge: true
             )
@@ -222,10 +222,10 @@ class DepositProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId)
-            .collection(Constants.listOfDepositTransactions)
-            .doc(depositModel.transactionId),
+            .collection(Constants.listOfDepositTnx)
+            .doc(depositModel.tnxId),
             
             depositModel.toMap(),
 
@@ -241,13 +241,13 @@ class DepositProvider extends ChangeNotifier{
           batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment(extraAmount)}
+            {Constants.blance : FieldValue.increment(extraAmount)}
             :
-            {Constants.deposit : FieldValue.increment(-extraAmount)},
+            {Constants.blance : FieldValue.increment(-extraAmount)},
             SetOptions(
               merge: true
             )
@@ -259,9 +259,9 @@ class DepositProvider extends ChangeNotifier{
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment( extraAmount)}
+            {Constants.blance : FieldValue.increment( extraAmount)}
             :
-            {Constants.deposit : FieldValue.increment(-extraAmount)},
+            {Constants.blance : FieldValue.increment(-extraAmount)},
             SetOptions(
               merge: true
             )
@@ -284,23 +284,23 @@ class DepositProvider extends ChangeNotifier{
           batch.delete(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId)
-            .collection(Constants.listOfDepositTransactions)
-            .doc(depositModel.transactionId)
+            .collection(Constants.listOfDepositTnx)
+            .doc(depositModel.tnxId)
           );
 
           // decrement my total diposite
           batch.update( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.member)
+            .collection(Constants.members)
             .doc(uId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            {Constants.blance : FieldValue.increment(-depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+            {Constants.blance : FieldValue.increment( depositModel.amount)}
           );
           
           // decrement mess total diposite
@@ -309,9 +309,9 @@ class DepositProvider extends ChangeNotifier{
             .doc(messId),
             
             depositModel.type==Constants.deposit? 
-            {Constants.deposit : FieldValue.increment(-depositModel.amount)}
+            {Constants.blance : FieldValue.increment(-depositModel.amount)}
             :
-            {Constants.deposit : FieldValue.increment( depositModel.amount)}
+            {Constants.blance : FieldValue.increment( depositModel.amount)}
           );
 
           await batch.commit();

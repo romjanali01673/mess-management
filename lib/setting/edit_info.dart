@@ -53,6 +53,7 @@ class _EditInfoState extends State<EditInfo> {
           number: phoneContriller.text.toString(), 
           sessionKey: authProvider.getUserModel!.sessionKey, 
           currentMessId: authProvider.getUserModel!.currentMessId, 
+          mealHisabId: authProvider.getUserModel!.mealHisabId, 
           fullAddress: addressContriller.text.toString(), 
           fname: nameContriller.text.toString(),
         ), 

@@ -312,7 +312,7 @@ void _handleScroll() {
                                             if(confirm!=null && confirm){
                                               fandProvider.deleteAFandTransaction(
                                                 messId: authProvider.getUserModel!.currentMessId, 
-                                                tnxId: fandmodel.transactionId, 
+                                                tnxId: fandmodel.tnxId, 
                                                 extraAmount: fandmodel.type==Constants.add? (-fandmodel.amount) : fandmodel.amount, 
                                                 onSuccess: () {
                                                   showSnackber(context: context, content: "Deletion Successed.");

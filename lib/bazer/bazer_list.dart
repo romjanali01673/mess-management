@@ -127,7 +127,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                           if(confirm!=null && confirm){
                                             debugPrint("Confirmed ------------");
                                             await bazerProvider.deleteABazerTransaction(
-                                              tnxId: bazerModel.transactionId, 
+                                              tnxId: bazerModel.tnxId, 
                                               messId: authProvider.getUserModel!.currentMessId, 
                                               extraAdd: (bazerModel.amount * -1), 
                                               onFail: (message){

@@ -270,7 +270,7 @@ class _AddDepositState extends State<AddDeposit> {
                     if(isUpdate){
                       await depositProvider.updateADepositTransaction(
                         depositModel: DepositModel(
-                          transactionId: widget.preDepositModel!.transactionId, 
+                          tnxId: widget.preDepositModel!.tnxId, 
                           amount: double.parse(amountController.text.toString()), 
                           description: descriptionController.text.toString(), 
                           type: widget.preDepositModel!.type, 
@@ -300,7 +300,7 @@ class _AddDepositState extends State<AddDeposit> {
                     else{
                       await depositProvider.addADepositTransaction(
                         depositModel: DepositModel(
-                          transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                          tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
                           amount: double.parse(amountController.text.toString()), 
                           description: descriptionController.text.toString(), 
                           type: isAdd? Constants.deposit : Constants.refund, 

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class UserModel {
@@ -9,6 +10,8 @@ class UserModel {
   String sessionKey;
   String currentMessId;
   String fullAddress;
+  String mealHisabId;
+  Timestamp? createdAt;
 
   UserModel({
     required this.uId,
@@ -19,6 +22,8 @@ class UserModel {
     required this.sessionKey,
     required this.currentMessId,
     required this.fullAddress,
+    required this.mealHisabId,
+    this.createdAt,
 
   });
 
@@ -28,10 +33,12 @@ class UserModel {
       Constants.fname  : fname,
       Constants.email  : email,
       Constants.image  : image,
-      Constants.number  : number,
+      Constants.phone  : number,
       Constants.sessionKey  : sessionKey,
       Constants.currentMessId  : currentMessId,
       Constants.fullAddress  : fullAddress,
+      Constants.mealHisabId: mealHisabId,
+      Constants.createdAt: createdAt?? FieldValue.serverTimestamp()
     };
   }
 
@@ -41,10 +48,12 @@ class UserModel {
       fname: data[Constants.fname]??"", 
       email: data[Constants.email]??"", 
       image: data[Constants.image]??"", 
-      number: data[Constants.number]??"",
+      number: data[Constants.phone]??"",
       sessionKey: data[Constants.sessionKey]??"",
       currentMessId: data[Constants.currentMessId]??"",
       fullAddress: data[Constants.fullAddress]??"",
+      mealHisabId : data[Constants.mealHisabId]??"",
+      createdAt: data[Constants.createdAt]?? Timestamp.now(), //Timestamp.fromDate(DateTime.now())==Timestamp.now(),
     );
   }
 }

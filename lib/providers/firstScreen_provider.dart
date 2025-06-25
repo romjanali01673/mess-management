@@ -136,7 +136,7 @@ class FirstScreenProvider extends ChangeNotifier{
     try {
       DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.bazer).doc(messId).get();
       if(snapshot.exists && snapshot.data() != null){
-        bazer = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.cost]).toString());
+        bazer = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalBazerCost]).toString());
         setTotalBazerCost(value: bazer);
       }
       print(bazer);
@@ -155,7 +155,7 @@ class FirstScreenProvider extends ChangeNotifier{
     try {
       DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).get();
       if(snapshot.exists && snapshot.data() != null){
-        deposit = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.deposit]).toString());
+        deposit = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
         setTotalDepositOfMess(value: deposit);
       }
       print("mess deposit $deposit");
@@ -172,7 +172,7 @@ class FirstScreenProvider extends ChangeNotifier{
     double deposit = 0.0;
     setIsLoading(value: true);
     try {
-      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.member).doc(uId).collection(Constants.listOfDepositTransactions).get();
+      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).doc(uId).collection(Constants.listOfDepositTnx).get();
       
       querySnapshot.docs.map((snapshot){
         print(snapshot.id);
@@ -199,7 +199,7 @@ class FirstScreenProvider extends ChangeNotifier{
     double meal = 0.0;
     setIsLoading(value: true);
     try {
-      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMeal).get();
+      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
       
       querySnapshot.docs.map((snapshot){
         print(snapshot.id);

@@ -171,7 +171,7 @@ class _DepositHistoryState extends State<DepositHistory> {
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index){
-              DepositModel depositModel = snapshot.data![index][Constants.deposit];
+              DepositModel depositModel = snapshot.data![index][Constants.blance];
               Map<String,dynamic> userData = snapshot.data![index][Constants.userData];
               bool showDetails = false;
               return StatefulBuilder(
@@ -215,7 +215,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                         spacing: 5,
                         children: [
                           Text("UId: ${userData[Constants.uId]}"),
-                          Text("Tnx Id: ${depositModel.transactionId}"),
+                          Text("Tnx Id: ${depositModel.tnxId}"),
                           Text("description: ${depositModel.description==""? "Empty!" : depositModel.description}" ),
                         ]
                       
@@ -270,9 +270,9 @@ class _DepositHistoryState extends State<DepositHistory> {
                 bool showDetails = false;
                 Map<String,dynamic> memberData = data[index];
                 String memberType = 
-                  messProvider.getMessModel!.messAuthorityId==memberData[Constants.uId]? 
+                  messProvider.getMessModel!.menagerId==memberData[Constants.uId]? 
                     Constants.menager
-                    : messProvider.getMessModel!.messAuthorityId2nd==memberData[Constants.uId]? 
+                    : messProvider.getMessModel!.actMenagerId==memberData[Constants.uId]? 
                     Constants.actMenager : Constants.member;
 
                 return StatefulBuilder(
@@ -375,7 +375,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text("Tnx Id: ${depositModel.transactionId}"),
+                                                  Text("Tnx Id: ${depositModel.tnxId}"),
                                                   Text("Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(depositModel.CreatedAt!.toDate().toLocal())}"),
                                                 ],
                                               ),

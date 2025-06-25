@@ -133,7 +133,7 @@ class _AddRuleState extends State<AddRule> {
                       if(isUpdate){
                         await messProvider.updateAMessRule(
                           ruleModel: RuleModel(
-                            transactionId: widget.preRuleModel!.transactionId, 
+                            tnxId: widget.preRuleModel!.tnxId, 
                             title: titleController.text.toString(), 
                             description: descController.text.toString(),
                             CreatedAt: widget.preRuleModel!.CreatedAt,
@@ -151,7 +151,7 @@ class _AddRuleState extends State<AddRule> {
                       else{
                         await messProvider.addAMessRule(
                           ruleModel: RuleModel(
-                            transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                            tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
                             title: titleController.text.toString(), 
                             description: descController.text.toString()
                           ), 

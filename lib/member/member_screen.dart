@@ -152,9 +152,9 @@ class _MemberScreenState extends State<MemberScreen> {
                 itemBuilder: (context, index) {
                   Map<String,dynamic> memberData = data[index];
                   String memberType = 
-                    messProvider.getMessModel!.messAuthorityId==memberData[Constants.uId]? 
+                    messProvider.getMessModel!.menagerId==memberData[Constants.uId]? 
                       Constants.menager
-                      : messProvider.getMessModel!.messAuthorityId2nd==memberData[Constants.uId]? 
+                      : messProvider.getMessModel!.actMenagerId==memberData[Constants.uId]? 
                       Constants.actMenager : Constants.member;
               
                   return  Card(

@@ -88,7 +88,7 @@ class FandProvider extends ChangeNotifier{
       fandListener2 = firebaseFirestore
       .collection(Constants.fand)
       .doc(messId)
-      .collection(Constants.listOfFandTransaction)
+      .collection(Constants.listOfFandTnx)
       .orderBy(Constants.createdAt, descending: true)
       .limit(limit)
       .snapshots()
@@ -101,7 +101,7 @@ class FandProvider extends ChangeNotifier{
               //Note: fandModel.createdAt == null because firebase firestore send to listener new model before inserting. that's why we can see createdAt == null
               // "listen" at first take few doc. for this moment we are already added by "initialload" function so we did not need to add the that's why we are ignoring the value.
 
-              if(!currentDocs.any((doc) => doc.transactionId == fandModel.transactionId)){ 
+              if(!currentDocs.any((doc) => doc.tnxId == fandModel.tnxId)){ 
                 currentDocs.insert(0, fandModel);// নতুন  উপরে বসাও
                 currentDocs.removeLast(); // because this value will not sync.
                 notifyListeners();
@@ -119,7 +119,7 @@ class FandProvider extends ChangeNotifier{
 
               // note in here data load also.
               final updatedModel = FandModel.fromMap(data);
-              final index = currentDocs.indexWhere((e) => e.transactionId == updatedModel.transactionId); // compare by id
+              final index = currentDocs.indexWhere((e) => e.tnxId == updatedModel.tnxId); // compare by id
 
               if (index != -1) {
                 currentDocs[index] = updatedModel;
@@ -144,7 +144,7 @@ class FandProvider extends ChangeNotifier{
     final snapshot = await FirebaseFirestore.instance
         .collection(Constants.fand) // change this to your collection name
         .doc(messId)
-        .collection(Constants.listOfFandTransaction)
+        .collection(Constants.listOfFandTnx)
         .orderBy(Constants.createdAt, descending: true)
         .limit(limit)
         .get();
@@ -177,7 +177,7 @@ class FandProvider extends ChangeNotifier{
       final snapshot = await FirebaseFirestore.instance
           .collection(Constants.fand)
           .doc(messId)
-          .collection(Constants.listOfFandTransaction)
+          .collection(Constants.listOfFandTnx)
           .orderBy(Constants.createdAt, descending: true)
           .startAfterDocument(_lastDoc!)
           .limit(limit)
@@ -223,7 +223,7 @@ class FandProvider extends ChangeNotifier{
       final snapshot = await FirebaseFirestore.instance
           .collection(Constants.fand)
           .doc(messId)
-          .collection(Constants.listOfFandTransaction)
+          .collection(Constants.listOfFandTnx)
           .orderBy(Constants.createdAt, descending: true)
           .endBeforeDocument(_firstDoc!)
           .limitToLast(limit)
@@ -282,7 +282,7 @@ class FandProvider extends ChangeNotifier{
     double blance=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTransaction).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTnx).get();
       list = snapshot.docs.map(
         (doc){
           FandModel fandModel = FandModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -312,8 +312,8 @@ class FandProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.fand)
             .doc(messId)
-            .collection(Constants.listOfFandTransaction)
-            .doc(fandModel.transactionId),
+            .collection(Constants.listOfFandTnx)
+            .doc(fandModel.tnxId),
             fandModel.toMap()
           );
 
@@ -356,8 +356,8 @@ class FandProvider extends ChangeNotifier{
       batch.set(
         firebaseFirestore.collection(Constants.fand)
         .doc(messId)
-        .collection(Constants.listOfFandTransaction)
-        .doc(fandModel.transactionId),
+        .collection(Constants.listOfFandTnx)
+        .doc(fandModel.tnxId),
         fandModel.toMap(),
         SetOptions(
           mergeFields: [
@@ -397,7 +397,7 @@ class FandProvider extends ChangeNotifier{
     final batch = firebaseFirestore.batch();
     try {
       batch.delete(
-        firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTransaction).doc(tnxId),
+        firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTnx).doc(tnxId),
       );
 
       batch.update(firebaseFirestore.

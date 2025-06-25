@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
@@ -99,9 +100,6 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                         userModel = null;
                       });
 
-                      print(messProvider.getMessModel!.toMap().toString());
-                      print(authProvider.getUserModel!.toMap().toString());
-                      print(amIAdmin(messProvider: messProvider, authProvider: authProvider));
 
                       if(amIAdmin(messProvider: messProvider, authProvider: authProvider)){
                         if(fromKey.currentState!.validate()){
@@ -190,7 +188,8 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                 ),SizedBox(
                   height: 40,
                 ),
-                if(messProvider.isLoading) SizedBox.square(dimension: 50 ,child: CircularProgressIndicator()),
+
+                messProvider.isLoading? showCircularProgressIndicator():
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 20,
@@ -203,6 +202,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                       });
                       //clear all variable or data
                     }),
+                    
                     getMenuItems(label: "Invite", ontap: ()async{
                       bool confirm = await showConfirmDialog(context: context, title: "Are your Sure to About this invitation");
                       if(confirm){
@@ -222,7 +222,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                             messProvider.setIsloading(false);
                             userModel = null;
                             found=false;
-                            showSnackber(context: context, content: "Invaitations Message has send Successfully");
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              showSnackber(context: context, content: "Invaitations Message has send Successfully");
+                            },);
                           },
                           onFail: (message) {
                             showSnackber(context: context, content: message);

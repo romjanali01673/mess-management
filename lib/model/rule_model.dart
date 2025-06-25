@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class RuleModel{
-  String transactionId;
+  String tnxId;
   String title;
   String description;
   Timestamp? CreatedAt;
@@ -10,7 +10,7 @@ class RuleModel{
 
   RuleModel(
     { 
-      required this.transactionId,
+      required this.tnxId,
       required this.title,
       required this.description,
       this.CreatedAt
@@ -19,7 +19,7 @@ class RuleModel{
 
   factory RuleModel.fromMap(Map<String , dynamic>data){
     return RuleModel(
-      transactionId: data[Constants.transactionId]?? "", 
+      tnxId: data[Constants.tnxId]?? "", 
       title: data[Constants.title]?? "", 
       description: data[Constants.description] ??"",
       CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
@@ -28,7 +28,7 @@ class RuleModel{
 
   Map<String,dynamic> toMap(){
     return{
-      Constants.transactionId: transactionId,
+      Constants.tnxId: tnxId,
       Constants.title: title,
       Constants.description : description,
       Constants.createdAt: FieldValue.serverTimestamp(),

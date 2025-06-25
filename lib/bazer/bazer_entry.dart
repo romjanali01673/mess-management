@@ -396,7 +396,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     }
                     BazerModel  bazerModel = isUpdate?
                     BazerModel(
-                      transactionId: widget.preBazerModel!.transactionId, 
+                      tnxId: widget.preBazerModel!.tnxId, 
                       amount: totalAmount, 
                       bazerList: bazerList,
                       bazerTime: formatTimeOfDay(time!).toString(),
@@ -408,7 +408,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     )
                     :
                     BazerModel(
-                      transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                      tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
                       amount: totalAmount, 
                       bazerList: bazerList,
                       bazerTime: formatTimeOfDay(time!).toString(),

@@ -21,7 +21,7 @@ class Constants {
   static const String fname = "fname";
   static const String email = "email";
   static const String image = "image";
-  static const String number = "number";
+  static const String phone = "phone";
   static const String createdAt = "createdAt";
   static const String sessionKey = "sessionKey";
   static const String currentMessId = "currentMessId";
@@ -47,28 +47,29 @@ class Constants {
   static const String messId="messId";
   static const String messName="messName";
   static const String messAddress="messAddress";
-  static const String messAuthorityId="messAuthorityId";
-  static const String messAuthorityId2nd="messAuthorityId2nd";
-  static const String messAuthorityName="messAuthorityName";
-  static const String messAuthorityName2nd="messAuthorityName2nd";
-  static const String messAuthorityNumber="messAuthorityNumber";
-  static const String messAuthorityEmail="messAuthorityEmail";
+  static const String menagerId="menagerId";
+  static const String menagerPhone="menagerPhone";
+  static const String menagerName="menagerName";
+  static const String menagerEmail="menagerEmail";
+  static const String actMenagerId="actMenagerId";
+  static const String actMenagerName="actMenagerName";
   static const String messMemberList="messMemberList";
   static const String disabledMemberList="disabledMemberList";
   
   static const String inSide = "inSide";
   static const String rules = "rules";
   
-  static const String preMessList = "preMessList";
+  static const String messList = "messList";
 
 
-
+  static const String preData = "preData";
+  static const String preDataList = "preDataList";
 
 
   // fand
-  static const String listOfFandTransaction = "listOfFandTransaction";
+  static const String listOfFandTnx = "listOfFandTnx";
   static const String fand = "fand";
-  static const String transactionId = "transactionId";
+  static const String tnxId = "tnxId";
   static const String amount = "amount";
   static const String title = "title";
   static const String type = "type";
@@ -76,10 +77,13 @@ class Constants {
   static const String sub = "sub";
   static const String blance = "blance";
 
+  static const String currentFandBlance = "currentFandBlance";
+
   //deposit
-  static const String listOfDepositTransactions = "listOfDepositTransactions";
+  static const String listOfDepositTnx = "listOfDepositTnx";
   static const String deposit = "deposit";
   static const String refund = "refund";
+  static const String totalDeposit = "totalDeposit";
   
 
 
@@ -93,20 +97,22 @@ class Constants {
 
   // bazer
   static const String bazer="bazer";
-  static const String cost="cost";
-  static const String listOfBazerTransaction="listOfBazerTransaction";
+  static const String listOfBazerTnx="listOfBazerTnx";
   static const String price="price";
   static const String product="product";
   static const String byWho="byWho";
   static const String bazerTime="bazerTime";
-  static const String bazerDate="bazerDate";
+  static const String bazerDate="bazerDate";  
+  static const String totalBazerCost="totalBazerCost";
+
 
   // meal 
   static const String date = "date";
   static const String totalMeal = "totalMeal";
   static const String meal = "meal";
-  static const String listOfBazerMeal = "listOfBazerMeal";
+  static const String listOfMealTnx = "listOfMealTnx";
   static const String listOfMeal = "listOfMeal";
+  static const String mealRate="mealRate";
 
   // notice
   static const String notice = "notice";
@@ -118,6 +124,11 @@ class Constants {
   static const String entryTime = "entryTime";
   static const String userData = "userData";
 
+  //xyz
+  static const String members = "members";
+  static const String mealHisaList = "mealHisaList";
+  static const String mealHisabId = "mealHisabId";
+  static const String joindAt = "joindAt";
 
 
 

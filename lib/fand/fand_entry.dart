@@ -204,7 +204,7 @@ class _AddFandState extends State<AddFand> {
                     if(isUpdate){
                       await fandProvider.updateAFandTransaction(
                         fandModel : FandModel(
-                          transactionId: widget.preFandModel!.transactionId, 
+                          tnxId: widget.preFandModel!.tnxId, 
                           title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 
                           amount: double.parse(amountController.text.toString()), 
@@ -233,7 +233,7 @@ class _AddFandState extends State<AddFand> {
                     else{
                       await fandProvider.addAFandTransaction(
                         fandModel : FandModel(
-                          transactionId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                          tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
                           title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 
                           amount: double.parse(amountController.text.toString()), 

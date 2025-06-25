@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
@@ -50,7 +51,7 @@ class _MessDeleteState extends State<MessDelete> {
   void _deleteMess()async{
     final authProvider = context.read<AuthenticationProvider>();
     final messProvider = context.read<MessProvider>();
-    if(authProvider.getUserModel!.currentMessId != "" && messProvider.getMessModel != null && messProvider.getMessModel!.messAuthorityId==authProvider.getUserModel!.uId){
+    if(amIAdmin(messProvider: messProvider, authProvider: authProvider)){
 
       // if offline stop leave process .
       if(!messProvider.isOnline) {
@@ -63,31 +64,20 @@ class _MessDeleteState extends State<MessDelete> {
 
       // delete mess collection/table
       await messProvider.deleteMess(
+        uId: authProvider.getUserModel!.uId,
+        messId: messProvider.getMessModel!.messId,
         onFail: (message) 
         {  
           // on failed show a "failed message"
           messProvider.setIsloading(false);
-          showSnackber(context: context, content: message);
+          showSnackber(context: context, content: "Mess Deleted Failed.\n$message");
         }, 
-        MessId: messProvider.getMessModel!.messId,
         onSuccess: ()async{
-          //remove current mess id from your user id.
-          // because auth provider hold current mess id in user model. it will not replace until you relunch/login the app. 
-          // clear manually
-          authProvider.setUserModel(currentMessId: "");
-          await messProvider.removeMessIdFromMemberProfile(
-            memberUid: authProvider.getUserModel!.uId, 
-            onFail: (p0) {
-              showSnackber(context: context, content: "somthing wrong!");
-            },
-          );
-
-          // on success show a "success message"
           showSnackber(context: context, content: "Mess Has Deleted");
           setState(() {
             
           });
-        },
+        }, 
       );
       // al done. stop loading
       messProvider.setIsloading(false);

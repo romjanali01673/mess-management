@@ -63,12 +63,12 @@ class _MessUpdateState extends State<MessUpdate> {
         onSuccess: (){
           if(!context.mounted) return;
 
-          messOwnerIdController.text = messProvider.getMessModel!.messAuthorityId;
-          messOwnerNameController.text = messProvider.getMessModel!.messAuthorityName;
+          messOwnerIdController.text = messProvider.getMessModel!.menagerId;
+          messOwnerNameController.text = messProvider.getMessModel!.menagerName;
           messNameController.text = messProvider.getMessModel!.messName;
           messAddressController.text = messProvider.getMessModel!.messAddress;
-          authorityPhoneController.text = messProvider.getMessModel!.messAuthorityNumber;
-          authorityEmailController.text = messProvider.getMessModel!.messAuthorityEmail;
+          authorityPhoneController.text = messProvider.getMessModel!.menagerPhone;
+          authorityEmailController.text = messProvider.getMessModel!.menagerEmail;
         
         }
       );
@@ -159,7 +159,7 @@ class _MessUpdateState extends State<MessUpdate> {
                         bool? res =await showConfirmDialog(context: context, title: "Are you sure about this Update.");
                         if(res?? false){
                           // update mess data
-                          await messProvider.updateMessDataToFirestore(
+                          await messProvider.updateMessData(
                             onFail: (message){
                               showSnackber(context: context, content: message);
                             }, 
@@ -167,12 +167,13 @@ class _MessUpdateState extends State<MessUpdate> {
                               messId: "", 
                               messName: messNameController.text.toString().trim(), 
                               messAddress: messAddressController.text.toString().trim(), 
-                              messAuthorityId: "", 
-                              messAuthorityId2nd: "", 
-                              messAuthorityName: "", 
-                              messAuthorityName2nd: "", 
-                              messAuthorityNumber: authorityPhoneController.text.toString().trim(), 
-                              messAuthorityEmail: authorityEmailController.text.toString().trim(), 
+                              menagerId: "", 
+                              menagerName: "", 
+                              actMenagerId: "", 
+                              actMenagerName: "", 
+                              mealHisabId: "",
+                              menagerPhone: authorityPhoneController.text.toString().trim(), 
+                              menagerEmail: authorityEmailController.text.toString().trim(), 
                               messMemberList: [],
                             ),
                             onSuccess: (){

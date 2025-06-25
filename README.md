@@ -15,20 +15,20 @@ backend : firebase
 # Authentication 
 
 Landing Screen
-![](ss/landing.png)
+![](ss/authentication/landing.png)
 
 
 Sign Up
-![](ss/signup.png)
+![](ss/authentication/signup.png)
 
 
 Sign In
-![](ss/signin.png)
+![](ss/authentication/signin.png)
 
 
 Reset Password
-![](ss/reset_pass.png)
-![](ss/reset2.png)
+![](ss/authentication/reset_pass.png)
+![](ss/authentication/reset2.png)
 
 
 
@@ -36,62 +36,62 @@ Reset Password
 # Home 
 
 Home
-![](ss/home1.png)
-![](ss/home2.png)
+![](ss/home/home1.png)
+![](ss/home/home2.png)
 
 
 Drawer 
-![](ss/drawer.png)
+![Drawer](ss/home/drawer.png)
 
 
 
 # Mess
 
 About Mess
-![about_mess](ss/about_mess.png)
+![about_mess](ss/mess/about_mess.png)
 
 
 Add Mess Rule
-![add_rule](ss/add_rule.png)
+![add_rule](ss/mess/add_rule.png)
 
 
 Create A Mess
-![](ss/create_mess.png)
+![Create A Mess](ss/mess/create_mess.png)
 
 
 Delete Your Mess
-![](ss/delete_mess.png)
+![Delete Your Mess](ss/mess/delete_mess.png)
 
 Mess Update
-![](ss/update_mess.png)
+![Mess Update](ss/mess/update_mess.png)
 
 
 Join or Leave
-![](ss/join_leave.png)
+![Join or Leave](ss/mess/join_leave.png)
 
 
 Transfer Ownership
-![](ss/transfer_ownership.png)
-![](ss/transfer_ownership1.png)
+![Transfer Ownership](ss/mess/transfer_ownership.png)
+![Transfer Ownership](ss/mess/transfer_ownership1.png)
 
 
 
 # Notices 
 
 Notices
-![](ss/notices.png)
+![Notices](ss/notices.png)
 
 
 
 # Member 
 
 Find And Add Member
-![](ss/find_member.png)
+![Find And Add Member](ss/member/find_member.png)
 
 
 Member List
-![](ss/member1.png)
-![](ss/member2.png)
+![Member List](ss/member/member1.png)
+![Member List](ss/member/member2.png)
 
 
 
@@ -102,78 +102,79 @@ Add Deposit
 
 
 Depsoit History Member Wise
-![](ss/deposit_history_memberWise.png)
+![Add Deposit](ss/deposit/deposit_history_memberWise.png)
 
 
 My Deposit List
-![](ss/my_depost.png)
+![My Deposit List](ss/deposit/my_depost.png)
 
 
 Add Deposit
-![add_deposit](ss/add_deposit.png)
+![add_deposit](ss/deposit/add_deposit.png)
 
 
 All Deposit History
-![](ss/all_deposit_history.png)
+![All Deposit History](ss/deposit/all_deposit_history.png)
 
 
 
 # Meal 
 
 Add Meal
-![add_meal](ss/add_meal.png)
-![add_meal2](ss/add_meal2.png)
+![add_meal](ss/meal/add_meal.png)
+![add_meal2](ss/meal/add_meal2.png)
 
 
 Group Meal List 
-![](ss/group_meal_list.png)
+![Group Meal List 
+](ss/meal/group_meal_list.png)
 
 
 My Meal List
-![](ss/my_meal_list.png)
+![My Meal List](ss/meal/my_meal_list.png)
 
 
 Member Meal List 
-![](ss/member_meal_list.png)
+![Member Meal List](ss/meal/member_meal_list.png)
 
 
 
 # Fand 
 
 Add Fand
-![add_fand](ss/add_fand.png)
+![add_fand](ss/fans/add_fand.png)
 
 
 
 Fand Transaction List
-![](ss/fand.png)
+![Fand Transaction List](ss/fand/fand.png)
 
 
 
 # Bazer 
 
 Bazer Entry
-![](ss/bazer_entry.png)
+![Bazer Entry](ss/bazer/bazer_entry.png)
 
 Bazer List
-![](ss/bazer_list.png)
+![Bazer List](ss/bazer/bazer_list.png)
 
 
 
 # Setting 
 
 Change Email
-![](ss/change_email.png)
+![Change Email](ss/setting/change_email.png)
 
 
 Change Info
-![](ss/change_info.png)
+![Change Info](ss/setting/change_info.png)
 
 
 Change Pass
-![](ss/change_pass.png)
+![Change Pass](ss/setting/change_pass.png)
 
 
 Logout
-![](ss/logout.png)
+![Logout](ss/setting/logout.png)
 

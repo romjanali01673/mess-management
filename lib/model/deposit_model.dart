@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
 class DepositModel{
-  String transactionId;
+  String tnxId;
   double amount;
   String description;
   String type;
@@ -10,7 +10,7 @@ class DepositModel{
 
   DepositModel(
     { 
-      required this.transactionId,
+      required this.tnxId,
       required this.amount,
       required this.description,
       required this.type,
@@ -20,7 +20,7 @@ class DepositModel{
 
   factory DepositModel.fromMap(Map<String , dynamic>data){
     return DepositModel(
-      transactionId: data[Constants.transactionId]?? "", 
+      tnxId: data[Constants.tnxId]?? "", 
       amount: data[Constants.amount]?? 0, 
       description: data[Constants.description]?? "",
       CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
@@ -30,7 +30,7 @@ class DepositModel{
 
   Map<String,dynamic> toMap(){
     return{
-      Constants.transactionId: transactionId,
+      Constants.tnxId: tnxId,
       Constants.amount: amount,
       Constants.description: description,
       Constants.createdAt: FieldValue.serverTimestamp(),

@@ -1,48 +1,73 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
-class BazerModel{
-  String transactionId;
-  double amount;
-  dynamic bazerList; //List<Map<String,dynamic>>
-  Map<String,dynamic> byWho; //{Constants.uId : "", Constants.fname:""}
-  Timestamp? CreatedAt;
-  String bazerTime;
-  String bazerDate;
+class PreDataMessModel{
+  String tnxId;
+  String messId;
+  String messName;
+  double totalDeposit;
+  double currentFandBlance;
+  double totalMeal;
+  double totalBazerCost; 
+  List<Map<String,dynamic>>   messMemberList;
+  double mealRate;
+  String email;
+  String phone;
+  String fullAddress;
+  Timestamp? createdAt;
 
-  BazerModel(
+
+  PreDataMessModel(
     { 
-      required this.transactionId,
-      required this.amount,
-      required this.bazerList,
-      required this.byWho,
-      required this.bazerTime,
-      required this.bazerDate,
-      this.CreatedAt
+      required this.tnxId,
+      required this.messId,
+      required this.messName,
+      required this.totalDeposit,
+      required this.currentFandBlance,
+      required this.totalMeal,
+      required this.totalBazerCost,
+      required this.messMemberList,
+      required this.mealRate,
+      required this.email,
+      required this.phone,
+      required this.fullAddress,
+      this.createdAt,
     }
   );
 
-  factory BazerModel.fromMap(Map<String , dynamic>data){
-    return BazerModel(
-      transactionId: data[Constants.transactionId]?? "", 
-      amount: data[Constants.amount]?? 0, 
-      bazerList: data[Constants.bazerList] ??[],
-      CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
-      byWho : data[Constants.byWho]??{Constants.uId : "", Constants.fname:""},
-      bazerTime: data[Constants.bazerTime],
-      bazerDate: data[Constants.bazerDate],
+  factory PreDataMessModel.fromMap(Map<String , dynamic>data){
+    return PreDataMessModel(
+      tnxId: data[Constants.tnxId]??"",
+      messId: data[Constants.messId]??"",
+      messName: data[Constants.messName]??"", 
+      totalDeposit: data[Constants.totalDeposit]??0,
+      currentFandBlance: data[Constants.currentFandBlance]??0,
+      totalMeal: data[Constants.totalMeal]??0,
+      totalBazerCost: data[Constants.totalBazerCost]??0, 
+      messMemberList: data[Constants.messMemberList]??[],
+      mealRate: data[Constants.mealRate]??0,
+      email: data[Constants.email]??"",
+      phone: data[Constants.phone]??"", 
+      fullAddress: data[Constants.fullAddress]??"", 
+      createdAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()),
     );
   }
 
   Map<String,dynamic> toMap(){
     return{
-      Constants.transactionId: transactionId,
-      Constants.amount: amount,
-      Constants.bazerList : bazerList,
+      Constants.tnxId: tnxId,
+      Constants.messId: messId,
+      Constants.messName: messName, 
+      Constants.totalDeposit: totalDeposit,
+      Constants.currentFandBlance: currentFandBlance,
+      Constants.totalMeal: totalMeal,
+      Constants.totalBazerCost: totalBazerCost, 
+      Constants.messMemberList: messMemberList,
+      Constants.mealRate: mealRate,
+      Constants.email: email,
+      Constants.phone: phone, 
+      Constants.fullAddress: fullAddress, 
       Constants.createdAt: FieldValue.serverTimestamp(),
-      Constants.byWho: byWho,
-      Constants.bazerTime: bazerTime ,
-      Constants.bazerDate:bazerDate ,
     };
   }
 }
