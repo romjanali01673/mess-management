@@ -35,7 +35,6 @@ class Constants {
   //
   static const String userImages = "userImages";
   static const String users = "users";
-  static const String userModel ="userModel";
 
   // 
   static const String isSignedIn = "isSignedIn";
@@ -66,9 +65,9 @@ class Constants {
   static const String preDataList = "preDataList";
 
 
-  // fand
-  static const String listOfFandTnx = "listOfFandTnx";
-  static const String fand = "fand";
+  // fund
+  static const String listOfFundTnx = "listOfFundTnx";
+  static const String fund = "fund";
   static const String tnxId = "tnxId";
   static const String amount = "amount";
   static const String title = "title";
@@ -77,7 +76,7 @@ class Constants {
   static const String sub = "sub";
   static const String blance = "blance";
 
-  static const String currentFandBlance = "currentFandBlance";
+  static const String currentFundBlance = "currentFundBlance";
 
   //deposit
   static const String listOfDepositTnx = "listOfDepositTnx";
@@ -126,9 +125,17 @@ class Constants {
 
   //xyz
   static const String members = "members";
-  static const String mealHisaList = "mealHisaList";
+  static const String mealHisabList = "mealHisabList";
   static const String mealHisabId = "mealHisabId";
   static const String joindAt = "joindAt";
+
+  // models
+  static const String userModel ="userModel";
+  static const String depositModel = "depositModel";
+  static const String fundModel= "fundModel";
+  static const String messModel = "messModel";
+  static const String bazerModel = "bazerModel";
+  static const String mealModel = "mealModel";
 
 
 
@@ -144,16 +151,17 @@ enum NoticeAndAnnouncement{
   Notices,
   addNotice,
 }
-enum Fand{
-  fand,
+enum Fund{
+  fund,
   addDeposit,
   addCost,
+  clearFund
 }
 enum DrawerItem{
   Home,
   Meal,
   Members,
-  Fand,
+  Fund,
   Notice_And_Announcements,
   Bazer,
   Mess,

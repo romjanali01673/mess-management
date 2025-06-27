@@ -64,7 +64,7 @@ class _LandingScreenState extends State<LandingScreen> {
             }
           },
           onFail: (message){
-            showSnackber(context: context, content: "Somthing Wrong-0001");
+            showSnackber(context: context, content: "Somthing Wrong\n$message"+"001");
             // Navigate to sigin screen
             navigate(isSignedIn: false);
           }

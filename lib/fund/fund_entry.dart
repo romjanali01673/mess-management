@@ -6,22 +6,22 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
 import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/model/fund_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/fund_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
-class AddFand extends StatefulWidget {
-  final FandModel? preFandModel;
-  const AddFand({super.key, this.preFandModel, });
+class AddFund extends StatefulWidget {
+  final FundModel? preFundModel;
+  const AddFund({super.key, this.preFundModel, });
 
   @override
-  State<AddFand> createState() => _AddFandState();
+  State<AddFund> createState() => _AddFundState();
 }
 
-class _AddFandState extends State<AddFand> {
+class _AddFundState extends State<AddFund> {
   bool isUpdate = false;
   final formKey = GlobalKey<FormState>();
 
@@ -38,14 +38,14 @@ class _AddFandState extends State<AddFand> {
 
   void setPreData(){
     isUpdate = true;
-    titleController.text = widget.preFandModel!.title;
-    descriptionController.text = widget.preFandModel!.description;
-    amountController.text = widget.preFandModel!.amount.toString();
+    titleController.text = widget.preFundModel!.title;
+    descriptionController.text = widget.preFundModel!.description;
+    amountController.text = widget.preFundModel!.amount.toString();
   }
 
   @override
   void initState() {
-    if(widget.preFandModel != null){
+    if(widget.preFundModel != null){
       setPreData();
     }
     
@@ -66,13 +66,13 @@ class _AddFandState extends State<AddFand> {
 
   @override
   Widget build(BuildContext context) {
-    final fandProvider = context.watch<FandProvider>();
+    final fundProvider = context.watch<FundProvider>();
     final authProvider = context.watch<AuthenticationProvider>();
     final messProvider = context.watch<MessProvider>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Fand Entry", style: getTextStyleForTitleXL(),),
+        title: Text("Fund Entry", style: getTextStyleForTitleXL(),),
         backgroundColor: Colors.grey,
       ),
       body: Container(
@@ -202,15 +202,15 @@ class _AddFandState extends State<AddFand> {
                   
                   if(valided){
                     if(isUpdate){
-                      await fandProvider.updateAFandTransaction(
-                        fandModel : FandModel(
-                          tnxId: widget.preFandModel!.tnxId, 
+                      await fundProvider.updateAFundTransaction(
+                        fundModel : FundModel(
+                          tnxId: widget.preFundModel!.tnxId, 
                           title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 
                           amount: double.parse(amountController.text.toString()), 
-                          type: widget.preFandModel!.type, 
+                          type: widget.preFundModel!.type, 
                         ), 
-                        extraAmount: double.parse(amountController.text.toString()) - widget.preFandModel!.amount ,
+                        extraAmount: double.parse(amountController.text.toString()) - widget.preFundModel!.amount ,
                         messId: authProvider.getUserModel!.currentMessId, 
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Updaate Failed! \n$message");
@@ -231,8 +231,8 @@ class _AddFandState extends State<AddFand> {
                       });
                     }
                     else{
-                      await fandProvider.addAFandTransaction(
-                        fandModel : FandModel(
+                      await fundProvider.addAFundTransaction(
+                        fundModel : FundModel(
                           tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
                           title: titleController.text.toString(), 
                           description: descriptionController.text.toString(), 

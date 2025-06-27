@@ -127,7 +127,7 @@ class AuthenticationProvider extends ChangeNotifier {
       print(getUserModel!.sessionKey+"firestore");
       print(userM.sessionKey+"shared pref");
     } catch (e) {
-      onFail(e.toString()+"0002");
+      onFail(e.toString());
     }
   }
 

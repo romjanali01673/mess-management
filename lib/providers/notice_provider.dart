@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/first_screen.dart';
+import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:meal_hisab/model/fund_model.dart';
 import 'package:meal_hisab/model/notice_model.dart';
+import 'package:meal_hisab/providers/firstScreen_provider.dart';
 
 class NoticeProvider extends ChangeNotifier{
 
@@ -70,31 +73,44 @@ class NoticeProvider extends ChangeNotifier{
     });
   }
 
-  Future<void> checkHasNoticeUnseen({required String uid, required String messId})async{
+  Future<void> checkHasNoticeUnseen({required String uid, required String messId, required String mealHisabId})async{
     print("has notice called");
     try {
-      DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.notice).doc(messId).get();
-      if(snapshot.exists && snapshot.data() != null){
-        List<String> memberList = ((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList] as List<dynamic>).map((x){ return x.toString();}).toList();
-        if(memberList.contains(uid)){
-          setHasUnseen(value: true);
-          print("has notice t");
-        }
-        else{
-          setHasUnseen(value: false);
-          print("has notice f$memberList");
-        }
-      }
-    } catch (e) {
-      print(e.toString()+"check has notice");
+      // DocumentSnapshot snapshot = await 
+      firebaseFirestore
+        .collection(Constants.notice)
+        .doc(messId)
+        .snapshots()
+        .listen((sanpshot){
+          if (sanpshot.data() != null){
+            var data = (sanpshot.data() as Map<String,dynamic>);
+            
+            if((data[Constants.messMemberList]??[]).contains(uid)){
+              setHasUnseen(value: true);
+              notifyListeners();
+              print("has notice t");
+            }
+            else{
+              setHasUnseen(value: false);
+              print("has notice f");
+            }
+          }
+        }  
+      );
+    }catch(e){
+      debugPrint(e.toString()+"check notifications");
     }
   }
+
   Future<void> pinToHome({required NoticeModel noticeModel, required String messId, required Function(String) onFail, Function()? onSuccess})async{
+    FirstScreenProvider  first = FirstScreenProvider();
     try {
       await firebaseFirestore.collection(Constants.notice).doc(messId).set(
         { Constants.homePindedNotice : noticeModel.toMap()}
       );
+
       onSuccess!=null? onSuccess():(){};
+      first.setPindNoticeForHome(value: noticeModel); 
     } catch (e) {
       onFail(e.toString());
     }
@@ -153,7 +169,7 @@ class NoticeProvider extends ChangeNotifier{
         noticeModel.toMap()
       );
 
-      batch.update(
+      batch.set(
         firebaseFirestore.collection(Constants.notice)
         .doc(messId),
         {Constants.messMemberList : currentMessMemberUidList}
@@ -165,7 +181,9 @@ class NoticeProvider extends ChangeNotifier{
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
+      debugPrint(e.toString());
     } 
+    setIsLoading(value: false);
   }
   // delete a notice from database 
   Future<void> deleteANotice({required String messId, required String noticeId,Function()? onSuccess, required Function(String) onFail})async{

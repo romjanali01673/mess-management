@@ -47,6 +47,7 @@ class _MyDepositState extends State<MyDeposit> {
                   FutureBuilder(
                     future: depositProvider.getDepositAmount(
                       messId: authProvider.getUserModel!.currentMessId,
+                      mealHisabId: authProvider.getUserModel!.mealHisabId,
                       uId: authProvider.getUserModel!.uId,
                       onFail: (message){
                         SchedulerBinding.instance.addPostFrameCallback((_){
@@ -79,6 +80,7 @@ class _MyDepositState extends State<MyDeposit> {
             child: FutureBuilder(
               future: depositProvider.getMemberDepositList(
                 messId: authProvider.getUserModel!.currentMessId, 
+                mealHisabId: authProvider.getUserModel!.mealHisabId, 
                 uId: authProvider.getUserModel!.uId,
                 onFail: (message ) { 
                   SchedulerBinding.instance.addPostFrameCallback((_){

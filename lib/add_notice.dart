@@ -7,10 +7,10 @@ import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/home.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/model/fund_model.dart';
 import 'package:meal_hisab/model/notice_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/fund_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:meal_hisab/providers/notice_provider.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +61,10 @@ class _AddNoticeState extends State<AddNotice> {
 
     
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Add Notice & Announcement"),
+        backgroundColor: Colors.grey,
+      ),
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,
@@ -203,4 +206,4 @@ class _AddNoticeState extends State<AddNotice> {
 }
 
 
-// fand -> mess_id -> transactions -> transaction_id ->  {id, amount, title, description, time, type{"add", "sub"}, }
+// fund -> mess_id -> transactions -> transaction_id ->  {id, amount, title, description, time, type{"add", "sub"}, }

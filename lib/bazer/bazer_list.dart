@@ -55,6 +55,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                child: FutureBuilder(
                 future: bazerProvider.getBazerTransactions(
                   messId: authProvider.getUserModel!.currentMessId, 
+                  mealHisabId: authProvider.getUserModel!.mealHisabId, 
                   onFail: (message){
                   }
                 ),
@@ -129,6 +130,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                             await bazerProvider.deleteABazerTransaction(
                                               tnxId: bazerModel.tnxId, 
                                               messId: authProvider.getUserModel!.currentMessId, 
+                                              mealHisabId: authProvider.getUserModel!.mealHisabId, 
                                               extraAdd: (bazerModel.amount * -1), 
                                               onFail: (message){
                                                 showSnackber(context: context, content: "Deletion Failed.\n$message");

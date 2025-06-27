@@ -3,20 +3,20 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/fand_model.dart';
+import 'package:meal_hisab/model/fund_model.dart';
 import 'package:provider/provider.dart';
 
-class FandProvider extends ChangeNotifier{
+class FundProvider extends ChangeNotifier{
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  StreamSubscription? fandListener;
-  StreamSubscription? fandListener2;
+  StreamSubscription? fundListener;
+  StreamSubscription? fundListener2;
   bool _isLoading = false;
-  FandModel? _fandModel;
+  FundModel? _fundModel;
   double _blance = 0;
 
-  int limit = 10;
-  List<FandModel> currentDocs = [];
+  int limit = 200;
+  List<FundModel> currentDocs = [];
   DocumentSnapshot? _firstDoc;
   DocumentSnapshot? _lastDoc;
 
@@ -39,21 +39,21 @@ class FandProvider extends ChangeNotifier{
   // get ------------
 
   bool get isLoading => _isLoading;
-  FandModel? get getFandModel => _fandModel;
+  FundModel? get getFundModel => _fundModel;
   double get getBlance => _blance;
-  List<FandModel> get getFandModelList => currentDocs;
+  List<FundModel> get getFundModelList => currentDocs;
 
   bool get getHasMoreForword => _hasMoreForward;
   bool get getHasMoreBackword => _hasMoreBackward;
 
   void reset(){
-    _fandModel = null;
+    _fundModel = null;
   }
 
   @override
   void dispose() {
-    fandListener?.cancel();
-    fandListener2?.cancel();
+    fundListener?.cancel();
+    fundListener2?.cancel();
     // TODO: implement dispose
     super.dispose();
   }
@@ -61,12 +61,12 @@ class FandProvider extends ChangeNotifier{
 
   // function -----------
 
-  void listenFand({required String messId}){
-    fandListener?.cancel();
+  void listenFundBlance({required String messId}){
+    fundListener?.cancel();
     try {
-      debugPrint("listenFand called"+messId);
-      fandListener = firebaseFirestore
-      .collection(Constants.fand)
+      debugPrint("listenfund called"+messId);
+      fundListener = firebaseFirestore
+      .collection(Constants.fund)
       .doc(messId)
       .snapshots()
       .listen((snapshot){
@@ -81,29 +81,34 @@ class FandProvider extends ChangeNotifier{
     }
   }
 
-  void listenFandDocChanges({required String messId}){
-    fandListener2?.cancel();
+  void listenFundDocChanges({required String messId}){
+    fundListener2?.cancel();
 
     try {
-      fandListener2 = firebaseFirestore
-      .collection(Constants.fand)
+      fundListener2 = firebaseFirestore
+      .collection(Constants.fund)
       .doc(messId)
-      .collection(Constants.listOfFandTnx)
+      .collection(Constants.listOfFundTnx)
       .orderBy(Constants.createdAt, descending: true)
       .limit(limit)
       .snapshots()
       .listen((snapshot){
         for(var change in snapshot.docChanges){
+
           if(change.type == DocumentChangeType.added){
             final data = change.doc.data();
             if (data != null) {
-              final fandModel = FandModel.fromMap(data);
-              //Note: fandModel.createdAt == null because firebase firestore send to listener new model before inserting. that's why we can see createdAt == null
+              debugPrint('add found');
+              final fundModel = FundModel.fromMap(data);
+              //Note: fundModel.createdAt == null because firebase firestore send to listener new model before inserting. that's why we can see createdAt == null
               // "listen" at first take few doc. for this moment we are already added by "initialload" function so we did not need to add the that's why we are ignoring the value.
 
-              if(!currentDocs.any((doc) => doc.tnxId == fandModel.tnxId)){ 
-                currentDocs.insert(0, fandModel);// নতুন  উপরে বসাও
-                currentDocs.removeLast(); // because this value will not sync.
+              if(!currentDocs.any((doc) => doc.tnxId == fundModel.tnxId)){ 
+                currentDocs.insert(0, fundModel);// নতুন  উপরে বসাও
+                if(currentDocs.length>limit){
+                  currentDocs.removeLast(); // because this value will not sync.
+                  
+                }
                 notifyListeners();
               }
             }
@@ -118,7 +123,7 @@ class FandProvider extends ChangeNotifier{
             if (data != null) {
 
               // note in here data load also.
-              final updatedModel = FandModel.fromMap(data);
+              final updatedModel = FundModel.fromMap(data);
               final index = currentDocs.indexWhere((e) => e.tnxId == updatedModel.tnxId); // compare by id
 
               if (index != -1) {
@@ -127,6 +132,22 @@ class FandProvider extends ChangeNotifier{
               }
             }
           }
+          else if(change.type == DocumentChangeType.removed){
+            debugPrint("delete found");
+            final data = change.doc.data();
+            if (data != null) {
+
+              // note in here data load also.
+              final removedModel = FundModel.fromMap(data);
+              final index = currentDocs.indexWhere((e) => e.tnxId == removedModel.tnxId); // compare by id
+
+              if (index != -1) {
+                currentDocs.removeAt(index);
+                notifyListeners();
+              }
+            }
+          }
+          
         }
       });
     } catch (e) {
@@ -142,19 +163,21 @@ class FandProvider extends ChangeNotifier{
 
   try {
     final snapshot = await FirebaseFirestore.instance
-        .collection(Constants.fand) // change this to your collection name
+        .collection(Constants.fund) // change this to your collection name
         .doc(messId)
-        .collection(Constants.listOfFandTnx)
+        .collection(Constants.listOfFundTnx)
         .orderBy(Constants.createdAt, descending: true)
         .limit(limit)
         .get();
 
     if (snapshot.docs.isNotEmpty) {
       debugPrint(snapshot.docs.length.toString());
-        currentDocs = snapshot.docs.map((x)=> FandModel.fromMap(x.data())).toList();
+        currentDocs = snapshot.docs.map((x)=> FundModel.fromMap(x.data())).toList();
         _firstDoc = snapshot.docs.first;
         _lastDoc = snapshot.docs.last;
-        _hasMoreForward = true;
+        if(snapshot.docs.length==limit){
+          _hasMoreForward = true;
+        }
         _hasMoreBackward = false;
     }
   } catch (e) {
@@ -175,9 +198,9 @@ class FandProvider extends ChangeNotifier{
 
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection(Constants.fand)
+          .collection(Constants.fund)
           .doc(messId)
-          .collection(Constants.listOfFandTnx)
+          .collection(Constants.listOfFundTnx)
           .orderBy(Constants.createdAt, descending: true)
           .startAfterDocument(_lastDoc!)
           .limit(limit)
@@ -188,7 +211,7 @@ class FandProvider extends ChangeNotifier{
         // snapshot.docs.forEach((x){
         //   print(x.id);
         // });
-          currentDocs.addAll(snapshot.docs.map((x)=>FandModel.fromMap(x.data())).toList());
+          currentDocs = (snapshot.docs.map((x)=>FundModel.fromMap(x.data())).toList());
           currentDocs.removeRange(0, snapshot.docs.length);
 
           notifyListeners();
@@ -196,10 +219,6 @@ class FandProvider extends ChangeNotifier{
           _lastDoc = snapshot.docs.last;
           _hasMoreBackward = true;
           _hasMoreForward = snapshot.docs.length == limit;
-
-          if(snapshot.docs.length<limit){
-            _hasMoreForward = false; 
-          }
 
       } else {
         _hasMoreForward = false;
@@ -221,9 +240,9 @@ class FandProvider extends ChangeNotifier{
 
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection(Constants.fand)
+          .collection(Constants.fund)
           .doc(messId)
-          .collection(Constants.listOfFandTnx)
+          .collection(Constants.listOfFundTnx)
           .orderBy(Constants.createdAt, descending: true)
           .endBeforeDocument(_firstDoc!)
           .limitToLast(limit)
@@ -232,7 +251,7 @@ class FandProvider extends ChangeNotifier{
       if (snapshot.docs.isNotEmpty) {
           int i =0;
           snapshot.docs.map((x){
-            currentDocs.insert(i, FandModel.fromMap(x.data()));
+            currentDocs.insert(i, FundModel.fromMap(x.data()));
             currentDocs.removeLast();
             i++;
           }).toList();
@@ -258,17 +277,21 @@ class FandProvider extends ChangeNotifier{
     setIsLoading(value: false);
   }
 
-  Future<double> getFandBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
-    print("called total fand");
+  Future<double> getFundBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    print("called total fund");
     double blance = 0.0;
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore
+      .collection(Constants.fund)
+      .doc(messId)
+      .get();
       if(snapshot.exists && snapshot.data() != null){
         blance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
         setBlance(amount: blance);
-      }
+        onSuccess!=null? onSuccess() : (){};
         print(blance);
-      onSuccess!=null? onSuccess() : (){};
+      }
+      onFail("Somthing Wrong.\nData Not Found");
     } catch (e) {
       onFail(e.toString());
     }  
@@ -276,21 +299,21 @@ class FandProvider extends ChangeNotifier{
   }
 
 
-  // get all fand transaction list 
-  Future<List<FandModel>?> getFandTransactions({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
-    List<FandModel>? list;
+  // get all fund transaction list 
+  Future<List<FundModel>?> getFundTransactions({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    List<FundModel>? list;
     double blance=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTnx).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.fund).doc(messId).collection(Constants.listOfFundTnx).get();
       list = snapshot.docs.map(
         (doc){
-          FandModel fandModel = FandModel.fromMap(doc.data() as Map<String, dynamic>);
+          FundModel fundModel = FundModel.fromMap(doc.data() as Map<String, dynamic>);
           
-          if(fandModel.type==Constants.add) blance += fandModel.amount;
-          else blance -= fandModel.amount;
+          if(fundModel.type==Constants.add) blance += fundModel.amount;
+          else blance -= fundModel.amount;
           
-          return fandModel;
+          return fundModel;
         }).toList();
       
       _blance = blance;
@@ -303,26 +326,26 @@ class FandProvider extends ChangeNotifier{
     return list?.reversed.toList();
   }
 
-  // add a fand transaction to database 
-  Future<void> addAFandTransaction({required FandModel fandModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
-    debugPrint("add fand called");
+  // add a fund transaction to database 
+  Future<void> addAFundTransaction({required FundModel fundModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    debugPrint("add fund called");
     final batch = firebaseFirestore.batch();
 
         try {
           batch.set(
-            firebaseFirestore.collection(Constants.fand)
+            firebaseFirestore.collection(Constants.fund)
             .doc(messId)
-            .collection(Constants.listOfFandTnx)
-            .doc(fandModel.tnxId),
-            fandModel.toMap()
+            .collection(Constants.listOfFundTnx)
+            .doc(fundModel.tnxId),
+            fundModel.toMap()
           );
 
-          if(fandModel.type ==Constants.add){
+          if(fundModel.type ==Constants.add){
             batch.set(
-              firebaseFirestore.collection(Constants.fand)
+              firebaseFirestore.collection(Constants.fund)
               .doc(messId),
               
-              {Constants.blance: FieldValue.increment(fandModel.amount)},
+              {Constants.blance: FieldValue.increment(fundModel.amount)},
               SetOptions(
                 merge: true,
               )              
@@ -330,9 +353,9 @@ class FandProvider extends ChangeNotifier{
           }
           else{
             batch.set(
-              firebaseFirestore.collection(Constants.fand)
+              firebaseFirestore.collection(Constants.fund)
               .doc(messId),
-              {Constants.blance:FieldValue.increment(-fandModel.amount)},
+              {Constants.blance:FieldValue.increment(-fundModel.amount)},
               SetOptions(
                 merge: true,
               )  
@@ -347,18 +370,18 @@ class FandProvider extends ChangeNotifier{
         } 
   }
 
-  // update a fand transaction to database 
-  Future<void> updateAFandTransaction({required FandModel fandModel,required String messId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
+  // update a fund transaction to database 
+  Future<void> updateAFundTransaction({required FundModel fundModel,required String messId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
 
     try {
 
       batch.set(
-        firebaseFirestore.collection(Constants.fand)
+        firebaseFirestore.collection(Constants.fund)
         .doc(messId)
-        .collection(Constants.listOfFandTnx)
-        .doc(fandModel.tnxId),
-        fandModel.toMap(),
+        .collection(Constants.listOfFundTnx)
+        .doc(fundModel.tnxId),
+        fundModel.toMap(),
         SetOptions(
           mergeFields: [
             Constants.amount, 
@@ -368,15 +391,15 @@ class FandProvider extends ChangeNotifier{
         )
       );
 
-      fandModel.type==Constants.add?
+      fundModel.type==Constants.add?
       batch.update(
-        firebaseFirestore.collection(Constants.fand)
+        firebaseFirestore.collection(Constants.fund)
         .doc(messId),
         {Constants.blance: FieldValue.increment(extraAmount)}
       )
       :
       batch.update(
-        firebaseFirestore.collection(Constants.fand)
+        firebaseFirestore.collection(Constants.fund)
         .doc(messId),
         {Constants.blance: FieldValue.increment(-extraAmount)}
       );
@@ -392,24 +415,83 @@ class FandProvider extends ChangeNotifier{
 
 
 
-  // delete a fand transaction
-  Future<void> deleteAFandTransaction({required String messId, required String tnxId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
+  // delete a fund transaction
+  Future<void> deleteAFundTransaction({required String messId, required String tnxId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     try {
       batch.delete(
-        firebaseFirestore.collection(Constants.fand).doc(messId).collection(Constants.listOfFandTnx).doc(tnxId),
+        firebaseFirestore.collection(Constants.fund).doc(messId).collection(Constants.listOfFundTnx).doc(tnxId),
       );
 
       batch.update(firebaseFirestore.
-        collection(Constants.fand)
+        collection(Constants.fund)
         .doc(messId),
         {Constants.blance : FieldValue.increment(extraAmount)}
       );
-      onSuccess!=null? onSuccess(): (){};
       await batch.commit();
+      onSuccess!=null? onSuccess(): (){};
     } catch (e) {
       onFail(e.toString());
     }
+  }
+
+  // delete a fund transaction
+  Future<void> clearAllFundTnx({required String messId, required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+    try {
+      setIsLoading(value: true);
+
+      final fundModel = FundModel(
+        tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
+        amount: getBlance, 
+        title: "Previous Transaction Has Cleared!", 
+        description: "All previous N (N<=900) transactions have been cleared. You will no longer be able to view them. From now on, only new transactions will be available.\n\nNote: The deposited amount reflects the Current remaining balance of the fund.", 
+        type: Constants.add,
+      );
+          
+      // delete all pre fand history or transactions. 
+      AggregateQuerySnapshot aQuerySnapshot = await firebaseFirestore
+        .collection(Constants.fund)
+        .doc(messId)
+        .collection(Constants.listOfFundTnx)
+        .count()
+        .get();
+          
+      int i = aQuerySnapshot.count!;
+
+      while(i>0){
+        try {
+          QuerySnapshot qSnapshot = await firebaseFirestore
+            .collection(Constants.fund)
+            .doc(messId)
+            .collection(Constants.listOfFundTnx)
+            .limit(800)
+            .get();
+
+          await Future.wait(qSnapshot.docs.map((x) => x.reference.delete()));
+          await Future.delayed(Duration(milliseconds: 1100));
+          i-=qSnapshot.docs.length;
+          if(qSnapshot.docs.isEmpty) break;
+        } catch (e) {
+          onFail(e.toString());
+          return;// to off loop and declain next process
+        }
+      }
+
+      batch.set(
+        firebaseFirestore.
+        collection(Constants.fund)
+        .doc(messId)
+        .collection(Constants.listOfFundTnx)
+        .doc(fundModel.tnxId),
+        fundModel.toMap()
+      );
+      await batch.commit();
+      onSuccess!=null? onSuccess(): (){};
+    } catch (e) {
+      onFail(e.toString());
+    }
+    setIsLoading(value: false);
   }
   
 }

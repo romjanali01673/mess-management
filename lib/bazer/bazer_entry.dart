@@ -424,6 +424,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     await bazerProvider.updateABazerTransaction(
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
+                      mealHisabId: authProvider.getUserModel!.mealHisabId, 
                       onFail: (message ) { 
                         showSnackber(context: context, content: "Failed!\n$message");
                       },
@@ -443,6 +444,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     await bazerProvider.addABazerTransaction(
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
+                      mealHisabId: authProvider.getUserModel!.mealHisabId, 
                       onFail: (message ) { 
                         showSnackber(context: context, content: "Bazer Entry Failed!\n$message");
                       },

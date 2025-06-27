@@ -91,6 +91,7 @@ class _MemberMealListState extends State<MemberMealList> {
                     memberMealData = null;
                     memberMealData = await mealProvider.getAllMealListOfAMember(
                       messId: authProvider.getUserModel!.currentMessId, 
+                      mealHisabId: authProvider.getUserModel!.mealHisabId, 
                       uId: userId, 
                       onFail: (message){showSnackber(context: context, content: "somthing Wrong \n $message");},
                     );

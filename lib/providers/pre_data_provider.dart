@@ -44,7 +44,7 @@
 //         final snapshot = await firebaseFirestore
 //             .collection(Constants.bazer)
 //             .doc(messId)
-//             .collection(Constants.listOfFandTnx)
+//             .collection(Constants.listOfFundTnx)
 //             // .orderBy(Constants.createdAt, descending: true)
 //             .startAfterDocument(_lastDoc!)
 //             .limit(500)
@@ -83,7 +83,7 @@
     
 //     double? totalMealOfMess;
 //     double? totalBazerCost;
-//     double? currentFandBlance;
+//     double? currentFundBlance;
 //     double? totalDepositOfMess;
 //     PreDataMessModel? preDataMessModel;
 //     List<PreDataMemberModel>? ListOfPreDataMemberModel;
@@ -101,7 +101,7 @@
 //           messId: messModel.messId, 
 //           messName: messModel.messName, 
 //           totalDeposit: 0.0, 
-//           currentFandBlance: 0.0, 
+//           currentFundBlance: 0.0, 
 //           totalMeal: 0.0, 
 //           totalBazerCost: 0.0, 
 //           messMemberList: messModel.messMemberList, 
@@ -139,11 +139,11 @@
 //     try {
 
 
-//       // get current fand blance 
+//       // get current fund blance 
 //       try {
-//         final snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).get(GetOptions(source: Source.server));
+//         final snapshot =  await firebaseFirestore.collection(Constants.fund).doc(messId).get(GetOptions(source: Source.server));
 //         if(snapshot.exists || snapshot.data()!=null){
-//           currentFandBlance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
+//           currentFundBlance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
 //         }
 //       } catch (e) {
 //         return false;

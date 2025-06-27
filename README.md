@@ -1,6 +1,6 @@
 # Project Name: Mess Management
 
-in this application user can manage there meal, diposite, fand, meal rate, bazer, total member data, Administrator Power,
+in this application user can manage there meal, diposite, fund, meal rate, bazer, total member data, Administrator Power,
 In this app has managed user Privacy, security with Confidentiallity, Integrity, Availability
 
 user can read and write online or offline.
@@ -139,15 +139,15 @@ Member Meal List
 
 
 
-# Fand 
+# Fund 
 
-Add Fand
-![add_fand](ss/fans/add_fand.png)
+Add Fund
+![add_fund](ss/fund/add_fund.png)
 
 
 
-Fand Transaction List
-![Fand Transaction List](ss/fand/fand.png)
+Fund Transaction List
+![Fund Transaction List](ss/fund/fund.png)
 
 
 

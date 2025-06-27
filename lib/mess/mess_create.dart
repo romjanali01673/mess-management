@@ -112,7 +112,12 @@ class _MessCreateState extends State<MessCreate> {
           // assign mess id to user model
           authProvider.getUserModel!.currentMessId = messProvider.getMessModel!.messId; 
           showSnackber(context: context, content: "Mess Has Created");
-          formKey.currentState!.reset();
+          messNameController.clear();
+          messAddressController.clear();
+          messOwnerIdController.clear();
+          messOwnerNameController.clear();
+          authorityPhoneController.clear();
+          authorityEmailController.clear();
         }, 
       );
 

@@ -12,7 +12,7 @@ class FirstScreenProvider extends ChangeNotifier{
 
   double _totalMealOfMess = 0;
   double _totalBazerCost = 0;
-  double _remainingFandBlance = 0;
+  double _remainingFundBlance = 0;
   double _totalDepositOfMess = 0;
 
   NoticeModel? _pindNoticeForHome;
@@ -36,7 +36,7 @@ class FirstScreenProvider extends ChangeNotifier{
   }
   double get getTotalMealOfMess => _totalMealOfMess;
   double get getTotalBazerCost =>  _totalBazerCost;
-  double get getRemainingFandBlance => _remainingFandBlance;
+  double get getRemainingFundBlance => _remainingFundBlance;
   double get getTotalDepositOfMess => _totalDepositOfMess;
 
   NoticeModel? get  getPindedNoticeForHome=> _pindNoticeForHome;
@@ -70,8 +70,8 @@ class FirstScreenProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void setRemainingFandBlanc({required double value}){
-    _remainingFandBlance = value;
+  void setRemainingFundBlanc({required double value}){
+    _remainingFundBlance = value;
     notifyListeners();
   }
 
@@ -93,15 +93,15 @@ class FirstScreenProvider extends ChangeNotifier{
 
 
 
-  Future<double> getFandBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
-    print("called total fand");
+  Future<double> getFundBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    print("called total fund");
     double blance = 0.0;
     setIsLoading(value: true);
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.fand).doc(messId).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.fund).doc(messId).get();
       if(snapshot.exists && snapshot.data() != null){
         blance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
-        setRemainingFandBlanc(value: blance);
+        setRemainingFundBlanc(value: blance);
       }
         print(blance);
       onSuccess!=null? onSuccess() : (){};

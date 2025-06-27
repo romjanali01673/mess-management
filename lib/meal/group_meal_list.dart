@@ -98,6 +98,7 @@ class _GroupMealListState extends State<GroupMealList> {
               FutureBuilder(
                 future: mealProvider.getMealList(
                   messId: authProvider.getUserModel!.currentMessId,
+                  mealHisabId: authProvider.getUserModel!.mealHisabId,
                   onFail: (message){
                     showSnackber(context: context, content: "somthing Wrong! \n$message");
                   },
@@ -227,6 +228,7 @@ class _GroupMealListState extends State<GroupMealList> {
                                       FutureBuilder(
                                         future: mealProvider.checkMealModelAlreadyExist(
                                           messId: authProvider.getUserModel!.currentMessId, 
+                                          mealHisabId: authProvider.getUserModel!.mealHisabId, 
                                           date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
                                           onFail: (message){
                                             showSnackber(context: context, content: "somthing Wrong \n $message");
@@ -272,6 +274,7 @@ class _GroupMealListState extends State<GroupMealList> {
                                                           });
                                                         },
                                                         messId: authProvider.getUserModel!.currentMessId, 
+                                                        mealHisabId: authProvider.getUserModel!.mealHisabId, 
                                                         extraMeal: (- snapshot.data!.totalMeal),
                                                       );
                                                     }, 

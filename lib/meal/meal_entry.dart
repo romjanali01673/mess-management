@@ -200,6 +200,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 mealModel: mealModel, 
                                 extraMeal: mealModel.totalMeal - widget.preMealModel!.totalMeal,
                                 messId: authProvider.getUserModel!.currentMessId, 
+                                mealHisabId: authProvider.getUserModel!.mealHisabId, 
                                 onFail: (message){
                                   showSnackber(context: context, content: message);
                                 },
@@ -231,6 +232,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                               mealProvider.addAMeal(
                                 mealModel: mealModel, 
                                 messId: authProvider.getUserModel!.currentMessId, 
+                                mealHisabId: authProvider.getUserModel!.mealHisabId, 
                                 onFail: (message){
                                   showSnackber(context: context, content: message);
                                 },

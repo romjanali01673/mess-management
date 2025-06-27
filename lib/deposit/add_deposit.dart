@@ -278,6 +278,7 @@ class _AddDepositState extends State<AddDeposit> {
                         extraAmount: double.parse(amountController.text.toString()) - widget.preDepositModel!.amount ,
                         uId: widget.preMemberData![Constants.uId].toString(), 
                         messId: authProvider.getUserModel!.currentMessId, 
+                        mealHisabId: authProvider.getUserModel!.mealHisabId,
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Updaate Failed! \n$message");
                         },
@@ -307,6 +308,7 @@ class _AddDepositState extends State<AddDeposit> {
                         ), 
                         uId: selectedItem.split("\n")[1], 
                         messId: authProvider.getUserModel!.currentMessId, 
+                        mealHisabId: authProvider.getUserModel!.mealHisabId,
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Deposit Failed! \n$message");
                         },

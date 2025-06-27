@@ -72,6 +72,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                      FutureBuilder(
                        future: depositProvider.getDepositAmount(
                          messId: authProvider.getUserModel!.currentMessId,
+                         mealHisabId: authProvider.getUserModel!.mealHisabId,
                          uId: authProvider.getUserModel!.uId,
                          onFail: (message){
                            showSnackber(context: context, content: "somthing Wrong! \n$message");
@@ -154,6 +155,7 @@ class _DepositHistoryState extends State<DepositHistory> {
       child: FutureBuilder(
         future: depositProvider.getAllDepositList(
           messId: authProvider.getUserModel!.currentMessId, 
+          mealHisabId: authProvider.getUserModel!.mealHisabId, 
           onFail: (message ) { 
             showSnackber(context: context, content: "somthing Wrong! \n$message");
           },
@@ -171,7 +173,7 @@ class _DepositHistoryState extends State<DepositHistory> {
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index){
-              DepositModel depositModel = snapshot.data![index][Constants.blance];
+              DepositModel depositModel = snapshot.data![index][Constants.depositModel];
               Map<String,dynamic> userData = snapshot.data![index][Constants.userData];
               bool showDetails = false;
               return StatefulBuilder(
@@ -303,6 +305,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                                       FutureBuilder(
                                         future: depositProvider.getTotalDepositOfAMember(
                                           messId: authProvider.getUserModel!.currentMessId,
+                                          mealHisabId: authProvider.getUserModel!.mealHisabId,
                                           uId: memberData[Constants.uId],
                                           onFail: (_){}
                                         ), 
@@ -333,6 +336,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                             child: FutureBuilder(
                               future: depositProvider.getMemberDepositList(
                                 messId: authProvider.getUserModel!.currentMessId, 
+                                mealHisabId: authProvider.getUserModel!.mealHisabId,
                                 uId: memberData[Constants.uId],
                                 onFail: (message ) { 
                                   showSnackber(context: context, content: "somthing Wrong! \n$message");
@@ -424,6 +428,7 @@ class _DepositHistoryState extends State<DepositHistory> {
                                                       depositModel: depositModel, 
                                                       uId: memberData[Constants.uId], 
                                                       messId: authProvider.getUserModel!.currentMessId, 
+                                                      mealHisabId: authProvider.getUserModel!.mealHisabId,
                                                       onFail: (message){
                                                         showSnackber(context: context, content: "Deletion Failed!\n$message");
                                                       },

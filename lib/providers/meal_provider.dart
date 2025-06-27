@@ -45,9 +45,16 @@ class MealProvider extends ChangeNotifier{
   // function -----------
 
   // get member data
-  Future<void> getMemberData({required String messId, Function()? onSuccess, required Function(String) onFail})async{
+  Future<void> getMemberData({required String messId, required String mealHisabId, Function()? onSuccess, required Function(String) onFail})async{
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.mess).doc(messId).get();
+      DocumentSnapshot snapshot =  await 
+      firebaseFirestore
+      .collection(Constants.mess)
+      .doc(messId)
+      .collection(Constants.mealHisabList)
+      .doc(mealHisabId)
+      .get();
+
       if(snapshot.exists){
         _listOfmember =  (snapshot.data() as Map<String,dynamic>)[Constants.messMemberList];
         onSuccess!=null? onSuccess():(){};
@@ -61,12 +68,19 @@ class MealProvider extends ChangeNotifier{
   }
   
   // get all meal transaction list 
-  Future<List<MealModel>?> getMealList({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<MealModel>?> getMealList({required String messId,required String mealHisabId, required Function(String) onFail, Function()? onSuccess,})async{
     List<MealModel>? list;
     double meal=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
+      QuerySnapshot snapshot =  await 
+      firebaseFirestore
+      .collection(Constants.meal)
+      .doc(messId)
+      .collection(Constants.mealHisabList)
+      .doc(mealHisabId)
+      .collection(Constants.listOfMealTnx)
+      .get();
       list = snapshot.docs.map(
         (doc){
           MealModel mealModel = MealModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -88,12 +102,19 @@ class MealProvider extends ChangeNotifier{
   }
 
   // get all meal transaction of a member
-  Future<List<Map<String,dynamic>>?> getAllMealListOfAMember({required String messId,required String uId, required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<Map<String,dynamic>>?> getAllMealListOfAMember({required String messId,required String mealHisabId, required String uId, required Function(String) onFail, Function()? onSuccess,})async{
     List<Map<String,dynamic>>? list;
     double meal=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
+      QuerySnapshot snapshot =  await firebaseFirestore.
+      collection(Constants.meal)
+      .doc(messId)
+      .collection(Constants.mealHisabList)
+      .doc(mealHisabId)
+      .collection(Constants.listOfMealTnx)
+      .get();
+
       snapshot.docs.map(
         (doc){
           MealModel mealModel = MealModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -124,9 +145,17 @@ class MealProvider extends ChangeNotifier{
   }
   
   // check already exist 
-  Future<MealModel?> checkMealModelAlreadyExist({required String messId,required String date,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<MealModel?> checkMealModelAlreadyExist({required String messId, required String mealHisabId, required String date,required Function(String) onFail, Function()? onSuccess,})async{
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).doc(date).get();
+      DocumentSnapshot snapshot =  await 
+      firebaseFirestore
+      .collection(Constants.meal)
+      .doc(messId)
+      .collection(Constants.mealHisabList)
+      .doc(mealHisabId)
+      .collection(Constants.listOfMealTnx)
+      .doc(date)
+      .get();
 
       onSuccess!=null? onSuccess() : (){};
       if(!snapshot.exists){
@@ -142,23 +171,29 @@ class MealProvider extends ChangeNotifier{
   }
 
   // add a meal transaction to database 
-  Future<void> addAMeal({required MealModel mealModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> addAMeal({required MealModel mealModel,required String messId, required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
 
-    MealModel? flg = await checkMealModelAlreadyExist(messId: messId, date: mealModel.date, onFail: (_) {});
+    MealModel? flg = await checkMealModelAlreadyExist(messId: messId, mealHisabId: mealHisabId, date: mealModel.date, onFail: (_) {});
     if(flg==null){
       try {
         batch.set(
-          firebaseFirestore.collection(Constants.meal)
+          firebaseFirestore
+          .collection(Constants.meal)
           .doc(messId)
+          .collection(Constants.mealHisabList)
+          .doc(mealHisabId)
           .collection(Constants.listOfMealTnx)
           .doc(mealModel.date),
           mealModel.toMap()
         );
   
         batch.set(
-          firebaseFirestore.collection(Constants.meal)
-          .doc(messId),
+          firebaseFirestore
+          .collection(Constants.meal)
+          .doc(messId)
+          .collection(Constants.mealHisabList)
+          .doc(mealHisabId),
           // increment work with only update. but work with setoption "merge"
           {Constants.totalMeal: FieldValue.increment(mealModel.totalMeal)},
           SetOptions(merge: true)
@@ -178,13 +213,16 @@ class MealProvider extends ChangeNotifier{
   }
 
   // update a meal from database 
-  Future<void> updateAMeal({required MealModel mealModel,required String messId,required double extraMeal,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> updateAMeal({required MealModel mealModel,required String messId,required String mealHisabId,required double extraMeal,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
     try {
       batch.set(
-        firebaseFirestore.collection(Constants.meal)
+        firebaseFirestore
+        .collection(Constants.meal)
         .doc(messId)
+        .collection(Constants.mealHisabList)
+        .doc(mealHisabId)
         .collection(Constants.listOfMealTnx)
         .doc(mealModel.date),
         mealModel.toMap(),
@@ -196,8 +234,11 @@ class MealProvider extends ChangeNotifier{
       );
      
       batch.update(
-        firebaseFirestore.collection(Constants.meal)
-        .doc(messId),
+        firebaseFirestore
+        .collection(Constants.meal)
+        .doc(messId)
+        .collection(Constants.mealHisabList)
+        .doc(mealHisabId),
         
         // increment work with only update. but work with setoption "merge"
         {Constants.totalMeal:FieldValue.increment(extraMeal)}
@@ -211,20 +252,25 @@ class MealProvider extends ChangeNotifier{
   }
 
   // delete a meal
-  Future<void> deleteAMeal({required String messId,required String date, Function()? onSuccess, required Function(String) onFail, required double extraMeal})async{
+  Future<void> deleteAMeal({required String messId, required String mealHisabId, required String date, Function()? onSuccess, required Function(String) onFail, required double extraMeal})async{
     final batch =  firebaseFirestore.batch();
     try {
       batch.delete(
         firebaseFirestore
           .collection(Constants.meal)
           .doc(messId)
+          .collection(Constants.mealHisabList)
+          .doc(mealHisabId)
           .collection(Constants.listOfMealTnx)
           .doc(date),
       );
 
       batch.update(
-        firebaseFirestore.collection(Constants.meal)
-        .doc(messId),
+        firebaseFirestore
+        .collection(Constants.meal)
+        .doc(messId)
+        .collection(Constants.mealHisabList)
+        .doc(mealHisabId),
         
         // increment work with only update. but work with setoption "merge"
         {Constants.totalMeal:FieldValue.increment(extraMeal)}
@@ -239,13 +285,15 @@ class MealProvider extends ChangeNotifier{
   }
   
   // delete a meal
-  Future<void> deleteAllTransaction({required String messId, Function()? onSuccess, required Function(String) onFail,})async{
+  Future<void> deleteAllTransaction({required String messId,required String mealHisabId,  Function()? onSuccess, required Function(String) onFail,})async{
     final batch =  firebaseFirestore.batch();
     try {
       batch.delete(
         firebaseFirestore
           .collection(Constants.meal)
           .doc(messId)
+          .collection(Constants.mealHisabList)
+          .doc(mealHisabId)
       );
 
       await batch.commit();

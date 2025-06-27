@@ -197,7 +197,7 @@ class MessProvider extends ChangeNotifier {
         .doc(uId)
         .collection(Constants.messList)
         .doc(messModel.messId)
-        .collection(Constants.mealHisaList)
+        .collection(Constants.mealHisabList)
         .doc(messModel.mealHisabId),
         {
           Constants.messId : messModel.messId,
@@ -307,17 +307,104 @@ class MessProvider extends ChangeNotifier {
     final batch = firebaseFirestore.batch();
     try{
 
+
+      // clear fund 
+      AggregateQuerySnapshot aQuerySnapshot = await firebaseFirestore
+        .collection(Constants.fund)
+        .doc(messId)
+        .collection(Constants.listOfFundTnx)
+        .count()
+        .get();
+          
+          int i = aQuerySnapshot.count!;
+
+      while(i>0){
+        try {
+          QuerySnapshot qSnapshot = await firebaseFirestore
+            .collection(Constants.fund)
+            .doc(messId)
+            .collection(Constants.listOfFundTnx)
+            .limit(800)
+            .get();
+
+          await Future.wait(qSnapshot.docs.map((x) => x.reference.delete()));
+          await Future.delayed(Duration(milliseconds: 1100));
+          i-=qSnapshot.docs.length;
+          if(qSnapshot.docs.isEmpty) break;
+        } catch (e) {
+          onFail(e.toString());
+          return;// to off loop and declain next process
+        }
+      }
+      await firebaseFirestore.collection(Constants.fund).doc(messId).delete();
+
+
+      //clear notices
+      AggregateQuerySnapshot aQuerySnapshot2 = await firebaseFirestore
+        .collection(Constants.notice)
+        .doc(messId)
+        .collection(Constants.listOfNotice)
+        .count()
+        .get();
+
+        i=0;  
+        i = aQuerySnapshot2.count!;
+
+      while(i>0){
+        try {
+          QuerySnapshot qSnapshot = await firebaseFirestore
+            .collection(Constants.notice)
+            .doc(messId)
+            .collection(Constants.listOfNotice)
+            .limit(800)
+            .get();
+
+          await Future.wait(qSnapshot.docs.map((x) => x.reference.delete()));
+          await Future.delayed(Duration(milliseconds: 1100));
+          i-=qSnapshot.docs.length;
+          if(qSnapshot.docs.isEmpty) break;
+        } catch (e) {
+          onFail(e.toString());
+          return;// to off loop and declain next process
+        }
+      }
+      await firebaseFirestore.collection(Constants.notice).doc(messId).delete();
+
+      // clear rulse
+      AggregateQuerySnapshot aQuerySnapshot3 = await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .collection(Constants.rules)
+        .count()
+        .get();
+
+        i=0;  
+        i = aQuerySnapshot3.count!;
+
+      while(i>0){
+        try {
+          QuerySnapshot qSnapshot = await firebaseFirestore
+            .collection(Constants.mess)
+            .doc(messId)
+            .collection(Constants.rules)
+            .limit(800)
+            .get();
+
+          await Future.wait(qSnapshot.docs.map((x) => x.reference.delete()));
+          await Future.delayed(Duration(milliseconds: 1100));
+          i-=qSnapshot.docs.length;
+          if(qSnapshot.docs.isEmpty) break;
+        } catch (e) {
+          onFail(e.toString());
+          return;// to off loop and declain next process
+        }
+      }
+
+
       // delete mess
       batch.delete(
         firebaseFirestore
         .collection(Constants.mess)
-        .doc(messId)
-      );
-
-      // clear fand 
-      batch.delete(
-        firebaseFirestore
-        .collection(Constants.fand)
         .doc(messId)
       );
 
@@ -332,11 +419,10 @@ class MessProvider extends ChangeNotifier {
         }
       );
 
-      batch.commit();
+      await batch.commit();
       _messModel = null;
       notifyListeners();
       onSuccess!=null? onSuccess():(){};
-
     } catch(e){
       onFail(e.toString());
     }
@@ -481,7 +567,7 @@ class MessProvider extends ChangeNotifier {
           .doc(member[Constants.uId])
           .collection(Constants.messList)
           .doc(messId)
-          .collection(Constants.mealHisaList)
+          .collection(Constants.mealHisabList)
           .doc((snapshot.data() as Map<String,dynamic>)[Constants.mealHisabId]),
           {
             Constants.mealHisabId : (snapshot.data() as Map<String,dynamic>)[Constants.mealHisabId],

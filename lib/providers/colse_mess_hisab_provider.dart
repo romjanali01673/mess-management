@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/bazer_model.dart';
 
 class ColseMessHisabProvider extends ChangeNotifier{
 
@@ -34,20 +32,9 @@ class ColseMessHisabProvider extends ChangeNotifier{
     // fatch cost,
     
     try {
-      batch.delete(
-        firebaseFirestore.collection(Constants.bazer)
-        .doc(messId),
-      );
 
-      batch.delete(
-        firebaseFirestore.collection(Constants.meal)
-        .doc(messId),
-      );
 
-      batch.delete(
-        firebaseFirestore.collection(Constants.deposit)
-        .doc(messId),
-      );
+      onFail("need to fixed, check in close mess hisab provaider");
        
       await batch.commit();
       onSuccess!=null? onSuccess() : (){};

@@ -31,7 +31,7 @@ class _MessCloseScreenState extends State<MessCloseScreen> {
           child: ElevatedButton(
             onPressed: ()async{
               if(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)){
-                bool confirm = await  showConfirmDialog(context: context, title: "your mess all transactions will be removed or cleard exipt fand and mess member");
+                bool confirm = await  showConfirmDialog(context: context, title: "your mess all transactions will be removed or cleard exipt fund and mess member");
                 if(confirm){
                   colseMessHisabProvider.closeMessHisab(
                     messId: authProvider.getUserModel!.currentMessId,

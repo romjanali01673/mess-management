@@ -130,6 +130,7 @@ class _MealScreenState extends State<MealScreen> {
               FutureBuilder(
                 future: mealProvider.getMealList(
                   messId: authProvider.getUserModel!.currentMessId,
+                  mealHisabId: authProvider.getUserModel!.mealHisabId,
                   onFail: (message){
                     showSnackber(context: context, content: "somthing Wrong! \n$message");
                   },
@@ -156,6 +157,7 @@ class _MealScreenState extends State<MealScreen> {
             child: FutureBuilder(
               future: mealProvider.getAllMealListOfAMember(
                 messId: authProvider.getUserModel!.currentMessId, 
+                mealHisabId: authProvider.getUserModel!.mealHisabId, 
                 uId: authProvider.getUserModel!.uId, 
                 onFail: (_){},
               ),

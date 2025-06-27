@@ -38,7 +38,7 @@ class _FirstScreenState extends State<FirstScreen> {
     // }
     final firstScreenProvider = context.read<FirstScreenProvider>();
     final authProvider = context.read<AuthenticationProvider>();
-    firstScreenProvider.getFandBlance(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
+    firstScreenProvider.getFundBlance(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
     firstScreenProvider.getTotalMeal(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
     firstScreenProvider.getTotalBazer(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
     firstScreenProvider.getTotalDeposit(messId: authProvider.getUserModel!.currentMessId, onFail: (_){});
@@ -55,19 +55,7 @@ class _FirstScreenState extends State<FirstScreen> {
         height: double.infinity,
         width: double.infinity,
         color: Colors.green.shade100,
-        child: FutureBuilder(
-          future: Future.delayed(Duration(seconds: 1)),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
-              return Center(child: showCircularProgressIndicator());
-            }
-            else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } 
-            else if (!snapshot.hasData || snapshot.data == null) {
-              // return Center(child: Text('Somthing Wrong'));
-            }
-            return SingleChildScrollView(
+            child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
@@ -211,10 +199,10 @@ class _FirstScreenState extends State<FirstScreen> {
                             children: [
                               FaIcon(FontAwesomeIcons.starHalfStroke),
                               FittedBox( 
-                                child: Text(getFormatedPrice(value: firstScreenProvider.getRemainingFandBlance), style: TextStyle(fontSize: 40)),
+                                child: Text(getFormatedPrice(value: firstScreenProvider.getRemainingFundBlance), style: TextStyle(fontSize: 40)),
               
                               ),
-                              Text("Fand Blance",style: TextStyle(fontSize: 20), textAlign: TextAlign.center,),
+                              Text("Fund Blance",style: TextStyle(fontSize: 20), textAlign: TextAlign.center,),
                             ],
                           ),
                         ),
@@ -262,7 +250,7 @@ class _FirstScreenState extends State<FirstScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              firstScreenProvider.getPindedNoticeForHome==null? Text("Nothing")
+                              firstScreenProvider.getPindedNoticeForHome==null? Center(child: Text("Nothing"))
                               :
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,14 +268,10 @@ class _FirstScreenState extends State<FirstScreen> {
                         ],
                       ),
                     ),
-                  ),
-
-                  
+                  ),    
                 ],
               ),
-            );
-          }
-        ),
-      );
+            ),
+        );
   }
 }

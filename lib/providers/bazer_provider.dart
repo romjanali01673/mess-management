@@ -39,12 +39,19 @@ class BazerProvider extends ChangeNotifier{
   // function -----------
 
   // get all Bazer transaction list 
-  Future<List<BazerModel>?> getBazerTransactions({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<BazerModel>?> getBazerTransactions({required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
     List<BazerModel>? list;
     double cost=0;
     _isLoading =  true;
     try {
-      QuerySnapshot snapshot =  await firebaseFirestore.collection(Constants.bazer).doc(messId).collection(Constants.listOfBazerTnx).get();
+      QuerySnapshot snapshot =  await firebaseFirestore
+      .collection(Constants.bazer)
+      .doc(messId)
+      .collection(Constants.mealHisabList)
+      .doc(mealHisabId)
+      .collection(Constants.listOfBazerTnx)
+      .get();
+
       list = snapshot.docs.map(
         (doc){
           BazerModel bazerModel = BazerModel.fromMap(doc.data() as Map<String, dynamic>);
@@ -66,28 +73,31 @@ class BazerProvider extends ChangeNotifier{
   }
 
   // add a bazer transaction to database 
-  Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
-    await getBazerTransactions(
-      messId: messId, 
-      onFail: (message) {  
-        onFail(message);
-      }, 
-      onSuccess: () async{
         try {
           batch.set(
-            firebaseFirestore.collection(Constants.bazer)
+            firebaseFirestore
+            .collection(Constants.bazer)
             .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId)
             .collection(Constants.listOfBazerTnx)
             .doc(bazerModel.tnxId),
             bazerModel.toMap()
           );
          
           batch.set(
-            firebaseFirestore.collection(Constants.bazer)
-            .doc(messId),
-            {Constants.totalBazerCost:getCost+bazerModel.amount}
+            firebaseFirestore
+            .collection(Constants.bazer)
+            .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId),
+            {Constants.totalBazerCost:FieldValue.increment(bazerModel.amount)},
+            SetOptions(
+              merge: true
+            )
           );
 
           await batch.commit();
@@ -96,26 +106,21 @@ class BazerProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         }  
-      }
-    );
   }
 
   
 
   // update a bazer transaction to database 
-  Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required String mealHisabId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
-    await getBazerTransactions(
-      messId: messId, 
-      onFail: (message) {  
-        onFail(message);
-      }, 
-      onSuccess: () async{
-        try {
+        try{
           batch.set(
-            firebaseFirestore.collection(Constants.bazer)
+            firebaseFirestore
+            .collection(Constants.bazer)
             .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId)
             .collection(Constants.listOfBazerTnx)
             .doc(bazerModel.tnxId),
             bazerModel.toMap(),
@@ -131,8 +136,11 @@ class BazerProvider extends ChangeNotifier{
           );
          
           batch.set(
-            firebaseFirestore.collection(Constants.bazer)
-            .doc(messId),
+            firebaseFirestore
+            .collection(Constants.bazer)
+            .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId),
             {Constants.totalBazerCost: FieldValue.increment(extraAdd)},
             SetOptions(
               merge: true
@@ -146,34 +154,38 @@ class BazerProvider extends ChangeNotifier{
           onFail(e.toString());
           print(e.toString());
         }  
-      }
-    );
+      
+    
   }
 
   
 
   // update a bazer transaction to database 
-  Future<void> deleteABazerTransaction({required String tnxId,required String messId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> deleteABazerTransaction({required String tnxId,required String messId,required String mealHisabId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
-    await getBazerTransactions(
-      messId: messId, 
-      onFail: (message) {  
-        onFail(message);
-      }, 
-      onSuccess: () async{
+
         try {
           batch.delete(
-            firebaseFirestore.collection(Constants.bazer)
+            firebaseFirestore
+            .collection(Constants.bazer)
             .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId)
             .collection(Constants.tnxId)
             .doc(tnxId),
           );
          
           batch.set(
-            firebaseFirestore.collection(Constants.bazer)
-            .doc(messId),
-            {Constants.totalBazerCost:(getCost+extraAdd)}
+            firebaseFirestore
+            .collection(Constants.bazer)
+            .doc(messId)
+            .collection(Constants.mealHisabList)
+            .doc(mealHisabId),
+            {Constants.totalBazerCost : FieldValue.increment(extraAdd)},
+            SetOptions(
+              merge:true
+            )
           );
 
           await batch.commit();
@@ -183,6 +195,5 @@ class BazerProvider extends ChangeNotifier{
           onFail(e.toString());
         }  
       }
-    );
-  }
+
 }

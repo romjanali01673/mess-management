@@ -6,7 +6,7 @@ class PreDataMessModel{
   String messId;
   String messName;
   double totalDeposit;
-  double currentFandBlance;
+  double currentFundBlance;
   double totalMeal;
   double totalBazerCost; 
   List<Map<String,dynamic>>   messMemberList;
@@ -23,7 +23,7 @@ class PreDataMessModel{
       required this.messId,
       required this.messName,
       required this.totalDeposit,
-      required this.currentFandBlance,
+      required this.currentFundBlance,
       required this.totalMeal,
       required this.totalBazerCost,
       required this.messMemberList,
@@ -41,7 +41,7 @@ class PreDataMessModel{
       messId: data[Constants.messId]??"",
       messName: data[Constants.messName]??"", 
       totalDeposit: data[Constants.totalDeposit]??0,
-      currentFandBlance: data[Constants.currentFandBlance]??0,
+      currentFundBlance: data[Constants.currentFundBlance]??0,
       totalMeal: data[Constants.totalMeal]??0,
       totalBazerCost: data[Constants.totalBazerCost]??0, 
       messMemberList: data[Constants.messMemberList]??[],
@@ -59,7 +59,7 @@ class PreDataMessModel{
       Constants.messId: messId,
       Constants.messName: messName, 
       Constants.totalDeposit: totalDeposit,
-      Constants.currentFandBlance: currentFandBlance,
+      Constants.currentFundBlance: currentFundBlance,
       Constants.totalMeal: totalMeal,
       Constants.totalBazerCost: totalBazerCost, 
       Constants.messMemberList: messMemberList,

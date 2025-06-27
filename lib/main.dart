@@ -11,7 +11,7 @@ import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/bazer_provider.dart';
 import 'package:meal_hisab/providers/colse_mess_hisab_provider.dart';
 import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/fand_provider.dart';
+import 'package:meal_hisab/providers/fund_provider.dart';
 import 'package:meal_hisab/providers/firstScreen_provider.dart';
 import 'package:meal_hisab/providers/meal_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
@@ -34,7 +34,7 @@ void main()async{
         ChangeNotifierProvider(create: (_) => ColseMessHisabProvider()),
         ChangeNotifierProvider(create: (_) => NoticeProvider()),
         ChangeNotifierProvider(create: (_) => FirstScreenProvider()),
-        ChangeNotifierProvider(create: (_) => FandProvider()),
+        ChangeNotifierProvider(create: (_) => FundProvider()),
         ChangeNotifierProvider(create: (_) => DepositProvider()),
         ChangeNotifierProvider(create: (_) => MealProvider()),
         ChangeNotifierProvider(create: (_) => BazerProvider()),

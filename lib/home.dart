@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meal_hisab/bazer/bazer_screen.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/deposit/deposit.dart';
-import 'package:meal_hisab/fand/fand.dart';
+import 'package:meal_hisab/fund/fund.dart';
 import 'package:meal_hisab/first_screen.dart';
 import 'package:meal_hisab/helper/helper_method.dart';
 import 'package:meal_hisab/helper/ui_helper.dart';
@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final authProvider = context.read<AuthenticationProvider>();
     final noticeProvider = context.read<NoticeProvider>();
 
-    noticeProvider.checkHasNoticeUnseen(uid: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId);
+    noticeProvider.checkHasNoticeUnseen(uid: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId, mealHisabId: authProvider.getUserModel!.mealHisabId);
   }
 
   @override
@@ -226,14 +226,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             getItems(
               icon: FontAwesomeIcons.bangladeshiTakaSign, 
-              label: "Fand",
-              selected: DrawerItemGroup==DrawerItem.Fand, 
+              label: "Fund",
+              selected: DrawerItemGroup==DrawerItem.Fund, 
               ontap: () {
-                DrawerItemGroup=DrawerItem.Fand;
+                DrawerItemGroup=DrawerItem.Fund;
                 Navigator.pop(context);
                 // Navigator.push(
                 //   context,
-                //   MaterialPageRoute(builder: (context) => FandScreen()),
+                //   MaterialPageRoute(builder: (context) => FundScreen()),
                 // );
                 setState((){
 
@@ -312,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
       :
       DrawerItemGroup == DrawerItem.Members ? MemberScreen()
       :
-      DrawerItemGroup == DrawerItem.Fand ? FandScreen()
+      DrawerItemGroup == DrawerItem.Fund ? FundScreen()
       :
       DrawerItemGroup == DrawerItem.Notice_And_Announcements ? NoticeAndAnnouncementScreen()
       :

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meal_hisab/constants.dart';
 
-class FandModel{
+class FundModel{
   String tnxId;
   double amount;
   String title;
@@ -9,7 +9,7 @@ class FandModel{
   String type;
   Timestamp? CreatedAt;
 
-  FandModel(
+  FundModel(
     { 
       required this.tnxId,
       required this.amount,
@@ -20,8 +20,8 @@ class FandModel{
     }
   );
 
-  factory FandModel.fromMap(Map<String , dynamic>data){
-    return FandModel(
+  factory FundModel.fromMap(Map<String , dynamic>data){
+    return FundModel(
       tnxId: data[Constants.tnxId]?? "", 
       amount: data[Constants.amount]?? 0, 
       title: data[Constants.title]?? "", 
