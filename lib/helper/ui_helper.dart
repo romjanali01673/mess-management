@@ -87,7 +87,7 @@ void showSnackber({required BuildContext context, required String content}){
   Future<bool> showConfirmDialog({required BuildContext context, required String title, String subTitle=""}) async{
     bool? res =  await showDialog(context: context, builder: (context) => AlertDialog(
       title: Text(title,style : getTextStyleForTitleL()),
-      content: Text(subTitle,style : getTextStyleForTitleL()),
+      content: Text(subTitle,style : getTextStyleForSubTitleL()),
       actions: [
         TextButton(
           onPressed: (){

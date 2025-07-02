@@ -9,7 +9,7 @@ import 'package:meal_hisab/mess/join_or_leave.dart';
 import 'package:meal_hisab/mess/mess_create.dart';
 import 'package:meal_hisab/mess/mess_delete.dart';
 import 'package:meal_hisab/mess/mess_update.dart';
-import 'package:meal_hisab/mess/pre_data.dart';
+import 'package:meal_hisab/pre_data/pre_data.dart';
 import 'package:meal_hisab/model/rule_model.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/mess_provider.dart';
@@ -44,6 +44,7 @@ class _MessScreenState extends State<MessScreen>{
     
     return Scaffold(
       appBar: AppBar(
+        title: Text(messProvider.getMessModel?.messName?? "Mess Name"),
         backgroundColor: Colors.grey,
         actions: [
           if(messScreemItemGrpup==Mess.mess)

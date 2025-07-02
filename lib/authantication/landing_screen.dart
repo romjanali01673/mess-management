@@ -31,13 +31,13 @@ class _LandingScreenState extends State<LandingScreen> {
         // get user data from fireStore
         print("Aaaaaaaaaaaaaaaaaaaaaaa");
         await authProvider.getUidFromFiretore(onFail: (message){
-          showSnackber(context: context, content: "somthing Wrong\n uid fatch error");
-          return;
+          if(mounted) showSnackber(context: context, content: "somthing Wrong\n uid fatch error");
+          navigate(isSignedIn: false);
         });
         debugPrint("getUserProfileData");
         await authProvider.getUserProfileData(onFail: (message) {  
-          showSnackber(context: context, content: message.toString());
-          return;
+          if(mounted) showSnackber(context: context, content: message.toString());
+          navigate(isSignedIn: false);
         });
         debugPrint("sessionValid");
         await authProvider.sessionValid(
@@ -59,12 +59,12 @@ class _LandingScreenState extends State<LandingScreen> {
               // perform an opration from here for clear cache 
 
               // Navigate to sigin screen
-              showSnackber(context: context, content: "session has closed by the user");
+              if(mounted) showSnackber(context: context, content: "session has closed by the user");
               navigate(isSignedIn: false);
             }
           },
           onFail: (message){
-            showSnackber(context: context, content: "Somthing Wrong\n$message"+"001");
+            if(mounted) showSnackber(context: context, content: "Somthing Wrong\n$message"+"001");
             // Navigate to sigin screen
             navigate(isSignedIn: false);
           }
@@ -74,7 +74,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
       }catch(e){
         print("xyz@${e.toString()}");
-        showSnackber(context: context, content: e.toString());
+        if(mounted) showSnackber(context: context, content: e.toString());
       }
     }
     else{

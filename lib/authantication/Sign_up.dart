@@ -53,7 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // now save user data to firestore
         String futureUid = DateTime.now().millisecondsSinceEpoch.toString();
         UserModel userModel = UserModel(
-          mealHisabId: "",
+          mealSessionId: "",
           number: phone,
           email: email,
           fname: Fname, 

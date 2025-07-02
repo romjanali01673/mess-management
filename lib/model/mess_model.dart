@@ -12,7 +12,7 @@ class MessModel {
   String actMenagerId;
   String actMenagerName;
   List<Map<String,dynamic>> messMemberList;
-  String mealHisabId;
+  String mealSessionId;
   Timestamp? createdAt;
 
   MessModel({
@@ -30,7 +30,7 @@ class MessModel {
     //   Constants.fname: authProvider.getUserModel!.fname.toString(),
     //   Constants.status: Constants.enable,
     // }
-    required this.mealHisabId,
+    required this.mealSessionId,
     required this.messMemberList, 
     this.createdAt,
   });
@@ -47,7 +47,7 @@ class MessModel {
       Constants.menagerPhone: menagerPhone,
       Constants.menagerEmail: menagerEmail,
       Constants.messMemberList: messMemberList,
-      Constants.mealHisabId : mealHisabId,
+      Constants.mealSessionId: mealSessionId,
       Constants.createdAt : FieldValue.serverTimestamp(),
     };
   }
@@ -67,8 +67,9 @@ class MessModel {
         ?.map((e) => Map<String, dynamic>.from(e as Map))
         .toList() ?? [],
             
-      mealHisabId : data[Constants.mealHisabId]??"",
+      mealSessionId: data[Constants.mealSessionId]??"",
       createdAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now())
     );
   }
 }
+

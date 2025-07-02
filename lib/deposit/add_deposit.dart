@@ -33,7 +33,7 @@ class _AddDepositState extends State<AddDeposit> {
   bool isAdd = true;
 
   List<String > list =[];
-  String selectedItem = "Select Member";
+  String selectedItem  =Constants.selectedMember;
   Set<String> disabledItems ={};
 
 
@@ -68,7 +68,7 @@ class _AddDepositState extends State<AddDeposit> {
 
   void setPreData(){
     isUpdate = true;
-    selectedItem = widget.preMemberData![Constants.fname].toString()+"\n"+widget.preMemberData![Constants.uId].toString();
+    selectedItem  = widget.preMemberData![Constants.fname].toString()+"\n"+widget.preMemberData![Constants.uId].toString();
     descriptionController.text = widget.preDepositModel!.description;
     amountController.text = widget.preDepositModel!.amount.toString();
   }
@@ -144,10 +144,10 @@ class _AddDepositState extends State<AddDeposit> {
                   enabled: (!isUpdate),
                   key: dropdownKey, // Needed for reset
                   asyncItems: (String filter) => _getAllMemberData(),
-                  selectedItem: selectedItem,
+                  selectedItem : selectedItem ,
                   dropdownDecoratorProps: const DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
-                      labelText: "Select Member",
+                      labelText: Constants.selectedMember,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -176,7 +176,7 @@ class _AddDepositState extends State<AddDeposit> {
                     if (value != null && disabledItems.contains(value)) {
                     // Reset visually and logically
                       dropdownKey.currentState?.clear(); // clears the selection
-                      debugPrint("Selected disable: $selectedItem");                    
+                      debugPrint("Selected disable: $selectedItem ");                    
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("This Member is disabled.")),
                       );
@@ -185,7 +185,7 @@ class _AddDepositState extends State<AddDeposit> {
                       if(value!=null){
                         // here we receive only enabled value.
                         setState(() {
-                          selectedItem = value.toString();
+                          selectedItem  = value.toString();
                         });
                         debugPrint("Selected enable: $value");
                       }
@@ -264,7 +264,7 @@ class _AddDepositState extends State<AddDeposit> {
                     return;
                   }
 
-                  bool valided  = (formKey.currentState!.validate() && selectedItem!="Select Member");
+                  bool valided  = (formKey.currentState!.validate() && selectedItem !=selectedItem );
                   
                   if(valided){
                     if(isUpdate){
@@ -278,7 +278,7 @@ class _AddDepositState extends State<AddDeposit> {
                         extraAmount: double.parse(amountController.text.toString()) - widget.preDepositModel!.amount ,
                         uId: widget.preMemberData![Constants.uId].toString(), 
                         messId: authProvider.getUserModel!.currentMessId, 
-                        mealHisabId: authProvider.getUserModel!.mealHisabId,
+                        mealSessionId: authProvider.getUserModel!.mealSessionId,
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Updaate Failed! \n$message");
                         },
@@ -291,7 +291,7 @@ class _AddDepositState extends State<AddDeposit> {
                       isUpdate = false;
                       amountController.clear();
                       descriptionController.clear();
-                      selectedItem = "Select Member"; // importent because dropdown key was rest but variable still hold pre value
+                      selectedItem  = Constants.selectedMember; // importent because dropdown key was rest but variable still hold pre value
                       dropdownKey.currentState!.clear();
 
                       setState(() {
@@ -306,9 +306,9 @@ class _AddDepositState extends State<AddDeposit> {
                           description: descriptionController.text.toString(), 
                           type: isAdd? Constants.deposit : Constants.refund, 
                         ), 
-                        uId: selectedItem.split("\n")[1], 
+                        uId: selectedItem .split("\n")[1], 
                         messId: authProvider.getUserModel!.currentMessId, 
-                        mealHisabId: authProvider.getUserModel!.mealHisabId,
+                        mealSessionId: authProvider.getUserModel!.mealSessionId,
                         onFail: (message ) { 
                           showSnackber(context: context, content: "Deposit Failed! \n$message");
                         },
@@ -320,7 +320,7 @@ class _AddDepositState extends State<AddDeposit> {
                       isUpdate = false;
                       amountController.clear();
                       descriptionController.clear();
-                      selectedItem = "Select Member";
+                      selectedItem  =  Constants.selectedMember;
                       dropdownKey.currentState!.clear();
 
                       setState(() {

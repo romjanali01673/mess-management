@@ -11,7 +11,11 @@ import 'package:meal_hisab/providers/deposit_provider.dart';
 import 'package:provider/provider.dart';
 
 class MyDeposit extends StatefulWidget {
-  const MyDeposit({super.key});
+  final bool fromPreMember;
+  final String? messId;
+  final String? mealSessionId;
+  final String? uId;
+  const MyDeposit({super.key, this.fromPreMember = false, this.messId, this.mealSessionId, this.uId});
 
   @override
   State<MyDeposit> createState() => _MyDepositState();
@@ -28,7 +32,7 @@ class _MyDepositState extends State<MyDeposit> {
     return Expanded(
       child: Column(
         children: [
-         StatefulBuilder(
+         if(!widget.fromPreMember) StatefulBuilder(
            builder: (context, setLocalState) {
              return Card(
                 color: Colors.green.shade500,
@@ -47,7 +51,7 @@ class _MyDepositState extends State<MyDeposit> {
                   FutureBuilder(
                     future: depositProvider.getDepositAmount(
                       messId: authProvider.getUserModel!.currentMessId,
-                      mealHisabId: authProvider.getUserModel!.mealHisabId,
+                      mealSessionId: authProvider.getUserModel!.mealSessionId,
                       uId: authProvider.getUserModel!.uId,
                       onFail: (message){
                         SchedulerBinding.instance.addPostFrameCallback((_){
@@ -78,9 +82,20 @@ class _MyDepositState extends State<MyDeposit> {
           // here my deposit list.
           Expanded(
             child: FutureBuilder(
-              future: depositProvider.getMemberDepositList(
+              future: widget.fromPreMember? depositProvider.getMemberDepositList(//get Member Deposit List For A Spacific Session
+                messId: widget.messId!,
+                mealSessionId: widget.mealSessionId!,
+                uId: widget.uId!,
+                onFail: (message){
+                  SchedulerBinding.instance.addPostFrameCallback((_){
+                    showSnackber(context: context, content: "somthing Wrong! \n$message");
+                  });
+                },
+              )
+              :
+              depositProvider.getMemberDepositList(
                 messId: authProvider.getUserModel!.currentMessId, 
-                mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                mealSessionId: authProvider.getUserModel!.mealSessionId, 
                 uId: authProvider.getUserModel!.uId,
                 onFail: (message ) { 
                   SchedulerBinding.instance.addPostFrameCallback((_){
@@ -96,7 +111,10 @@ class _MyDepositState extends State<MyDeposit> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                 } 
                 else if (!snapshot.hasData || snapshot.data == null) {
-                    return Center(child: Text('No Transaction found.'));
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 100),
+                      child: Text('No Transaction found.'),
+                    );
                 }
                 return ListView.builder(
                   // reverse: true,

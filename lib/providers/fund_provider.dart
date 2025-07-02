@@ -158,6 +158,7 @@ class FundProvider extends ChangeNotifier{
 
 
   Future<void> loadInitial({required String messId}) async {
+    currentDocs = [];
     debugPrint("loadInitial called");
     setIsLoading(value: true);
 
@@ -181,6 +182,34 @@ class FundProvider extends ChangeNotifier{
         _hasMoreBackward = false;
     }
   } catch (e) {
+  }
+    setIsLoading(value: false);
+  }
+
+  Future<void> loadForASpacificRange({required String messId, required Timestamp fromDate, required Timestamp toDate}) async {
+    debugPrint("loadForASpacificRange");
+    // print(toDate.toString() +"\n" + fromDate.toString());
+    currentDocs = [];
+    setIsLoading(value: true);
+
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection(Constants.fund) // change this to your collection name
+        .doc(messId)
+        .collection(Constants.listOfFundTnx)
+        .where(FieldPath.documentId ,isGreaterThanOrEqualTo: fromDate.toDate().millisecondsSinceEpoch.toString())
+        .where(FieldPath.documentId ,isLessThanOrEqualTo: toDate.toDate().millisecondsSinceEpoch.toString())
+        .orderBy(Constants.createdAt, descending: true)
+        // .limit(limit)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      currentDocs = snapshot.docs.map((x)=> FundModel.fromMap(x.data())).toList();
+      _hasMoreForward = false;
+      _hasMoreBackward = false;
+    }
+  } catch (e) {
+    debugPrint(e.toString());
   }
     setIsLoading(value: false);
   }
@@ -449,7 +478,7 @@ class FundProvider extends ChangeNotifier{
         type: Constants.add,
       );
           
-      // delete all pre fand history or transactions. 
+      // delete all pre fund history or transactions. 
       AggregateQuerySnapshot aQuerySnapshot = await firebaseFirestore
         .collection(Constants.fund)
         .doc(messId)

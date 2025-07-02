@@ -87,7 +87,7 @@ class _MessCreateState extends State<MessCreate> {
         uId: authProvider.getUserModel!.uId,
         messModel: MessModel(
           messId: DateTime.now().millisecondsSinceEpoch.toString(), 
-          mealHisabId: DateTime.now().millisecondsSinceEpoch.toString(),
+          mealSessionId: DateTime.now().millisecondsSinceEpoch.toString(),
           messName: messNameController.text.toString().trim(), 
           messAddress: messAddressController.text.toString().trim(), 
           menagerId: authProvider.getUserModel!.uId.toString(), 

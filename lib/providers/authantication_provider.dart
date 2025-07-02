@@ -58,7 +58,7 @@ class AuthenticationProvider extends ChangeNotifier {
     String ? number,
     String ? sessionKey,
     String ? currentMessId,
-    String ? mealHisabId,
+    String ? mealSessionId,
     Timestamp ? createdAt,
   }){
 
@@ -69,7 +69,7 @@ class AuthenticationProvider extends ChangeNotifier {
     _userModel!.number = number?? _userModel!.number;
     _userModel!.sessionKey = sessionKey??  _userModel!.sessionKey;
     _userModel!.currentMessId = currentMessId??  _userModel!.currentMessId;
-    _userModel!.mealHisabId = mealHisabId??  _userModel!.mealHisabId;
+    _userModel!.mealSessionId= mealSessionId??  _userModel!.mealSessionId;
     _userModel!.createdAt = createdAt??  _userModel!.createdAt;
     
     notifyListeners();

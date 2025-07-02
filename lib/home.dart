@@ -53,6 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onFail: (_){
         }, 
         onSuccess: () {
+          setState(() {
+            
+          });
         },
       );
     }
@@ -66,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final authProvider = context.read<AuthenticationProvider>();
     final noticeProvider = context.read<NoticeProvider>();
 
-    noticeProvider.checkHasNoticeUnseen(uid: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId, mealHisabId: authProvider.getUserModel!.mealHisabId);
+    noticeProvider.checkHasNoticeUnseen(uid: authProvider.getUserModel!.uId, messId: authProvider.getUserModel!.currentMessId, mealSessionId: authProvider.getUserModel!.mealSessionId);
   }
 
   @override
@@ -76,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey,
+        title: Text(messProvider.getMessModel?.messName?? "Mess Name"),
         
         actions: [
           

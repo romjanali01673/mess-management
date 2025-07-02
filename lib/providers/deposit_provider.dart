@@ -47,7 +47,7 @@ class DepositProvider extends ChangeNotifier{
 
 
   // get all deposit transaction list 
-  Future<void> getDepositAmount({required String messId,required String mealHisabId, String? uId, required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> getDepositAmount({required String messId,required String mealSessionId, String? uId, required Function(String) onFail, Function()? onSuccess,})async{
     double depositOfMember = 0; 
     double depositOfmess = 0;
     _isLoading =  true;
@@ -56,8 +56,8 @@ class DepositProvider extends ChangeNotifier{
         firebaseFirestore
         .collection(Constants.deposit)
         .doc(messId)
-        .collection(Constants.mealHisabList)
-        .doc(mealHisabId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
         .collection(Constants.members)
         .get();
       List<QueryDocumentSnapshot> memberUidDocList = snapshot.docs;
@@ -91,7 +91,7 @@ class DepositProvider extends ChangeNotifier{
   }
 
   // get member list 
-  Future<List<DepositModel>?> getMemberDepositList({required String messId,required String mealHisabId,String? uId, required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<DepositModel>?> getMemberDepositList({required String messId,required String mealSessionId,required String uId, required Function(String) onFail, Function()? onSuccess,})async{
     List<DepositModel>? list;
     _isLoading =  true;
     try {
@@ -99,8 +99,8 @@ class DepositProvider extends ChangeNotifier{
         firebaseFirestore
         .collection(Constants.deposit)
         .doc(messId)
-        .collection(Constants.mealHisabList)
-        .doc(mealHisabId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
         .collection(Constants.members)
         .doc(uId)
         .collection(Constants.listOfDepositTnx)
@@ -112,27 +112,25 @@ class DepositProvider extends ChangeNotifier{
         }
       }
       
-      onSuccess!=null? onSuccess():(){};
-      return list?.reversed.toList();
-    
+      onSuccess!=null? onSuccess():(){};    
     } catch (e) {
       onFail(e.toString());
       debugPrint("getDepositAmount");
     }  
     _isLoading  = false;
-    return null;
+    return list?.reversed.toList();
   }
 
   // get total deposit of a member 
-  Future<double> getTotalDepositOfAMember({required String messId,required String mealHisabId, required String uId, required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalDepositOfAMember({required String messId,required String mealSessionId, required String uId, required Function(String) onFail, Function()? onSuccess,})async{
     double amount = 0.0;
     try {
       DocumentSnapshot snapshot =  await 
         firebaseFirestore
         .collection(Constants.deposit)
         .doc(messId)
-        .collection(Constants.mealHisabList)
-        .doc(mealHisabId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
         .collection(Constants.members)
         .doc(uId)
         .get();
@@ -150,7 +148,7 @@ class DepositProvider extends ChangeNotifier{
 
   // get all deposit list 
   // {DepositModel,{fname,uid}}
-  Future<List<Map<String, dynamic>>?> getAllDepositList({required String messId,required String mealHisabId, required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<Map<String, dynamic>>?> getAllDepositList({required String messId,required String mealSessionId, required Function(String) onFail, Function()? onSuccess,})async{
     List<Map<String, dynamic>>? list;
     _isLoading =  true;
     try {
@@ -158,8 +156,8 @@ class DepositProvider extends ChangeNotifier{
         firebaseFirestore
         .collection(Constants.deposit)
         .doc(messId)
-        .collection(Constants.mealHisabList)
-        .doc(mealHisabId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
         .collection(Constants.members)
         .get();
 
@@ -168,8 +166,8 @@ class DepositProvider extends ChangeNotifier{
           firebaseFirestore
           .collection(Constants.deposit)
           .doc(messId)
-          .collection(Constants.mealHisabList)
-          .doc(mealHisabId)
+          .collection(Constants.mealSessionList)
+          .doc(mealSessionId)
           .collection(Constants.members)
           .doc(member.id)
           .collection(Constants.listOfDepositTnx)
@@ -208,7 +206,7 @@ class DepositProvider extends ChangeNotifier{
   }
 
   // add a deposit transaction to database 
-  Future<void> addADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> addADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
         try {
 
@@ -217,8 +215,8 @@ class DepositProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId)
             .collection(Constants.listOfDepositTnx)
@@ -231,8 +229,8 @@ class DepositProvider extends ChangeNotifier{
           batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId),
             
@@ -249,8 +247,8 @@ class DepositProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             
             depositModel.type==Constants.deposit? 
             {Constants.blance : FieldValue.increment( depositModel.amount)}
@@ -269,7 +267,7 @@ class DepositProvider extends ChangeNotifier{
   }
 
   // update a deposit transaction to database 
-  Future<void> updateADepositTransaction({required DepositModel depositModel, required String uId,required double extraAmount, required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> updateADepositTransaction({required DepositModel depositModel, required String uId,required double extraAmount, required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
         try {
           
@@ -277,8 +275,8 @@ class DepositProvider extends ChangeNotifier{
           batch.set(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId)
             .collection(Constants.listOfDepositTnx)
@@ -298,8 +296,8 @@ class DepositProvider extends ChangeNotifier{
           batch.set( // we can't use update here because initially the document was not exist
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId),
             
@@ -317,8 +315,8 @@ class DepositProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             
             depositModel.type==Constants.deposit? 
             {Constants.blance : FieldValue.increment( extraAmount)}
@@ -338,7 +336,7 @@ class DepositProvider extends ChangeNotifier{
   }
 
   // delete a deposit transaction to database 
-  Future<void> deleteADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> deleteADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
         try {
 
@@ -346,8 +344,8 @@ class DepositProvider extends ChangeNotifier{
           batch.delete(
             firebaseFirestore.collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId)
             .collection(Constants.listOfDepositTnx)
@@ -359,8 +357,8 @@ class DepositProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.members)
             .doc(uId),
             
@@ -375,8 +373,8 @@ class DepositProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.deposit)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             
             depositModel.type==Constants.deposit? 
             {Constants.blance : FieldValue.increment(-depositModel.amount)}

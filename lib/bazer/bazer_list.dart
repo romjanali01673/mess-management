@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meal_hisab/bazer/bazer_entry.dart';
@@ -13,7 +14,13 @@ import 'package:meal_hisab/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class BazerListScreen extends StatefulWidget {
-  const BazerListScreen({super.key});
+  final Timestamp? fromDate;
+  final Timestamp? toDate;
+  final bool fromPreMember;
+  final String? messId;
+  final String? mealSessionId;
+  const BazerListScreen({super.key, this.fromPreMember = false, this.fromDate, this.toDate, this.messId, this.mealSessionId });
+
 
   @override
   State<BazerListScreen> createState() => _BazerListScreenState();
@@ -31,7 +38,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
     return Expanded(
       child: Column(
         children: [
-          Card(
+          if(!widget.fromPreMember)Card(
             color: Colors.green.shade500,
             child: ListTile(
               trailing: IconButton(
@@ -52,24 +59,38 @@ class _BazerListScreenState extends State<BazerListScreen> {
       
           // amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)?
           Expanded(
-               child: FutureBuilder(
-                future: bazerProvider.getBazerTransactions(
+            child: FutureBuilder(
+              future: widget.fromPreMember? 
+                bazerProvider.getBazerTransactionsForASpacificRange(
+                  messId: widget.messId!, 
+                  mealSessionId: widget.mealSessionId!,
+                  fromDate: widget.fromDate!, 
+                  toDate: widget.toDate!, 
+                  onFail: (message){
+                    showSnackber(context: context, content: "Failed to Fatch Data!.\n$message");
+                  }                
+                )
+                :
+                bazerProvider.getBazerTransactions(
                   messId: authProvider.getUserModel!.currentMessId, 
-                  mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                  mealSessionId: authProvider.getUserModel!.mealSessionId, 
                   onFail: (message){
                   }
-                ),
-                builder: (context,AsyncSnapshot<List<BazerModel>?> snapshot) {
-                  showDetails.clear();
-                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
-                    return Center(child: showCircularProgressIndicator());
-                  }
-                  else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } 
-                  else if (!snapshot.hasData || snapshot.data == null) {
-                    return Center(child: Text('No Transaction found.'));
-                  }
+              ),
+              builder: (context,AsyncSnapshot<List<BazerModel>?> snapshot) {
+                showDetails.clear();
+                if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                  return Center(child: showCircularProgressIndicator());
+                }
+                else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } 
+                else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: Text('No Transaction found.'),
+                  );
+                }
 
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
@@ -89,12 +110,18 @@ class _BazerListScreenState extends State<BazerListScreen> {
                               backgroundColor: Colors.red,
                               child: Text("$index"),
                             ),
-                            title: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(bazerModel.CreatedAt!.toDate().toLocal())}",style : getTextStyleForTitleM()), // entry time 
-                            subtitle: Text(bazerModel.byWho[Constants.fname]),
+                            title: Text(
+                              "${DateFormat("hh:mm a dd-MM-yyyy").format(bazerModel.CreatedAt!.toDate().toLocal())}",
+                              style : getTextStyleForTitleS(),
+                            ), // entry time 
+                            subtitle: Text(
+                              bazerModel.byWho[Constants.fname],
+                              style : getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                            ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(bazerModel.amount.toString(), style: TextStyle(fontSize: 18),),// amount
+                                Text(getFormatedPrice(value: bazerModel.amount.toString()), style: TextStyle(fontSize: 18),),// amount
                                 PopupMenuButton(
                                   icon: Icon(Icons.more_vert),
                                   itemBuilder: (context) =>[
@@ -130,7 +157,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                             await bazerProvider.deleteABazerTransaction(
                                               tnxId: bazerModel.tnxId, 
                                               messId: authProvider.getUserModel!.currentMessId, 
-                                              mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                                              mealSessionId: authProvider.getUserModel!.mealSessionId, 
                                               extraAdd: (bazerModel.amount * -1), 
                                               onFail: (message){
                                                 showSnackber(context: context, content: "Deletion Failed.\n$message");

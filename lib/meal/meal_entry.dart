@@ -192,6 +192,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 date: widget.preMealModel!.date,
                                 listOfMeal: listOfMeal, 
                                 totalMeal: getTotalMeal(),
+                                CreatedAt: widget.preMealModel!.CreatedAt
                               );
                               
                               print(mealModel.toMap());
@@ -200,7 +201,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 mealModel: mealModel, 
                                 extraMeal: mealModel.totalMeal - widget.preMealModel!.totalMeal,
                                 messId: authProvider.getUserModel!.currentMessId, 
-                                mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                                mealSessionId: authProvider.getUserModel!.mealSessionId, 
                                 onFail: (message){
                                   showSnackber(context: context, content: message);
                                 },
@@ -212,9 +213,12 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                   listOfTexteditingController.forEach((x){
                                     x.text = "";
                                   });
+                                  dateController.clear();
+                                  isUpdate = false;
+                                  date = null;
                               
                                   showSnackber(context: context, content: "Meal Update Success");
-                                  setLocalState(() {
+                                  setState(() {
                                     
                                   });
                                 }, 
@@ -232,7 +236,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                               mealProvider.addAMeal(
                                 mealModel: mealModel, 
                                 messId: authProvider.getUserModel!.currentMessId, 
-                                mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                                mealSessionId: authProvider.getUserModel!.mealSessionId, 
                                 onFail: (message){
                                   showSnackber(context: context, content: message);
                                 },

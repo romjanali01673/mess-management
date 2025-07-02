@@ -33,7 +33,7 @@ class _MessUpdateState extends State<MessUpdate> {
   List<String > list =["wqer","qwe"];
   // member uid|name
   Map<String,(String,String)> memberUidList={};
-  String selectedItem = "Select Member";
+  String selectedItem  = Constants.selectedMember;
   Set<String> disabledItems ={};
 
   @override
@@ -135,11 +135,11 @@ class _MessUpdateState extends State<MessUpdate> {
                       bool? res =await showConfirmDialog(context: context, title: "you are going to transfer \nyour administrator power. \nAre you sure about this Update.");
                       if(res ?? false){
                         // transfer ownership
-                        if(selectedItem!="Select Member"){
+                        if(selectedItem != Constants.selectedMember){
                           debugPrint("ownership transfer requesting");
                           await messProvider.transferMessOwnership(
-                            adminId: memberUidList[selectedItem]!.$1, 
-                            adimnName: memberUidList[selectedItem]!.$2, 
+                            adminId: memberUidList[selectedItem ]!.$1, 
+                            adimnName: memberUidList[selectedItem ]!.$2, 
                             onFail: (message){
                               if(context.mounted) showSnackber(context: context, content: "Updatation Failed \n$message");
                             },
@@ -171,7 +171,7 @@ class _MessUpdateState extends State<MessUpdate> {
                               menagerName: "", 
                               actMenagerId: "", 
                               actMenagerName: "", 
-                              mealHisabId: "",
+                              mealSessionId: "",
                               menagerPhone: authorityPhoneController.text.toString().trim(), 
                               menagerEmail: authorityEmailController.text.toString().trim(), 
                               messMemberList: [],
@@ -239,10 +239,10 @@ class _MessUpdateState extends State<MessUpdate> {
               child: DropdownSearch<String>(
                 key: dropdownKey, // Needed for reset
                 asyncItems: (String filter) => _getAllMemberData(),
-                selectedItem: selectedItem,
+                selectedItem : selectedItem ,
                 dropdownDecoratorProps: const DropDownDecoratorProps(
                   dropdownSearchDecoration: InputDecoration(
-                    labelText: "Select Member",
+                    labelText: Constants.selectedMember,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -271,7 +271,7 @@ class _MessUpdateState extends State<MessUpdate> {
                   if (value != null && disabledItems.contains(value)) {
                   // Reset visually and logically
                     dropdownKey.currentState?.clear(); // clears the selection
-                    debugPrint("Selected disable: $selectedItem");                    
+                    debugPrint("Selected disable: $selectedItem ");                    
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("This Member is disabled.")),
                     );
@@ -280,7 +280,7 @@ class _MessUpdateState extends State<MessUpdate> {
                     if(value!=null){
                       // here we receive only enabled value.
                       setState(() {
-                        selectedItem = value.toString();
+                        selectedItem  = value.toString();
                       });
                       debugPrint("Selected enable: $value");
                     }

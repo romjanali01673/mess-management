@@ -81,44 +81,48 @@ class _GroupMealListState extends State<GroupMealList> {
     return Expanded(
       child: Column(
         children: [
-          Card(
-            color: Colors.green.shade500,
-            child: ListTile(
-              trailing: IconButton(
-                onPressed: (){
-                  setState(() {
-                  showTotalMeal = !showTotalMeal;
-                    
-                  });
-                }, 
-                icon: showTotalMeal? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-              ),
-              title: 
-              showTotalMeal? 
-              FutureBuilder(
-                future: mealProvider.getMealList(
-                  messId: authProvider.getUserModel!.currentMessId,
-                  mealHisabId: authProvider.getUserModel!.mealHisabId,
-                  onFail: (message){
-                    showSnackber(context: context, content: "somthing Wrong! \n$message");
-                  },
+          StatefulBuilder(
+            builder: (context, setLocalState) {
+              return Card(
+                color: Colors.green.shade500,
+                child: ListTile(
+                  trailing: IconButton(
+                    onPressed: (){
+                      setLocalState(() {
+                      showTotalMeal = !showTotalMeal;
+                        
+                      });
+                    }, 
+                    icon: showTotalMeal? Icon(Icons.visibility) : Icon(Icons.visibility_off),
+                  ),
+                  title: 
+                  showTotalMeal? 
+                  FutureBuilder(
+                    future: mealProvider.getMealList(
+                      messId: authProvider.getUserModel!.currentMessId,
+                      mealSessionId: authProvider.getUserModel!.mealSessionId,
+                      onFail: (message){
+                        showSnackber(context: context, content: "somthing Wrong! \n$message");
+                      },
+                    ),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                        return Center(child: showCircularProgressIndicator());
+                      }
+                      else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                      } 
+                      else if (!snapshot.hasData || snapshot.data == null) {
+                          return Center(child: Text('No Transaction found.'));
+                    }
+                      return Text("Total Mess Meal: ${mealProvider.getTotalMealOfMess}",);
+                    }
+                  )
+                  :
+                  Text("tap to see Meal"),
                 ),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
-                    return Center(child: showCircularProgressIndicator());
-                  }
-                  else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                  } 
-                  else if (!snapshot.hasData || snapshot.data == null) {
-                      return Center(child: Text('No Transaction found.'));
-                }
-                  return Text("Total Mess Meal: ${mealProvider.getTotalMealOfMess}",);
-                }
-              )
-              :
-              Text("tap to see Meal"),
-            ),
+              );
+            }
           ),
           Row(
             children: [
@@ -207,16 +211,16 @@ class _GroupMealListState extends State<GroupMealList> {
                       ),
                       if(monthName[monthName.keys.first]![0]) ...List.generate(
                         days, (x){
+                          x++;
                           bool canSee = false;
                           return StatefulBuilder(
                             builder: ( context,setLocalState){
-
                               return Card(
                                 child: Column(
                                   children: [
                                     ListTile(
                                       contentPadding: EdgeInsets.only(left: 8),
-                                      title: Text("${x+1}-${monthName[monthName.keys.first]![1]}"),
+                                      title: Text("${x}-${monthName[monthName.keys.first]![1]}"),
                                       onTap: () {
                                         canSee = !canSee;
                                         setLocalState(() {
@@ -228,8 +232,8 @@ class _GroupMealListState extends State<GroupMealList> {
                                       FutureBuilder(
                                         future: mealProvider.checkMealModelAlreadyExist(
                                           messId: authProvider.getUserModel!.currentMessId, 
-                                          mealHisabId: authProvider.getUserModel!.mealHisabId, 
-                                          date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
+                                          mealSessionId: authProvider.getUserModel!.mealSessionId, 
+                                          date: "${x<10?"0$x":x}-${monthName[monthName.keys.first]![2]<10?"0${monthName[monthName.keys.first]![2]}":monthName[monthName.keys.first]![2]}-$year", 
                                           onFail: (message){
                                             showSnackber(context: context, content: "somthing Wrong \n $message");
                                           },
@@ -263,7 +267,7 @@ class _GroupMealListState extends State<GroupMealList> {
                                                     padding: EdgeInsets.all(0),
                                                     onPressed: ()async{
                                                       await mealProvider.deleteAMeal(
-                                                        date: "${x+1}-0${monthName[monthName.keys.first]![2]}-$year", 
+                                                        date: "${x<10?"0$x":x}-${monthName[monthName.keys.first]![2]<10?"0${monthName[monthName.keys.first]![2]}":monthName[monthName.keys.first]![2]}-$year", 
                                                         onFail: (message){
                                                           showSnackber(context: context, content: "Deletein Failed!\n$message");
                                                         }, 
@@ -274,7 +278,7 @@ class _GroupMealListState extends State<GroupMealList> {
                                                           });
                                                         },
                                                         messId: authProvider.getUserModel!.currentMessId, 
-                                                        mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                                                        mealSessionId: authProvider.getUserModel!.mealSessionId, 
                                                         extraMeal: (- snapshot.data!.totalMeal),
                                                       );
                                                     }, 

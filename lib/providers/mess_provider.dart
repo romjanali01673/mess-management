@@ -7,10 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/model/joining_model.dart';
+import 'package:meal_hisab/model/member_summary_model.dart';
 import 'package:meal_hisab/model/mess_model.dart';
+import 'package:meal_hisab/model/mess_summary_model.dart';
 import 'package:meal_hisab/model/notice_model.dart';
 import 'package:meal_hisab/model/rule_model.dart';
 import 'package:meal_hisab/model/user_model.dart';
+import 'package:meal_hisab/providers/deposit_provider.dart';
+import 'package:meal_hisab/providers/firstScreen_provider.dart';
+import 'package:meal_hisab/providers/meal_provider.dart';
 
 
 class MessProvider extends ChangeNotifier {
@@ -55,7 +60,7 @@ class MessProvider extends ChangeNotifier {
     String? actMenagerName,
     List<Map<String,dynamic>>? messMemberList,
     List?disabledMemberList,
-    String? mealHisabId,
+    String? mealSessionId,
     Timestamp? createdAt,
   }){
     if(messId != null) _messModel!.messId = messId;
@@ -68,7 +73,7 @@ class MessProvider extends ChangeNotifier {
     if(actMenagerId != null)_messModel!.actMenagerId = actMenagerId;
     if(actMenagerName != null)_messModel!.actMenagerName = actMenagerName;
     if(messMemberList != null)_messModel!.messMemberList = messMemberList;
-    if(mealHisabId != null)_messModel!.mealHisabId = mealHisabId;
+    if(mealSessionId!= null)_messModel!.mealSessionId= mealSessionId;
     if(createdAt != null)_messModel!.createdAt = createdAt;
     notifyListeners();
   }
@@ -169,7 +174,7 @@ class MessProvider extends ChangeNotifier {
         .doc(uId),
         {
           Constants.currentMessId : messModel.messId ,
-          Constants.mealHisabId : messModel.mealHisabId,
+          Constants.mealSessionId: messModel.mealSessionId,
         },
         SetOptions(
           merge: true
@@ -191,20 +196,53 @@ class MessProvider extends ChangeNotifier {
       );
       
       // add meal hisab id to my profile 
+      MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+        mealSessionId: messModel.mealSessionId, 
+        messId: messModel.messId, 
+        messName: messModel.messName, 
+        totalMeal: 0, 
+        totalDeposit: 0, 
+        remaining: 0, 
+        totalMealOfMess: 0, 
+        mealRate: 0, 
+        totalBazerCost: 0, 
+        currentFundBlance: 0,
+      );
       batch.set(
         firebaseFirestore
         .collection(Constants.users)
         .doc(uId)
         .collection(Constants.messList)
         .doc(messModel.messId)
-        .collection(Constants.mealHisabList)
-        .doc(messModel.mealHisabId),
-        {
-          Constants.messId : messModel.messId,
-          Constants.mealHisabId : messModel.mealHisabId,
-          Constants.messName : messModel.messName,
-          Constants.joindAt: FieldValue.serverTimestamp(),
-        },        
+        .collection(Constants.mealSessionList)
+        .doc(messModel.mealSessionId),
+
+        memberSummaryModel.toMap()      
+      );
+
+      // create a mess summary model.
+      MessSummaryModel messSummaryModel = MessSummaryModel(
+        mealSessionId: messModel.mealSessionId, 
+        messId: messModel.messId, 
+        messName: messModel.messName, 
+        messMemberList: messModel.messMemberList, 
+        totalDeposit: 0, 
+        remaining: 0, 
+        totalMealOfMess: 0, 
+        mealRate: 0, 
+        totalBazerCost: 0, 
+        currentFundBlance: 0,
+      );
+    
+      batch.set(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messModel.messId)
+        .collection(Constants.mealSessionList)
+        .doc(messModel.mealSessionId),
+          
+        messSummaryModel.toMap()
+        
       );
 
       await batch.commit();
@@ -275,12 +313,12 @@ class MessProvider extends ChangeNotifier {
   // }
 
   // remove from Mess- Id To Member Profile / leave
-  Future<void> leaveFromMess({required Function(String) onFail, Function()? onSuccess,required String memberUid})async{
+  Future<void> leaveFromMess({required Function(String) onFail, Function()? onSuccess,required String memberUid, required String messId})async{
      final batch = firebaseFirestore.batch();
     try{
 
       // clear current mess id
-      // clear current access id
+      // clear current session id
       batch.update( 
         firebaseFirestore
         .collection(Constants.users)
@@ -288,9 +326,21 @@ class MessProvider extends ChangeNotifier {
       
         {
           Constants.currentMessId : "",
-          Constants.mealHisabId : "",
+          Constants.mealSessionId: "",
         },
       );
+
+      // add as leaved member id, because when menager create a new session create excipt you.
+      batch.update( 
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId),
+      
+        {
+          Constants.leavedMemberIds: FieldValue.arrayUnion([memberUid]),
+        },
+      );
+
 
       await batch.commit();
       _messModel= null;
@@ -302,9 +352,10 @@ class MessProvider extends ChangeNotifier {
     }
   }
 
-    // delete  Mess doc from mess collection
+  // delete  Mess doc from mess collection
   Future<void> deleteMess({required Function(String) onFail, Function()? onSuccess,required String messId,required String uId})async{
     final batch = firebaseFirestore.batch();
+    setIsloading(false);
     try{
 
 
@@ -316,7 +367,7 @@ class MessProvider extends ChangeNotifier {
         .count()
         .get();
           
-          int i = aQuerySnapshot.count!;
+      int i = aQuerySnapshot.count!;
 
       while(i>0){
         try {
@@ -333,10 +384,43 @@ class MessProvider extends ChangeNotifier {
           if(qSnapshot.docs.isEmpty) break;
         } catch (e) {
           onFail(e.toString());
+          setIsloading(false);
           return;// to off loop and declain next process
         }
       }
       await firebaseFirestore.collection(Constants.fund).doc(messId).delete();
+
+
+      // clear meal session 
+      AggregateQuerySnapshot aQuerySnapshonMealSession = await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .count()
+        .get();
+          
+      i = aQuerySnapshonMealSession.count!;
+
+      while(i>0){
+        try {
+          QuerySnapshot aQuerySnapshonMealSession = await firebaseFirestore
+            .collection(Constants.mess)
+            .doc(messId)
+            .collection(Constants.mealSessionList)
+            .limit(800)
+            .get();
+
+          await Future.wait(aQuerySnapshonMealSession.docs.map((x) => x.reference.delete()));
+          await Future.delayed(Duration(milliseconds: 1100));
+          i-=aQuerySnapshonMealSession.docs.length;
+          if(aQuerySnapshonMealSession.docs.isEmpty) break;
+        } catch (e) {
+          onFail(e.toString());
+          setIsloading(false);
+          return;// to off loop and declain next process
+        }
+      }
+      // await firebaseFirestore.collection(Constants.fund).doc(messId).delete();
 
 
       //clear notices
@@ -365,6 +449,7 @@ class MessProvider extends ChangeNotifier {
           if(qSnapshot.docs.isEmpty) break;
         } catch (e) {
           onFail(e.toString());
+          setIsloading(false);
           return;// to off loop and declain next process
         }
       }
@@ -396,6 +481,7 @@ class MessProvider extends ChangeNotifier {
           if(qSnapshot.docs.isEmpty) break;
         } catch (e) {
           onFail(e.toString());
+          setIsloading(false);
           return;// to off loop and declain next process
         }
       }
@@ -408,16 +494,35 @@ class MessProvider extends ChangeNotifier {
         .doc(messId)
       );
 
+
+
       // remove current mess id and meal hisab id 
-      batch.update(
-        firebaseFirestore
-        .collection(Constants.users)
-        .doc(uId),
-        {
-          Constants.currentMessId :"",
-          Constants.mealHisabId :"",
+
+      final snapshot= await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .get(GetOptions(source: Source.server));
+
+      if(snapshot.exists && snapshot.data()!=null){
+        
+        List<String> leavedMemberIds = (((snapshot.data() as Map<String,dynamic>)[Constants.leavedMemberIds]?? []) as List<dynamic>).map((x)=>x as String).toList();
+        List<Map<String,dynamic>> memberList = ((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList] as List<dynamic>).map((x)=>x as Map<String,dynamic>).toList();
+        memberList.removeWhere((x)=>leavedMemberIds.contains(x[Constants.uId]));// remove leaved member data from the list
+        
+        for(var x in memberList){
+          // change current meal hisab id
+          batch.update(
+            firebaseFirestore
+            .collection(Constants.users)
+            .doc(x[Constants.uId]),
+            {
+              Constants.currentMessId :"",
+              Constants.mealSessionId:"",
+            },
+          );
         }
-      );
+      }
+
 
       await batch.commit();
       _messModel = null;
@@ -426,6 +531,7 @@ class MessProvider extends ChangeNotifier {
     } catch(e){
       onFail(e.toString());
     }
+    setIsloading(false);
   }
 
   // get mess data 
@@ -454,6 +560,14 @@ class MessProvider extends ChangeNotifier {
       notifyListeners();
       onSuccess!=null?onSuccess():(){};
     }
+  }
+  // get mess data 
+  Future<List<Map<String,dynamic>>> getMessMemberList({required Function(String) onFail, Function()? onSuccess, required String messId,bool Function()? isDisposed})async{
+    debugPrint("getMessMemberList called");
+    
+    await getMessData(onFail: onFail, messId: messId);
+    onSuccess!=null?onSuccess():(){};
+    return getMessModel!.messMemberList;
   }
 
   // change mess ownership 
@@ -509,6 +623,7 @@ class MessProvider extends ChangeNotifier {
     try{
       DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.mess).doc(messId).get();
       if(snapshot.exists){
+        MessModel messModel = MessModel.fromMap(snapshot.data() as Map<String,dynamic>);
         
         // add member to mess
         batch.update(
@@ -516,8 +631,22 @@ class MessProvider extends ChangeNotifier {
           .collection(Constants.mess)
           .doc(messId),
           {
-            Constants.messMemberList : FieldValue.arrayUnion([member])
+            Constants.messMemberList : FieldValue.arrayUnion([member]),
+            Constants.leavedMemberIds: FieldValue.arrayRemove([member[Constants.uId].toString()]),
           }
+        );
+
+        // assign new member data to the mealsession of mess summary
+        batch.update(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc((snapshot.data() as Map<String,dynamic>)[Constants.messId])
+          .collection(Constants.mealSessionList)
+          .doc((snapshot.data() as Map<String,dynamic>)[Constants.mealSessionId]),
+          {
+            //mess member list AND add new meal hisab id in mealSessionList FOR MESS
+            Constants.messMemberList: FieldValue.arrayUnion([member]),
+          },
         );
         
         
@@ -542,7 +671,7 @@ class MessProvider extends ChangeNotifier {
 
           {
             Constants.currentMessId : messId,
-            Constants.mealHisabId : (snapshot.data() as Map<String,dynamic>)[Constants.mealHisabId],
+            Constants.mealSessionId: (snapshot.data() as Map<String,dynamic>)[Constants.mealSessionId],
           },        
         );
                                                 
@@ -561,20 +690,30 @@ class MessProvider extends ChangeNotifier {
         );
 
         // start meal 
+
+        MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+          mealSessionId: messModel.mealSessionId, 
+          messId: messModel.messId, 
+          messName: messModel.messName, 
+          totalMeal: 0, 
+          totalDeposit: 0, 
+          remaining: 0, 
+          totalMealOfMess: 0, 
+          mealRate: 0, 
+          totalBazerCost: 0, 
+          currentFundBlance: 0,
+        );
         batch.set(
           firebaseFirestore
           .collection(Constants.users)
           .doc(member[Constants.uId])
           .collection(Constants.messList)
           .doc(messId)
-          .collection(Constants.mealHisabList)
-          .doc((snapshot.data() as Map<String,dynamic>)[Constants.mealHisabId]),
-          {
-            Constants.mealHisabId : (snapshot.data() as Map<String,dynamic>)[Constants.mealHisabId],
-            Constants.messId : messId,
-            Constants.messName : (snapshot.data() as Map<String,dynamic>)[Constants.messName],
-            Constants.joindAt: FieldValue.serverTimestamp()
-          },            
+          .collection(Constants.mealSessionList)
+          .doc((snapshot.data() as Map<String,dynamic>)[Constants.mealSessionId]),
+          
+          memberSummaryModel.toMap()
+                      
         );
 
         await batch.commit();                                 
@@ -725,7 +864,7 @@ class MessProvider extends ChangeNotifier {
         .doc(member[Constants.uId]),
         {
           Constants.currentMessId : "",
-          Constants.mealHisabId : "",
+          Constants.mealSessionId: "",
         },        
       );
 
@@ -824,5 +963,304 @@ class MessProvider extends ChangeNotifier {
     }
     return list;
   }
+
+  Future<void> closeMessHisab({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+    final batch = firebaseFirestore.batch();
+    setIsloading(true);
+    List<String> leavedMemberIds=[];
+    List<Map<String,dynamic>> memberList=[];
+    MessModel? messModel;
+
+    try {
+      String newmealSessionId= DateTime.now().millisecondsSinceEpoch.toString();
+
+      final snapshot= await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(messId)
+        .get(GetOptions(source: Source.server));
+
+
+      // set new meal hisab id in every member profile
+      if(snapshot.exists && snapshot.data()!=null){
+        
+        messModel = MessModel.fromMap(snapshot.data() as Map<String,dynamic>);
+        leavedMemberIds = (((snapshot.data() as Map<String,dynamic>)[Constants.leavedMemberIds]??[]) as List<dynamic>).map((x)=>x as String).toList();
+        memberList = ((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList] as List<dynamic>).map((x)=>x as Map<String,dynamic>).toList();
+        memberList.removeWhere((x)=>leavedMemberIds.contains(x[Constants.uId]));// remove leaved member data from the list
+        
+        for(var x in memberList){
+          // change current meal hisab id
+          batch.update(
+            firebaseFirestore
+            .collection(Constants.users)
+            .doc(x[Constants.uId]),
+            {
+              Constants.mealSessionId:newmealSessionId,
+            },
+          );
+
+          // add new meal session id in mealSessionList
+          MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+            mealSessionId: newmealSessionId, 
+            messId: messModel.messId, 
+            messName: messModel.messName, 
+            totalMeal: 0, 
+            totalDeposit: 0, 
+            remaining: 0, 
+            totalMealOfMess: 0, 
+            mealRate: 0, 
+            totalBazerCost: 0, 
+            currentFundBlance: 0,
+          );
+          batch.set(
+            firebaseFirestore
+            .collection(Constants.users)
+            .doc(x[Constants.uId])
+            .collection(Constants.messList)
+            .doc(messId)
+            .collection(Constants.mealSessionList)
+            .doc(newmealSessionId),
+            
+            memberSummaryModel.toMap(),
+          );
+        }
+
+        // create new mess summary .
+        MessSummaryModel messSummaryModel = MessSummaryModel(
+          mealSessionId: newmealSessionId, //new
+          messId: messModel.messId, 
+          messName: messModel.messName, 
+          messMemberList: messModel.messMemberList, 
+          totalDeposit: 0, 
+          remaining: 0, 
+          totalMealOfMess: 0, 
+          mealRate: 0, 
+          totalBazerCost: 0, 
+          currentFundBlance: 0,
+        );
+
+        batch.set(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(messId)
+          .collection(Constants.mealSessionList)
+          .doc(newmealSessionId),
+          
+          messSummaryModel.toMap()
+          
+        );
+
+        // set session end date to pre meal session model
+        batch.update(
+          firebaseFirestore
+            .collection(Constants.mess)
+            .doc(messModel.messId)
+            .collection(Constants.mealSessionList)
+            .doc(messModel.mealSessionId),// pre meal session id
+          
+          {
+            Constants.closedAt: FieldValue.serverTimestamp(),
+          }
+        );
+
+        // removed leaved mess member data from the member list.
+        // clear leaved member list
+        // update new meal hisab id in mess profile
+        batch.update(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(messId),
+          {
+            Constants.messMemberList:memberList, 
+            Constants.mealSessionId:newmealSessionId,
+            Constants.leavedMemberIds:[],
+          },
+        );
+
+
+        await batch.commit();
+        setMessModel(mealSessionId: "");
+        onSuccess!=null? onSuccess() : (){};
+      }
+      else{
+        // safety if get faild when read.
+        onFail("Somthing Wrong");
+        return;
+      }
+
+    } catch (e) {
+      onFail(e.toString());     
+      debugPrint(e.toString()); 
+    }  
+    setIsloading(false);
+  }
+
+  Future<List<Map<String,dynamic>>> getAUserMessList({
+    required String uId,
+    required Function(String) onFail,
+    Function()? onSuccess,
+  }) async{
+    List<Map<String,dynamic>> list = [];
+
+    QuerySnapshot qSnapshot =await firebaseFirestore.collection(Constants.users).doc(uId).collection(Constants.messList).get();
+  
+
+    for (DocumentSnapshot x in qSnapshot.docs){
+      try {
+          list.add(x.data() as Map<String, dynamic>);
+      } catch (e) {
+        onFail("Failed to get data for ID $x: $e");
+      }
+    }
+
+    onSuccess?.call();
+    return list;
+  }
+
+  Future<List<Map<String,dynamic>>> getAMembermealSessionIdListForASpacificMess({
+    required String uId,
+    required String messId,
+    required Function(String) onFail,
+    Function()? onSuccess,
+  }) async{
+    List<Map<String,dynamic>> list = [];
+
+    QuerySnapshot qSnapshot =await firebaseFirestore
+      .collection(Constants.users)
+      .doc(uId)
+      .collection(Constants.messList)
+      .doc(messId)
+      .collection(Constants.mealSessionList)
+      .get();
+  
+    for (DocumentSnapshot x in qSnapshot.docs){
+      try {
+          list.add(x.data() as Map<String, dynamic>);
+      } catch (e) {
+        onFail("Failed to get data for ID $x: $e");
+      }
+    }
+
+    onSuccess?.call();
+    return list;
+  }
+
+  // genarate member summary
+
+  Future<void> genarateMemberSummary({
+    required String uId,
+    required MemberSummaryModel memberSummaryModel,
+    required Function(String) onFail,
+    Function()? onSuccess,
+  })async{
+    setIsloading(true);
+    print("genarateMemberSummary called");
+    final firstScreenProvider =  FirstScreenProvider();
+    final  mealProvider =  MealProvider();
+    final  depositProvider =  DepositProvider();
+      
+    double getTotalDepositOfMember =0;
+    double getTotalMealOfMember = 0;
+
+    double totalDepositOfMess = 0;
+    double totalBazerCost =  0; 
+    double totalMealOfMess = 0;    
+    double currentFundBlance = 0;    
+    bool flag = true;
+
+    MessSummaryModel? preMessSummaryModel;
+
+    final batch= firebaseFirestore.batch();
+
+    try {
+      if(flag) totalDepositOfMess =      await firstScreenProvider.getTotalDeposit(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+      if(flag) totalBazerCost =          await firstScreenProvider.getTotalBazer(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+      if(flag) totalMealOfMess =         await firstScreenProvider.getTotalMeal(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+      if(flag) currentFundBlance =       await firstScreenProvider.getFundBlance(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;},);
+      
+      double mealRate = totalBazerCost / (totalMealOfMess==0? 1:totalMealOfMess);
+
+      DocumentSnapshot snapshot = await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(memberSummaryModel.messId)
+        .collection(Constants.mealSessionList)
+        .doc(memberSummaryModel.mealSessionId)
+        .get();
+
+      if(snapshot.exists && snapshot.data()!=null){
+        preMessSummaryModel = MessSummaryModel.fromMap(snapshot.data() as Map<String,dynamic>);
+        
+
+
+        // set final member summary for every member of this session.
+        for(var x in preMessSummaryModel.messMemberList){
+          if(flag) getTotalDepositOfMember = await depositProvider.getTotalDepositOfAMember(messId: memberSummaryModel.messId, uId: x[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+          if(flag) getTotalMealOfMember =    await mealProvider.getTotalMealOfMember(messId: memberSummaryModel.messId, uId: x[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+
+          // data get failed,
+          // stop progress
+          if(!flag) return;
+
+          MemberSummaryModel newMemberSummaryModel = MemberSummaryModel(
+            mealSessionId: memberSummaryModel.mealSessionId,
+            messId: memberSummaryModel.messId, 
+            messName: memberSummaryModel.messName, 
+            joindAt: memberSummaryModel.joindAt,
+            closedAt: preMessSummaryModel.closedAt, //update closedAt 
+
+            totalMeal: getTotalMealOfMember, 
+            totalDeposit: getTotalDepositOfMember, 
+            remaining: (getTotalDepositOfMember - mealRate*getTotalMealOfMember), 
+            totalMealOfMess: totalMealOfMess, 
+            mealRate: mealRate, 
+            totalBazerCost: totalBazerCost, 
+            currentFundBlance: currentFundBlance,
+            status: Constants.Fianl, // make it final 
+          );
+
+          batch.set(
+            firebaseFirestore 
+              .collection(Constants.users)
+              .doc(x[Constants.uId])
+              .collection(Constants.messList)
+              .doc(memberSummaryModel.messId)
+              .collection(Constants.mealSessionList)
+              .doc(memberSummaryModel.mealSessionId),
+
+            newMemberSummaryModel.toMap()
+          );
+
+
+        }
+
+        // make mess summary final.
+        preMessSummaryModel.totalDeposit = totalDepositOfMess;
+        preMessSummaryModel.totalMealOfMess = totalMealOfMess;
+        preMessSummaryModel.totalBazerCost = totalBazerCost;
+        preMessSummaryModel.currentFundBlance = currentFundBlance;
+        preMessSummaryModel.mealRate = mealRate;
+        preMessSummaryModel.remaining = totalDepositOfMess+currentFundBlance-totalBazerCost;
+        preMessSummaryModel.status = Constants.Fianl;// make it final 
+
+        batch.update(
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(preMessSummaryModel.messId)
+          .collection(Constants.mealSessionList)
+          .doc(preMessSummaryModel.mealSessionId),
+          
+          preMessSummaryModel.toMap()
+        );
+
+        await batch.commit();
+        onSuccess!=null? onSuccess():(){};
+      }
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint("genarateMemberSummary Error: " + e.toString());
+    }
+    setIsloading(false);
+  }
+
 }
 

@@ -10,7 +10,7 @@ class UserModel {
   String sessionKey;
   String currentMessId;
   String fullAddress;
-  String mealHisabId;
+  String mealSessionId;
   Timestamp? createdAt;
 
   UserModel({
@@ -22,7 +22,7 @@ class UserModel {
     required this.sessionKey,
     required this.currentMessId,
     required this.fullAddress,
-    required this.mealHisabId,
+    required this.mealSessionId,
     this.createdAt,
 
   });
@@ -37,7 +37,7 @@ class UserModel {
       Constants.sessionKey  : sessionKey,
       Constants.currentMessId  : currentMessId,
       Constants.fullAddress  : fullAddress,
-      Constants.mealHisabId: mealHisabId,
+      Constants.mealSessionId: mealSessionId,
       Constants.createdAt: createdAt?? FieldValue.serverTimestamp()
     };
   }
@@ -52,7 +52,7 @@ class UserModel {
       sessionKey: data[Constants.sessionKey]??"",
       currentMessId: data[Constants.currentMessId]??"",
       fullAddress: data[Constants.fullAddress]??"",
-      mealHisabId : data[Constants.mealHisabId]??"",
+      mealSessionId: data[Constants.mealSessionId]??"",
       createdAt: data[Constants.createdAt]?? Timestamp.now(), //Timestamp.fromDate(DateTime.now())==Timestamp.now(),
     );
   }

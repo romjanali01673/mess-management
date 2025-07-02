@@ -54,6 +54,7 @@ class Constants {
   static const String actMenagerName="actMenagerName";
   static const String messMemberList="messMemberList";
   static const String disabledMemberList="disabledMemberList";
+  static const String leavedMemberIds="leavedMemberIds";
   
   static const String inSide = "inSide";
   static const String rules = "rules";
@@ -125,9 +126,16 @@ class Constants {
 
   //xyz
   static const String members = "members";
-  static const String mealHisabList = "mealHisabList";
-  static const String mealHisabId = "mealHisabId";
+  static const String mealSessionList = "mealSessionList";
+  static const String mealSessionId = "mealSessionId";
   static const String joindAt = "joindAt";
+  static const String remaining = "remaining";
+  static const String mealSessionModel = "mealSessionModel";
+  static const String totalMealOfMess = "totalMealOfMess";
+  static const String Temporary = "Temporary";
+  static const String Fianl = "Final";
+  static const String closedAt = "closedAt";
+  static const String selectedMember = "Selected Member";
 
   // models
   static const String userModel ="userModel";

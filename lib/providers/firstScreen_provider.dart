@@ -6,7 +6,7 @@ class FirstScreenProvider extends ChangeNotifier{
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
-
+  double blance = 0;
   double _myTotalMeal = 0;
   double _myTotalDeposit = 0;
 
@@ -22,6 +22,7 @@ class FirstScreenProvider extends ChangeNotifier{
 // get ---------------------------------------------------------
 
   bool   get getIsLoading=> _isLoading;
+  double get getBlance => (_totalDepositOfMess - _totalBazerCost + _remainingFundBlance);
 
   double get getMealRate{
     if(_totalMealOfMess==0){
@@ -98,7 +99,11 @@ class FirstScreenProvider extends ChangeNotifier{
     double blance = 0.0;
     setIsLoading(value: true);
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.fund).doc(messId).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore
+        .collection(Constants.fund)
+        .doc(messId)
+        .get();
+
       if(snapshot.exists && snapshot.data() != null){
         blance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
         setRemainingFundBlanc(value: blance);
@@ -111,12 +116,19 @@ class FirstScreenProvider extends ChangeNotifier{
     setIsLoading(value: false);
     return blance;
   }
-  Future<double> getTotalMeal({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalMeal({required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     print("get total meal called");
     double meal = 0.0;
     setIsLoading(value: true);
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).get();
+      DocumentSnapshot snapshot =  await 
+      firebaseFirestore
+        .collection(Constants.meal)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .get();
+
       if(snapshot.exists && snapshot.data() != null){
         meal = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalMeal]).toString());
         setTotalMealOfMess(value: meal);
@@ -129,12 +141,19 @@ class FirstScreenProvider extends ChangeNotifier{
     setIsLoading(value: false);
     return meal;
   }
-  Future<double> getTotalBazer({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalBazer({required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     print("get total bazer called");
     double bazer = 0.0;
     setIsLoading(value: true);
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.bazer).doc(messId).get();
+      DocumentSnapshot snapshot =  await 
+        firebaseFirestore
+        .collection(Constants.bazer)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .get();
+
       if(snapshot.exists && snapshot.data() != null){
         bazer = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalBazerCost]).toString());
         setTotalBazerCost(value: bazer);
@@ -148,12 +167,19 @@ class FirstScreenProvider extends ChangeNotifier{
     return bazer;
   }
   
-  Future<double> getTotalDeposit({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalDeposit({required String messId ,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     print("get total deposit called");
     double deposit = 0.0;
     setIsLoading(value: true);
     try {
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).get();
+      DocumentSnapshot snapshot =  await firebaseFirestore
+        .collection(Constants.deposit)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .get();
+
+
       if(snapshot.exists && snapshot.data() != null){
         deposit = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
         setTotalDepositOfMess(value: deposit);
@@ -167,12 +193,20 @@ class FirstScreenProvider extends ChangeNotifier{
     return deposit;
   }
 
-  Future<double> getTotalDepositOfMember({required String messId,required String uId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalDepositOfMember({required String messId,required String mealSessionId,required String uId,required Function(String) onFail, Function()? onSuccess,})async{
     print("get my total deposit called");
     double deposit = 0.0;
     setIsLoading(value: true);
     try {
-      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.deposit).doc(messId).collection(Constants.members).doc(uId).collection(Constants.listOfDepositTnx).get();
+      QuerySnapshot querySnapshot =  await firebaseFirestore
+        .collection(Constants.deposit)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .collection(Constants.members)
+        .doc(uId)
+        .collection(Constants.listOfDepositTnx)
+        .get();
       
       querySnapshot.docs.map((snapshot){
         print(snapshot.id);
@@ -187,19 +221,25 @@ class FirstScreenProvider extends ChangeNotifier{
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
-      print(e.toString());
+      print(e.toString()+"getTotalDepositOfMember");
     }  
     setIsLoading(value: false);
     return deposit;
   }
 
 
-  Future<double> getTotalMealOfMember({required String messId,required String uId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<double> getTotalMealOfMember({required String messId,required String mealSessionId,required String uId,required Function(String) onFail, Function()? onSuccess,})async{
     print("get my total meal called");
     double meal = 0.0;
     setIsLoading(value: true);
     try {
-      QuerySnapshot querySnapshot =  await firebaseFirestore.collection(Constants.meal).doc(messId).collection(Constants.listOfMealTnx).get();
+      QuerySnapshot querySnapshot =  await firebaseFirestore
+        .collection(Constants.meal)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .collection(Constants.listOfMealTnx)
+        .get();
       
       querySnapshot.docs.map((snapshot){
         print(snapshot.id);
@@ -219,7 +259,7 @@ class FirstScreenProvider extends ChangeNotifier{
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
-      print(e.toString());
+      print(e.toString()+"getTotalMealOfMember");
     }  
     setIsLoading(value: false);
     return meal;
@@ -230,20 +270,27 @@ class FirstScreenProvider extends ChangeNotifier{
     setIsLoading(value: true);
     try {
       NoticeModel? noticeModel;
-      DocumentSnapshot snapshot =  await firebaseFirestore.collection(Constants.notice).doc(messId).get();
+      DocumentSnapshot snapshot =  await 
+      firebaseFirestore
+      .collection(Constants.notice)
+      .doc(messId)
+      .get();
       
     
       if(snapshot.exists && snapshot.data() != null){
-        noticeModel = NoticeModel.fromMap(((snapshot.data()as Map<String,dynamic>)[Constants.homePindedNotice] as Map<String,dynamic>));
+        if((snapshot.data()as Map<String,dynamic>)[Constants.homePindedNotice] !=null){
+          noticeModel = NoticeModel.fromMap(((snapshot.data()as Map<String,dynamic>)[Constants.homePindedNotice] as Map<String,dynamic>));
+        }
+        if((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList] !=null){
+        }
       }
     
       setPindNoticeForHome(value: noticeModel);
       
-      debugPrint("getPindedNotice"+noticeModel!.toMap().toString());
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
-      print(e.toString());
+      print(e.toString()+"getPindedNotice");
     }  
     setIsLoading(value: false);
     return null;

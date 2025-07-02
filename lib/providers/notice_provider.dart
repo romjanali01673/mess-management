@@ -73,7 +73,7 @@ class NoticeProvider extends ChangeNotifier{
     });
   }
 
-  Future<void> checkHasNoticeUnseen({required String uid, required String messId, required String mealHisabId})async{
+  Future<void> checkHasNoticeUnseen({required String uid, required String messId, required String mealSessionId})async{
     print("has notice called");
     try {
       // DocumentSnapshot snapshot = await 

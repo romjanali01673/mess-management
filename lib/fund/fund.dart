@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -90,8 +91,19 @@ class _FundScreenState extends State<FundScreen> {
 }
 
 
+
+
+
+
+
+
+
 class FundHome extends StatefulWidget {
-  const FundHome({super.key});
+  final Timestamp? fromDate;
+  final Timestamp? toDate;
+  final bool fromPreMember;
+  final String? messId;
+  const FundHome({super.key, this.fromPreMember = false, this.fromDate, this.toDate, this.messId });
 
   @override
   State<FundHome> createState() => _FundHomeState();
@@ -111,9 +123,15 @@ void initState() {
     final fundProvider = context.read<FundProvider>();
     final authProvider = context.read<AuthenticationProvider>();
     
-    fundProvider.listenFundBlance(messId: authProvider.getUserModel!.currentMessId);
-    fundProvider.listenFundDocChanges(messId: authProvider.getUserModel!.currentMessId);
-    fundProvider.loadInitial(messId: authProvider.getUserModel!.currentMessId);
+    if(widget.fromPreMember){
+      
+      fundProvider.loadForASpacificRange(messId: widget.messId!, fromDate: widget.fromDate!, toDate: widget.toDate!);
+    }
+    else{
+      fundProvider.listenFundBlance(messId: authProvider.getUserModel!.currentMessId);
+      fundProvider.listenFundDocChanges(messId: authProvider.getUserModel!.currentMessId);
+      fundProvider.loadInitial(messId: authProvider.getUserModel!.currentMessId);
+    }
 
     // _scrollController.addListener(_handleScroll);
   });
@@ -211,7 +229,8 @@ void _handleScroll() {
           
         builder: (context, value, child) => Column(
         children: [
-          child!,     // the child will not rebuild        
+          if(!widget.fromPreMember) child!,     // the child will not rebuild    
+          if(fundProvider.isLoading) showCircularProgressIndicator(),    
           if (fundProvider.getFundModelList.isEmpty)  Center(child: Text('No Transaction found.'))
           else Expanded(
             child: ListView.builder(
@@ -279,8 +298,8 @@ void _handleScroll() {
                                     Text("${DateFormat("hh:mm a dd-MM-yyyy").format(fundmodel.CreatedAt!.toDate().toLocal())}"),
                                     // Text((fundmodel.CreatedAt!.toDate().toString())),
                                   ],
-                                ),
-                                trailing: Row(
+                                ), 
+                                trailing:widget.fromPreMember? SizedBox.shrink() : Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     showPrice(value: fundmodel.amount),

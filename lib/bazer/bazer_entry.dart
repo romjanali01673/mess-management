@@ -31,11 +31,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
 
-  List<String > list =[];
-
-  // "name" + "\n" + "uid"
-  String selectedItem = "Select Member";
-  Set<String> disabledItems ={};
+  Map<String,dynamic>? selectedItem;
 
 
 
@@ -51,41 +47,15 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
     date = DateFormat("dd/MM/yyyy").parse(widget.preBazerModel!.bazerDate);
     dateController.text = widget.preBazerModel!.bazerDate;
 
-    selectedItem = widget.preBazerModel!.byWho[Constants.fname].toString()+"\n"+widget.preBazerModel!.byWho[Constants.uId].toString();
+    selectedItem  ={
+      Constants.fname : widget.preBazerModel!.byWho[Constants.fname],
+      Constants.uId : widget.preBazerModel!.byWho[Constants.uId],
+      Constants.status : Constants.enable,
+    };
 
     setState(() {
       
     });
-  }
-
-
-  Future<List<String>> _getAllMemberData()async{
-    list.clear();
-    disabledItems.clear();
-    final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    final messProvider = context.read<MessProvider>();
-    final authProvider = context.read<AuthenticationProvider>();
-    await messProvider.getMessData(
-      onFail: (message){
-
-      }, 
-      messId:authProvider.getUserModel!.currentMessId,
-    );
-
-    if(messProvider.getMessModel==null) return list;
-    for(dynamic member in messProvider.getMessModel!.messMemberList){
-      try {
-        
-          list.add("${member[Constants.fname]}\n${member[Constants.uId]}");
-          if(member[Constants.status]==Constants.disable){
-            disabledItems.add("${member[Constants.fname]}\n${member[Constants.uId]}");
-          }
-        
-      } catch (e) {
-        showSnackber(context: context, content: e.toString());
-      }
-    }
-    return list;
   }
 
   @override
@@ -125,64 +95,85 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
         width: double.infinity,
         child: Column(
           children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              // child: FutureBuilder(
-              //   future: future, 
-              //   builder: builder,
-              // ),
-              child: DropdownSearch<String>(
-                key: dropdownKey, // Needed for reset
-                asyncItems: (String filter) => _getAllMemberData(),
-                selectedItem: selectedItem,
-                dropdownDecoratorProps: const DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                    labelText: "Select Member",
-                    border: OutlineInputBorder(),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: DropdownSearch<Map<String, dynamic>>(
+                    key: dropdownKey, // Needed for reset
+                    asyncItems: (String filter)async => messProvider.getMessMemberList(onFail: (_){}, messId: authProvider.getUserModel!.currentMessId),
+                    itemAsString: (item) =>item[Constants.fname]+"\n"+item[Constants.uId], // we can see it as selected value{name, id}. but we receive the currect data {Map}.
+                    // asyncItems: (String filter) => _getAllMemberData(),
+                    selectedItem : selectedItem,
+                    
+                    dropdownDecoratorProps: const DropDownDecoratorProps(
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: Constants.selectedMember,
+                        border: OutlineInputBorder(),
+                        
+                      ),
+                    ),
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if(value==null) return "Fill!";
+                      if(value[Constants.status]==Constants.disable){
+                        return "The Member Are Disabled!";
+                      }
+                      return null;
+                    },
+                    
+                    // dropdownBuilder 
+                    dropdownBuilder: (context, selectedItem) {
+                      if (selectedItem == null) return Text("No member selected");
+                      return Column(
+                        children: [
+                          ListTile(
+                          contentPadding: EdgeInsets.all(0),
+                          minVerticalPadding: 0,
+                          minTileHeight: 0,
+                          minLeadingWidth: 0,
+                          title: Text(selectedItem[Constants.fname]),
+                          subtitle: Text(selectedItem[Constants.uId]),
+                          leading: Icon(Icons.person),
+                        )
+                        ],
+                        // leading: Icon(Icons.person),
+                      );
+                    },
+                    popupProps: PopupProps.menu(  
+                      showSearchBox: true,
+                      disabledItemFn: (item) {
+                        return item[Constants.status]==Constants.disable;
+                      },
+                      
+                      itemBuilder: (context, item, isSelected) {
+                        if(isSelected) print("get silected");
+                        bool isDisabled = item[Constants.status] == Constants.disable;
+                        return ListTile(
+                          title: Text(
+                            item[Constants.fname],
+                            style : getTextStyleForTitleM().copyWith(
+                              color: isDisabled ? Colors.grey : Colors.black,
+                            )
+                          ),
+                          subtitle: Text(
+                            item[Constants.uId],
+                            style : getTextStyleForTitleM().copyWith(
+                              color: isDisabled ? Colors.grey : Colors.black,
+                            )
+                          ),
+                        );
+                        
+                      },
+                    ),
+                    onChanged: (value) {
+                      print(value.toString());
+                      selectedItem = value;
+                
+                      // if(messProvider.getMessModel!.messMemberList[0] == value){
+                      //   dropdownKey.currentState?.clear();
+                      // }
+                    },
                   ),
                 ),
-                popupProps: PopupProps.menu(
-                  showSearchBox: true,
-                      
-                  // Disable specific item visually and functionally
-                  itemBuilder: (context, item, isSelected) {
-                    bool isDisabled = disabledItems.contains(item);
-                    return IgnorePointer(
-                      ignoring: isDisabled,
-                      child: ListTile(
-                        title: Text(
-                          item,
-                          style : getTextStyleForTitleM().copyWith(
-                            color: isDisabled ? Colors.grey : Colors.black,
-                          )
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                // always use this function it's tested
-                // otherwise we get error because there are few bug here
-                onChanged: (value) {
-                  if (value != null && disabledItems.contains(value)) {
-                  // Reset visually and logically
-                    dropdownKey.currentState?.clear(); // clears the selection
-                    debugPrint("Selected disable: $selectedItem");                    
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("This Member is disabled.")),
-                    );
-                  } 
-                  else {
-                    if(value!=null){
-                      // here we receive only enabled value.
-                      setState(() {
-                        selectedItem = value.toString();
-                      });
-                      debugPrint("Selected enable: $value");
-                    }
-                  }
-                },
-              ),
-            ),
             
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -367,7 +358,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
               label:  isUpdate?"update" : "save", 
               ontap: ()async{
                 if(amIAdmin(messProvider:messProvider , authProvider: authProvider) || amIactmenager(messProvider:messProvider , authProvider: authProvider)){
-                  if(selectedItem=="Select Member"){
+                  if(selectedItem == null){
                     showSnackber(context: context, content: "Member Was Not Slelcted.");
                     return;
                   }
@@ -401,10 +392,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       bazerList: bazerList,
                       bazerTime: formatTimeOfDay(time!).toString(),
                       bazerDate: DateFormat("dd/MM/yyyy").format(date!).toString(),
-                      byWho: {
-                        Constants.fname:selectedItem.split('\n')[0],
-                        Constants.uId: selectedItem.split('\n')[1], 
-                      },
+                      byWho: selectedItem!,
                     )
                     :
                     BazerModel(
@@ -413,10 +401,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       bazerList: bazerList,
                       bazerTime: formatTimeOfDay(time!).toString(),
                       bazerDate: DateFormat("dd/MM/yyyy").format(date!).toString(),
-                      byWho: {
-                        Constants.fname:selectedItem.split('\n')[0],
-                        Constants.uId: selectedItem.split('\n')[1], 
-                      },
+                      byWho: selectedItem!,
                     );
                     print(totalAmount.toString()+"a");
 
@@ -424,7 +409,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     await bazerProvider.updateABazerTransaction(
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
-                      mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                      mealSessionId: authProvider.getUserModel!.mealSessionId, 
                       onFail: (message ) { 
                         showSnackber(context: context, content: "Failed!\n$message");
                       },
@@ -444,7 +429,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     await bazerProvider.addABazerTransaction(
                       bazerModel: bazerModel, 
                       messId: authProvider.getUserModel!.currentMessId, 
-                      mealHisabId: authProvider.getUserModel!.mealHisabId, 
+                      mealSessionId: authProvider.getUserModel!.mealSessionId, 
                       onFail: (message ) { 
                         showSnackber(context: context, content: "Bazer Entry Failed!\n$message");
                       },

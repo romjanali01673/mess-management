@@ -39,7 +39,7 @@ class BazerProvider extends ChangeNotifier{
   // function -----------
 
   // get all Bazer transaction list 
-  Future<List<BazerModel>?> getBazerTransactions({required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<List<BazerModel>?> getBazerTransactions({required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     List<BazerModel>? list;
     double cost=0;
     _isLoading =  true;
@@ -47,9 +47,47 @@ class BazerProvider extends ChangeNotifier{
       QuerySnapshot snapshot =  await firebaseFirestore
       .collection(Constants.bazer)
       .doc(messId)
-      .collection(Constants.mealHisabList)
-      .doc(mealHisabId)
+      .collection(Constants.mealSessionList)
+      .doc(mealSessionId)
       .collection(Constants.listOfBazerTnx)
+      // .orderBy(Constants.createdAt, descending: true)// don't need we are using reverse.
+      .get();
+
+      list = snapshot.docs.map(
+        (doc){
+          BazerModel bazerModel = BazerModel.fromMap(doc.data() as Map<String, dynamic>);
+          print(bazerModel.bazerList);
+          cost += bazerModel.amount;
+          
+          return bazerModel;
+        }).toList();
+      
+      _cost = cost;
+      debugPrint(_cost.toString());
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      debugPrint('FAILED');
+      onFail(e.toString());
+    }  
+    _isLoading  = false;
+    return list?.reversed.toList();
+  }
+
+  // get all Bazer transaction list 
+  Future<List<BazerModel>?> getBazerTransactionsForASpacificRange({required String messId,required String mealSessionId,required Function(String) onFail,required Timestamp fromDate, required Timestamp toDate, Function()? onSuccess,})async{
+    List<BazerModel>? list;
+    double cost=0;
+    _isLoading =  true;
+    try {
+      QuerySnapshot snapshot =  await firebaseFirestore
+      .collection(Constants.bazer)
+      .doc(messId)
+      .collection(Constants.mealSessionList)
+      .doc(mealSessionId)
+      .collection(Constants.listOfBazerTnx)
+      .where(FieldPath.documentId ,isGreaterThanOrEqualTo: fromDate.toDate().millisecondsSinceEpoch.toString())
+      .where(FieldPath.documentId ,isLessThanOrEqualTo: toDate.toDate().millisecondsSinceEpoch.toString())
+      .orderBy(Constants.createdAt, descending: true) 
       .get();
 
       list = snapshot.docs.map(
@@ -73,7 +111,7 @@ class BazerProvider extends ChangeNotifier{
   }
 
   // add a bazer transaction to database 
-  Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required String mealHisabId,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
         try {
@@ -81,8 +119,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.listOfBazerTnx)
             .doc(bazerModel.tnxId),
             bazerModel.toMap()
@@ -92,8 +130,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             {Constants.totalBazerCost:FieldValue.increment(bazerModel.amount)},
             SetOptions(
               merge: true
@@ -111,7 +149,7 @@ class BazerProvider extends ChangeNotifier{
   
 
   // update a bazer transaction to database 
-  Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required String mealHisabId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required String mealSessionId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
         try{
@@ -119,8 +157,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.listOfBazerTnx)
             .doc(bazerModel.tnxId),
             bazerModel.toMap(),
@@ -139,8 +177,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             {Constants.totalBazerCost: FieldValue.increment(extraAdd)},
             SetOptions(
               merge: true
@@ -161,7 +199,7 @@ class BazerProvider extends ChangeNotifier{
   
 
   // update a bazer transaction to database 
-  Future<void> deleteABazerTransaction({required String tnxId,required String messId,required String mealHisabId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
+  Future<void> deleteABazerTransaction({required String tnxId,required String messId,required String mealSessionId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
 
@@ -170,8 +208,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId)
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId)
             .collection(Constants.tnxId)
             .doc(tnxId),
           );
@@ -180,8 +218,8 @@ class BazerProvider extends ChangeNotifier{
             firebaseFirestore
             .collection(Constants.bazer)
             .doc(messId)
-            .collection(Constants.mealHisabList)
-            .doc(mealHisabId),
+            .collection(Constants.mealSessionList)
+            .doc(mealSessionId),
             {Constants.totalBazerCost : FieldValue.increment(extraAdd)},
             SetOptions(
               merge:true

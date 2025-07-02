@@ -66,6 +66,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
           showSnackber(context: context, content: message);
         }, 
         memberUid: authProvider.getUserModel!.uId,
+        messId: authProvider.getUserModel!.currentMessId,
         onSuccess: (){
           //remove current mess id from your user id.
           // because auth provider hold current mess id in user model. it will not replace until you relunch/login the app. 

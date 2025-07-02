@@ -14,8 +14,6 @@ class ClearFund extends StatefulWidget {
   State<ClearFund> createState() => _ClearFundState();
 }
 
-
-
 class _ClearFundState extends State<ClearFund> {
 
   @override
@@ -35,43 +33,42 @@ class _ClearFundState extends State<ClearFund> {
     FundProvider fundProvider = context.watch<FundProvider>();
     AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
     MessProvider messProvider = context.read<MessProvider>();
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Clear Fund"),
-          backgroundColor: Colors.grey,
-        ),
-      body:  Container(
-        color: Colors.red,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              onPressed: ()async{
-              if(!amIAdmin(messProvider: messProvider, authProvider: authProvider)){
-                showSnackber(context: context, content: "Required Administator Power");
-                return;
-              }
-              bool res = await showConfirmDialog(context: context, title: "Clear Fund Hostory", subTitle: "if you cleard fund transaction you can't be availabe next to undone. your fund blance will exist same but all fund transactions will be replaced by one net amout transaction what is current blance.");
-              if(res){
-                fundProvider.clearAllFundTnx(
-                  messId: authProvider.getUserModel!.currentMessId, 
-                  onFail: (message){
-                    showSnackber(context: context, content: "Failed!\n$message");
-                  }, 
-                  onSuccess: (){
-                    showSnackber(context: context, content: "Successed.");
-                  }
-                );
-              }
-            },
-            child: fundProvider.isLoading?showCircularProgressIndicator() : Text("Clear All Transactions."),
-            )
-          ],
-        ),
-      )
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Clear Fund"),
+        backgroundColor: Colors.grey,
       ),
+    body:  Container(
+      width: double.infinity,
+      color: Colors.red,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: ()async{
+            if(!amIAdmin(messProvider: messProvider, authProvider: authProvider)){
+              showSnackber(context: context, content: "Required Administator Power");
+              return;
+            }
+            bool res = await showConfirmDialog(context: context, title: "Clear Fund Hostory", subTitle: "if you cleard fund transaction you can't be availabe next to undone. your fund blance will exist same but all fund transactions will be replaced by one net amout transaction what is current blance.");
+            if(res){
+              fundProvider.clearAllFundTnx(
+                messId: authProvider.getUserModel!.currentMessId, 
+                onFail: (message){
+                  showSnackber(context: context, content: "Failed!\n$message");
+                }, 
+                onSuccess: (){
+                  showSnackber(context: context, content: "Successed.");
+                }
+              );
+            }
+          },
+          child: fundProvider.isLoading?showCircularProgressIndicator() : Text("Clear All Transactions."),
+          )
+        ],
+      ),
+    )
     );
   }
 }

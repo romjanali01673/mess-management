@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meal_hisab/authantication/Sign_up.dart';
 import 'package:meal_hisab/authantication/landing_screen.dart';
 import 'package:meal_hisab/authantication/sign_in.dart';
 import 'package:meal_hisab/constants.dart';
 import 'package:meal_hisab/firebase_options.dart';
 import 'package:meal_hisab/home.dart';
+import 'package:meal_hisab/mess/close_mess_hisab.dart';
 import 'package:meal_hisab/providers/authantication_provider.dart';
 import 'package:meal_hisab/providers/bazer_provider.dart';
 import 'package:meal_hisab/providers/colse_mess_hisab_provider.dart';
@@ -27,11 +29,12 @@ void main()async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(
     MultiProvider(
       providers: [
         // add all provider here
-        ChangeNotifierProvider(create: (_) => ColseMessHisabProvider()),
+        // ChangeNotifierProvider(create: (_) => ColseMessHisabProvider()),
         ChangeNotifierProvider(create: (_) => NoticeProvider()),
         ChangeNotifierProvider(create: (_) => FirstScreenProvider()),
         ChangeNotifierProvider(create: (_) => FundProvider()),
@@ -74,11 +77,13 @@ class MyApp extends StatelessWidget {
       ),
       // home:  HomeScreen(),
       initialRoute: Constants.LandingScreen,
+      // initialRoute: Constants.mealSessionList,
       routes: {  
         Constants.HomeScreen : (context) => const HomeScreen(),
         Constants.logInScreen:(context)=> const SignInScreen(),
         Constants.SignUpScreen:(context)=> const SignUpScreen(),
         Constants.LandingScreen:(context)=> const LandingScreen(),
+        // Constants.mealSessionList:(context)=> const MessCloseScreen(),
       },
     );
   }
