@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class RestPass extends StatefulWidget {

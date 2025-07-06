@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/bazer_model.dart';
-import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/model/user_model.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/model/bazer_model.dart';
+import 'package:mess_management/model/meal_model.dart';
+import 'package:mess_management/model/user_model.dart';
 
 class MealProvider extends ChangeNotifier{
 
@@ -23,6 +23,10 @@ class MealProvider extends ChangeNotifier{
 
   setMeal({required double meal,}){
     _totalMeal = meal;
+    notifyListeners();
+  }
+  setTotalMealOfMess({required double meal,}){
+    _totalMealOfMess = meal;
     notifyListeners();
   }
 
@@ -64,6 +68,34 @@ class MealProvider extends ChangeNotifier{
       }
     } catch (e) {
       onFail(e.toString());
+    }
+  }
+  
+
+  // get Total Meal Of Mess From Database
+  Future<void> getTotalMealOfMessFromDatabase({required String messId, required String mealSessionId, Function()? onSuccess, required Function(String) onFail})async{
+    try {
+      DocumentSnapshot snapshot =  await 
+      firebaseFirestore
+      .collection(Constants.meal)
+      .doc(messId)
+      .collection(Constants.mealSessionList)
+      .doc(mealSessionId)
+      .get();
+
+      if(snapshot.exists){
+        double d = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalMeal]).toString());
+        onSuccess!=null? onSuccess():(){};
+        setTotalMealOfMess(meal: d);
+      }
+      else{
+        onFail("No Data Found!");
+        setTotalMealOfMess(meal: 0);
+
+      }
+    } catch (e) {
+      onFail(e.toString());
+      setTotalMealOfMess(meal: 0);
     }
   }
   
@@ -137,6 +169,7 @@ class MealProvider extends ChangeNotifier{
       print(e.toString()+"getTotalMealOfMember");
     }  
     // setIsLoading(value: false);
+    _totalMeal = meal;
     return meal;
   }
 
@@ -241,7 +274,7 @@ class MealProvider extends ChangeNotifier{
         );
 
         await batch.commit();
-        setMeal(meal: getTotalMealOfMess+mealModel.totalMeal);
+        setTotalMealOfMess(meal: getTotalMealOfMess+mealModel.totalMeal);
         onSuccess!=null? onSuccess() : (){};
 
       } catch (e) {
@@ -285,7 +318,7 @@ class MealProvider extends ChangeNotifier{
         {Constants.totalMeal:FieldValue.increment(extraMeal)}
       );
       await batch.commit();
-      setMeal(meal: getTotalMealOfMess+extraMeal);
+      setTotalMealOfMess(meal: getTotalMealOfMess+extraMeal);
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
@@ -318,7 +351,7 @@ class MealProvider extends ChangeNotifier{
       );
 
       await batch.commit();
-
+      setTotalMealOfMess(meal: getTotalMealOfMess -extraMeal);
       onSuccess!=null? onSuccess():(){};
     } catch (e) {
       onFail(e.toString());

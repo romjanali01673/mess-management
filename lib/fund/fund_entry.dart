@@ -2,15 +2,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/model/fund_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/fund_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/deposit_model.dart';
+import 'package:mess_management/model/fund_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/fund_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddFund extends StatefulWidget {
@@ -70,11 +70,12 @@ class _AddFundState extends State<AddFund> {
     final authProvider = context.watch<AuthenticationProvider>();
     final messProvider = context.watch<MessProvider>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Fund Entry", style: getTextStyleForTitleXL(),),
+    return Scaffold(// required scaffold 
+      appBar: isUpdate? AppBar(
+        title: Text("Edit Fund Tnx"),
         backgroundColor: Colors.grey,
-      ),
+      )
+      : null,
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,

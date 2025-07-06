@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/member/add_member.dart';
-import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/member/add_member.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MemberScreen extends StatefulWidget {
@@ -258,9 +258,9 @@ class _MemberScreenState extends State<MemberScreen> {
                                   return;
                                 }
                                 // change member status
-                                memberData[Constants.status] = Constants.disable;
+                                memberData[Constants.status] = (memberData[Constants.status] == Constants.disable)? Constants.enable:Constants.disable ;
                                 final list = messProvider.getMessModel!.messMemberList;
-                                list[index] = memberData;
+                                list[list.indexWhere((test)=>test[Constants.uId]==memberData[Constants.uId])] = memberData;
                                 messProvider.setMessModel(messMemberList: list);
                                 await messProvider.changeMemberStatus();
                                 

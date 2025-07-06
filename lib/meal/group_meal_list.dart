@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/meal/meal_entry.dart';
-import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/meal/meal_entry.dart';
+import 'package:mess_management/model/meal_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class GroupMealList extends StatefulWidget {
@@ -98,7 +98,7 @@ class _GroupMealListState extends State<GroupMealList> {
                   title: 
                   showTotalMeal? 
                   FutureBuilder(
-                    future: mealProvider.getMealList(
+                    future: mealProvider.getTotalMealOfMessFromDatabase(
                       messId: authProvider.getUserModel!.currentMessId,
                       mealSessionId: authProvider.getUserModel!.mealSessionId,
                       onFail: (message){
@@ -112,9 +112,6 @@ class _GroupMealListState extends State<GroupMealList> {
                       else if (snapshot.hasError) {
                           return Center(child: Text('Error: ${snapshot.error}'));
                       } 
-                      else if (!snapshot.hasData || snapshot.data == null) {
-                          return Center(child: Text('No Transaction found.'));
-                    }
                       return Text("Total Mess Meal: ${mealProvider.getTotalMealOfMess}",);
                     }
                   )

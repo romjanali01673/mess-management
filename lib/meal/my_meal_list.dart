@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
 import 'package:provider/provider.dart';
 
 class MyMealList extends StatefulWidget {
@@ -25,6 +25,7 @@ class _MyMealListState extends State<MyMealList> {
     final authProvider = context.read<AuthenticationProvider>();
     return Expanded(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           if(!widget.fromPreMember) StatefulBuilder(
             builder: (context , setLocalState) {
@@ -59,7 +60,7 @@ class _MyMealListState extends State<MyMealList> {
                           return Center(child: Text('Error: ${snapshot.error}'));
                       } 
                       else if (!snapshot.hasData || snapshot.data == null) {
-                          return Center(child: Text('No Transaction found.'));
+                          return Text('No Transaction found.');
                     }
                       return Text("Total Meal: ${mealProvider.getTotalMeal}",);
                     }
@@ -94,7 +95,10 @@ class _MyMealListState extends State<MyMealList> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                 } 
                 else if (!snapshot.hasData || snapshot.data == null) {
-                    return Center(child: Text('No Transaction found.'));
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: Text('No Transaction found.'),
+                  );                
                 }
                 return ListView.builder(
                   itemCount: snapshot.data!.length,

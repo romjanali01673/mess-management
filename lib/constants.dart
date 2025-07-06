@@ -159,12 +159,7 @@ enum NoticeAndAnnouncement{
   Notices,
   addNotice,
 }
-enum Fund{
-  fund,
-  addDeposit,
-  addCost,
-  clearFund
-}
+
 enum DrawerItem{
   Home,
   Meal,
@@ -173,6 +168,7 @@ enum DrawerItem{
   Notice_And_Announcements,
   Bazer,
   Mess,
+  PreData,
   Settings,
   Deposit,
 }

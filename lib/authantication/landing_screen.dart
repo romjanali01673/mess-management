@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/services/asset_manager.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/services/asset_manager.dart';
 import 'package:provider/provider.dart';
 
 class LandingScreen extends StatefulWidget {

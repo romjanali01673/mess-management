@@ -2,12 +2,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/authantication/sign_in.dart';
-import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/authantication/sign_in.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/deposit/deposit.dart';
-import 'package:meal_hisab/model/deposit_model.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/deposit/deposit.dart';
+import 'package:mess_management/model/deposit_model.dart';
 
 class DepositProvider extends ChangeNotifier{
 
@@ -162,6 +162,7 @@ class DepositProvider extends ChangeNotifier{
         .get();
 
       for(var member in snapshot.docs){// here member contain uid doc
+        // the member all deposit list
         QuerySnapshot dipositListOfTheMember = await 
           firebaseFirestore
           .collection(Constants.deposit)
@@ -173,6 +174,7 @@ class DepositProvider extends ChangeNotifier{
           .collection(Constants.listOfDepositTnx)
           .get();
 
+        // get the member data
         DocumentSnapshot userData = await 
           firebaseFirestore
           .collection(Constants.users)

@@ -3,21 +3,22 @@ import 'dart:ui';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/bazer/bazer_screen.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/deposit/deposit.dart';
-import 'package:meal_hisab/fund/fund.dart';
-import 'package:meal_hisab/first_screen.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/meal/meal.dart';
-import 'package:meal_hisab/member/member_screen.dart';
-import 'package:meal_hisab/mess/mess_screen.dart';
-import 'package:meal_hisab/notice_and_announcement.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/providers/notice_provider.dart';
-import 'package:meal_hisab/setting/setting_secrren.dart';
+import 'package:mess_management/bazer/bazer_screen.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/deposit/deposit.dart';
+import 'package:mess_management/fund/fund.dart';
+import 'package:mess_management/first_screen.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/meal/meal.dart';
+import 'package:mess_management/member/member_screen.dart';
+import 'package:mess_management/mess/mess_screen.dart';
+import 'package:mess_management/notice_and_announcement.dart';
+import 'package:mess_management/pre_data/pre_data.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/providers/notice_provider.dart';
+import 'package:mess_management/setting/setting_secrren.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -233,12 +234,12 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Fund",
               selected: DrawerItemGroup==DrawerItem.Fund, 
               ontap: () {
-                DrawerItemGroup=DrawerItem.Fund;
+                // DrawerItemGroup=DrawerItem.Fund;
                 Navigator.pop(context);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => FundScreen()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FundScreen()),
+                );
                 setState((){
 
                 });
@@ -248,11 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "Deposit",
               selected: DrawerItemGroup==DrawerItem.Deposit, 
               ontap: () {
-                Navigator.pop(context);
-                DrawerItemGroup=DrawerItem.Deposit;
-                setState(() {
+                // Navigator.pop(context);
+                // DrawerItemGroup=DrawerItem.Deposit;
+                // setState(() {
                 
-                });
+                // });
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>DepositScreen()));
               },
             ),
             getItems(
@@ -269,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             getItems(
-              icon: Icons.payment, 
+              icon: Icons.shopping_bag_outlined, 
               label: "Bazer",
               selected: DrawerItemGroup == DrawerItem.Bazer,
               ontap: () {
@@ -291,6 +294,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 // });
                 Navigator.push(context, MaterialPageRoute( builder:(context)=> MessScreen()));
+              },
+            ),
+            getItems(
+              icon: Icons.dataset_linked, 
+              label: "Pre Data",
+              selected: DrawerItemGroup == DrawerItem.PreData,
+              ontap: () {
+                Navigator.pop(context);
+                // DrawerItemGroup=DrawerItem.Mess;
+                // setState(() {
+                
+                // });
+                Navigator.push(context, MaterialPageRoute( builder:(context)=> PreDataScreen()));
               },
             ),
             getItems(

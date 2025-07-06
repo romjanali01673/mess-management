@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:meal_hisab/constants.dart';
+import 'package:mess_management/constants.dart';
 
 class NoticeModel{
   String noticeId;

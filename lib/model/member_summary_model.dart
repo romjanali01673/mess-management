@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:meal_hisab/constants.dart';
+import 'package:mess_management/constants.dart';
 
 class MemberSummaryModel {
+
+  String fname;
+  String uId;
 
   String mealSessionId;
   String messId;
@@ -22,6 +25,9 @@ class MemberSummaryModel {
 
 
   MemberSummaryModel( {
+    required this.fname,
+    required this.uId,
+
     required this.mealSessionId,
     required this.messId,
     required this.messName,      
@@ -41,6 +47,9 @@ class MemberSummaryModel {
 
   Map<String,dynamic> toMap(){
     return{
+      Constants.fname: fname,
+      Constants.uId: uId,
+
       Constants.mealSessionId: mealSessionId,
       Constants.messId:messId,
       Constants.messName: messName,
@@ -62,6 +71,8 @@ class MemberSummaryModel {
 
   factory MemberSummaryModel.fromMap(Map<String,dynamic>data){
     return MemberSummaryModel(
+      fname: data[Constants.fname]??"",
+      uId: data[Constants.uId]??"",
       mealSessionId: data[Constants.mealSessionId]??"",
       messId: data[Constants.messId]?? "", 
       messName: data[Constants.messName] ??"", 

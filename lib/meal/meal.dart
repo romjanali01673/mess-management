@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/meal/Member_meal_list.dart';
-import 'package:meal_hisab/meal/group_meal_list.dart';
-import 'package:meal_hisab/meal/meal_entry.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/meal/my_meal_list.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/home.dart';
+import 'package:mess_management/meal/Member_meal_list.dart';
+import 'package:mess_management/meal/group_meal_list.dart';
+import 'package:mess_management/meal/meal_entry.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/meal/my_meal_list.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
 import 'package:provider/provider.dart';
 
 class MealScreen extends StatefulWidget {

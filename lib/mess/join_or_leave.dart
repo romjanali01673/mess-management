@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/joining_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/joining_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class JoinOrLeave extends StatefulWidget {
@@ -108,7 +108,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
           
           Expanded(
             child: FutureBuilder(
-              future:messProvider.getInvaitationsList(uId: authProvider.uid!, onFail: (message) {showSnackber(context: context, content: "invaitations list found Error!\n$message");}) ,
+              future:messProvider.getInvaitationsList(uId: authProvider.getUid!, onFail: (message) {showSnackber(context: context, content: "invaitations list found Error!\n$message");}) ,
               
               builder: (context, AsyncSnapshot<List<JoiningModel?>?> snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
@@ -173,11 +173,8 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                               }, 
                                               onSuccess: ()async{
                                                 showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
-                                                authProvider.setUserModel(currentMessId: joiningModel.messId);
-                                                setState(() {
-                                                  
-                                                });
-
+                                                await authProvider.getUserProfileData(onFail: (_){});
+                                                Navigator.pop(context);
                                               }, 
                                             );  
                                           }

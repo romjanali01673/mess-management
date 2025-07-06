@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/member_summary_model.dart';
-import 'package:meal_hisab/model/mess_model.dart';
-import 'package:meal_hisab/pre_data/summary.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/member_summary_model.dart';
+import 'package:mess_management/model/mess_model.dart';
+import 'package:mess_management/pre_data/meal_session_list.dart';
+import 'package:mess_management/pre_data/member_summary.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class PreDataScreen extends StatefulWidget {
@@ -30,6 +31,13 @@ class _PreDataScreenState extends State<PreDataScreen> {
       appBar: AppBar(
         title: Text("Mess List"),
         backgroundColor: Colors.grey,
+        actions: [
+          IconButton(
+            onPressed: (){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MealSessionList()));
+            }, 
+            icon: Icon(Icons.admin_panel_settings))
+        ],
       ),
       body: SafeArea(
         child: Center(
@@ -99,7 +107,7 @@ class _PreDataScreenState extends State<PreDataScreen> {
                               ],
                             ),
                             if(showmealSessionList)FutureBuilder(
-                              future: messProvider.getAMembermealSessionIdListForASpacificMess(
+                              future: messProvider.getAMemberMealSessionListForASpacificMess(
                                 uId: authProvider.getUserModel!.uId, 
                                 messId:snapshot.data![index][Constants.messId].toString(),
                                 onFail: (message){
@@ -128,7 +136,7 @@ class _PreDataScreenState extends State<PreDataScreen> {
                                       color: Colors.green.shade50,
                                       child: ListTile(
                                         title: Text(
-                                          "Meal Id: ${memberSummaryModel.mealSessionId}",
+                                          "Meal Session Id: ${memberSummaryModel.mealSessionId}",
                                           style: getTextStyleForTitleS(),
                                         ),
                                         subtitle: Text(
@@ -141,7 +149,7 @@ class _PreDataScreenState extends State<PreDataScreen> {
                                             showMessageDialog(context: context, title: "Current Meal Session", Discreption: "This is your current meal session.\nyou will be avail to see this meal details after close this meal session.");
                                             return;
                                           }
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Options(memberSummaryModel:memberSummaryModel)));
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>MemberSummary(memberSummaryModel:memberSummaryModel)));
                                         },
                                       )
                                     );

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/meal_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/meal_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MealEntryScreen extends StatefulWidget {
@@ -232,7 +232,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 totalMeal: getTotalMeal(),
                               );
                               print(mealModel.toMap());
-                              
+                              print(authProvider.getUserModel!.mealSessionId);
                               mealProvider.addAMeal(
                                 mealModel: mealModel, 
                                 messId: authProvider.getUserModel!.currentMessId, 
@@ -293,8 +293,10 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                               },
                               enabled: isUpdate? true :  member[Constants.status]==Constants.enable,
                               onChanged: (value){
+                                value = value.trim();
                                 try{
-                                  double d = double.parse(value.toString());
+                                  print(value.toString());
+                                  double d = value.isEmpty ? 0 : double.tryParse(value) ?? 0;
                                   listOfMeal[index][Constants.meal] = d;
                                 }catch(e){
                                   listOfTexteditingController[index].text = "";

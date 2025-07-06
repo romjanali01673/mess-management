@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/bazer/bazer_entry.dart';
-import 'package:meal_hisab/bazer/bazer_list.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/item_provider.dart';
-import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
+import 'package:mess_management/bazer/bazer_entry.dart';
+import 'package:mess_management/bazer/bazer_list.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/item_provider.dart';
+import 'package:mess_management/home.dart';
+import 'package:mess_management/helper/ui_helper.dart';
 
 class BazerScreen extends StatefulWidget {
   const BazerScreen({super.key});

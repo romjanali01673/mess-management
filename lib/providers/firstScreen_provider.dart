@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/notice_model.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/model/notice_model.dart';
 class FirstScreenProvider extends ChangeNotifier{
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
@@ -33,7 +33,7 @@ class FirstScreenProvider extends ChangeNotifier{
   double get getMyTotalMeal => _myTotalMeal;
   double get getMyTotalDeposit =>_myTotalDeposit;
   double get getMyRemainingTk{
-    return getMealRate * getMyTotalMeal;
+    return _myTotalDeposit - (getMealRate * getMyTotalMeal);
   }
   double get getTotalMealOfMess => _totalMealOfMess;
   double get getTotalBazerCost =>  _totalBazerCost;
@@ -106,13 +106,13 @@ class FirstScreenProvider extends ChangeNotifier{
 
       if(snapshot.exists && snapshot.data() != null){
         blance = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
-        setRemainingFundBlanc(value: blance);
       }
         print(blance);
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
     }  
+    setRemainingFundBlanc(value: blance);
     setIsLoading(value: false);
     return blance;
   }
@@ -131,13 +131,13 @@ class FirstScreenProvider extends ChangeNotifier{
 
       if(snapshot.exists && snapshot.data() != null){
         meal = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalMeal]).toString());
-        setTotalMealOfMess(value: meal);
       }
         print(meal);
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
     }  
+    setTotalMealOfMess(value: meal);
     setIsLoading(value: false);
     return meal;
   }
@@ -156,13 +156,13 @@ class FirstScreenProvider extends ChangeNotifier{
 
       if(snapshot.exists && snapshot.data() != null){
         bazer = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalBazerCost]).toString());
-        setTotalBazerCost(value: bazer);
       }
       print(bazer);
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
     }  
+    setTotalBazerCost(value: bazer);
     setIsLoading(value: false);
     return bazer;
   }
@@ -182,13 +182,13 @@ class FirstScreenProvider extends ChangeNotifier{
 
       if(snapshot.exists && snapshot.data() != null){
         deposit = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());
-        setTotalDepositOfMess(value: deposit);
       }
       print("mess deposit $deposit");
       onSuccess!=null? onSuccess() : (){};
     } catch (e) {
       onFail(e.toString());
     }  
+    setTotalDepositOfMess(value: deposit);
     setIsLoading(value: false);
     return deposit;
   }
@@ -215,7 +215,6 @@ class FirstScreenProvider extends ChangeNotifier{
         }
       }).toList();
       
-      setMyTotalDeposit(value: deposit);
       
       print("my deposit $deposit");
       onSuccess!=null? onSuccess() : (){};
@@ -223,6 +222,7 @@ class FirstScreenProvider extends ChangeNotifier{
       onFail(e.toString());
       print(e.toString()+"getTotalDepositOfMember");
     }  
+    setMyTotalDeposit(value: deposit);
     setIsLoading(value: false);
     return deposit;
   }
@@ -253,7 +253,6 @@ class FirstScreenProvider extends ChangeNotifier{
         }
       }).toList();
       
-      setMyTotalMeal(value: meal);
       
       print("my total meal $meal");
       onSuccess!=null? onSuccess() : (){};
@@ -261,6 +260,7 @@ class FirstScreenProvider extends ChangeNotifier{
       onFail(e.toString());
       print(e.toString()+"getTotalMealOfMember");
     }  
+    setMyTotalMeal(value: meal);
     setIsLoading(value: false);
     return meal;
   }

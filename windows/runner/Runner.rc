@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "meal_hisab" "\0"
+            VALUE "FileDescription", "mess_management" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "meal_hisab" "\0"
+            VALUE "InternalName", "mess_management" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "meal_hisab.exe" "\0"
-            VALUE "ProductName", "meal_hisab" "\0"
+            VALUE "OriginalFilename", "mess_management.exe" "\0"
+            VALUE "ProductName", "mess_management" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

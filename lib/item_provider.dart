@@ -1,4 +1,4 @@
-import 'package:meal_hisab/constants.dart';
+import 'package:mess_management/constants.dart';
 
 class ItemProvider {
 

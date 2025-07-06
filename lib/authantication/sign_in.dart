@@ -1,12 +1,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/authantication/Sign_up.dart';
-import 'package:meal_hisab/authantication/reset_pass.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:mess_management/authantication/Sign_up.dart';
+import 'package:mess_management/authantication/reset_pass.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -40,20 +40,23 @@ class _SignInScreenState extends State<SignInScreen> {
       );
       if(userCredential!=null){
         //user valid, now try to fatch user data
-        bool isSuccess = false;
+        bool isSuccess = true;
         // get
         await authProvider.getUidFromFiretore(onFail: (message){
-
+          isSuccess = false;
         });
-        await authProvider.setSessionKey(
-          onSuccess: (){
-            isSuccess = true;
-          },
-          onFail: (message){
-            isSuccess =false;
-            showSnackber(context: context, content: "User Data fatch Error");
-          }
-        );
+        if(isSuccess){
+          await authProvider.setSessionKey(
+            onSuccess: (){
+              isSuccess = true;
+            },
+            onFail: (message){
+              isSuccess =false;
+              showSnackber(context: context, content: "User Data fatch Error");
+            }
+          );
+        }
+          
         if(isSuccess){
           isSuccess = await authProvider.getUserProfileData(onFail: (message){
             showSnackber(context: context, content: "somthing Wrong\n try again!");

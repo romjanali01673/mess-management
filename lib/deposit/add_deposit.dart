@@ -2,13 +2,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/deposit_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/deposit_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddDeposit extends StatefulWidget {
@@ -78,7 +78,6 @@ class _AddDepositState extends State<AddDeposit> {
     if(widget.preDepositModel != null && widget.preMemberData!=null){
       setPreData();
     }
-    
     // TODO: implement initState
     super.initState();
   }
@@ -100,10 +99,10 @@ class _AddDepositState extends State<AddDeposit> {
     final authProvider = context.watch<AuthenticationProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Deposit Entry", style: getTextStyleForTitleXL(),),
+      appBar: isUpdate? AppBar(
+        title: Text("Edit Deposit", style: getTextStyleForTitleXL(),),
         backgroundColor: Colors.grey,
-      ),
+      ):null,
       body: Container(
         height: double.infinity,
         color: Colors.green.shade50,
@@ -231,6 +230,7 @@ class _AddDepositState extends State<AddDeposit> {
                         onTapOutside: (event) {
                           FocusScope.of(context).unfocus();
                         },
+                        autofocus: true,
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         textInputAction: TextInputAction.done,
@@ -264,7 +264,7 @@ class _AddDepositState extends State<AddDeposit> {
                     return;
                   }
 
-                  bool valided  = (formKey.currentState!.validate() && selectedItem !=selectedItem );
+                  bool valided  = (formKey.currentState!.validate() && selectedItem != Constants.selectedMember );
                   
                   if(valided){
                     if(isUpdate){

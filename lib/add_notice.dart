@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/fund_model.dart';
-import 'package:meal_hisab/model/notice_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/fund_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/providers/notice_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/home.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/fund_model.dart';
+import 'package:mess_management/model/notice_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/fund_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/providers/notice_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddNotice extends StatefulWidget {

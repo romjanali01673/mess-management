@@ -1,6 +1,6 @@
 {
-    "name": "meal_hisab",
-    "short_name": "meal_hisab",
+    "name": "mess_management",
+    "short_name": "mess_management",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

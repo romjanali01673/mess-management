@@ -1,13 +1,13 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/mess_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/mess_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessCreate extends StatefulWidget {
@@ -84,7 +84,11 @@ class _MessCreateState extends State<MessCreate> {
 
       // store mess created info to firestore
       await messProvider.createMess(
-        uId: authProvider.getUserModel!.uId,
+        member: {
+          Constants.fname: authProvider.getUserModel!.fname,
+          Constants.uId: authProvider.getUserModel!.uId,
+          Constants.status: Constants.enable,
+        },
         messModel: MessModel(
           messId: DateTime.now().millisecondsSinceEpoch.toString(), 
           mealSessionId: DateTime.now().millisecondsSinceEpoch.toString(),

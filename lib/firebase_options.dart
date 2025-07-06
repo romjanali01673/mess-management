@@ -41,48 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBL_vyK_lbKnV7W5Wl6tdczjBVppa34_FA',
-    appId: '1:414026155088:web:da254930af9e8905c33d55',
-    messagingSenderId: '414026155088',
-    projectId: 'meal-hisab',
-    authDomain: 'meal-hisab.firebaseapp.com',
-    storageBucket: 'meal-hisab.firebasestorage.app',
-    measurementId: 'G-KZZ3NJ7F7L',
+    apiKey: 'AIzaSyC0jsOKMfiJxYSU4VXDXhVSQwAdcIc0kw8',
+    appId: '1:12282274098:web:204ac56a1dba70ceeff72b',
+    messagingSenderId: '12282274098',
+    projectId: 'mess-management-b82d9',
+    authDomain: 'mess-management-b82d9.firebaseapp.com',
+    storageBucket: 'mess-management-b82d9.firebasestorage.app',
+    measurementId: 'G-FS351TH28T',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC7qa4WK1YPFy1EVsWm_2FxBDZCk-2x2OU',
-    appId: '1:414026155088:android:fadc4380e57351aac33d55',
-    messagingSenderId: '414026155088',
-    projectId: 'meal-hisab',
-    storageBucket: 'meal-hisab.firebasestorage.app',
+    apiKey: 'AIzaSyAgqmJur5ZGIpO-WdyxEiVIlyps2jzTZ6k',
+    appId: '1:12282274098:android:28c2d24f51e7915beff72b',
+    messagingSenderId: '12282274098',
+    projectId: 'mess-management-b82d9',
+    storageBucket: 'mess-management-b82d9.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA-p_cKd1lcO8b0EjWrp6Kuzdn2mC-BwZk',
-    appId: '1:414026155088:ios:b62e154e7cd4381ac33d55',
-    messagingSenderId: '414026155088',
-    projectId: 'meal-hisab',
-    storageBucket: 'meal-hisab.firebasestorage.app',
-    iosBundleId: 'com.example.mealHisab',
+    apiKey: 'AIzaSyDWILcjyrVszWkqhMuA5V1L5GYaJMuZHEU',
+    appId: '1:12282274098:ios:47f01f9759154959eff72b',
+    messagingSenderId: '12282274098',
+    projectId: 'mess-management-b82d9',
+    storageBucket: 'mess-management-b82d9.firebasestorage.app',
+    iosBundleId: 'com.engromjanali.messManagement',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA-p_cKd1lcO8b0EjWrp6Kuzdn2mC-BwZk',
-    appId: '1:414026155088:ios:b62e154e7cd4381ac33d55',
-    messagingSenderId: '414026155088',
-    projectId: 'meal-hisab',
-    storageBucket: 'meal-hisab.firebasestorage.app',
-    iosBundleId: 'com.example.mealHisab',
+    apiKey: 'AIzaSyDWILcjyrVszWkqhMuA5V1L5GYaJMuZHEU',
+    appId: '1:12282274098:ios:9a259db44b0773e1eff72b',
+    messagingSenderId: '12282274098',
+    projectId: 'mess-management-b82d9',
+    storageBucket: 'mess-management-b82d9.firebasestorage.app',
+    iosBundleId: 'com.example.messManagement',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBL_vyK_lbKnV7W5Wl6tdczjBVppa34_FA',
-    appId: '1:414026155088:web:c70583cc90c1701ec33d55',
-    messagingSenderId: '414026155088',
-    projectId: 'meal-hisab',
-    authDomain: 'meal-hisab.firebaseapp.com',
-    storageBucket: 'meal-hisab.firebasestorage.app',
-    measurementId: 'G-DK9CLNBC32',
+    apiKey: 'AIzaSyC0jsOKMfiJxYSU4VXDXhVSQwAdcIc0kw8',
+    appId: '1:12282274098:web:9e93c1972e4e0440eff72b',
+    messagingSenderId: '12282274098',
+    projectId: 'mess-management-b82d9',
+    authDomain: 'mess-management-b82d9.firebaseapp.com',
+    storageBucket: 'mess-management-b82d9.firebasestorage.app',
+    measurementId: 'G-SBK8BEWLNS',
   );
 }

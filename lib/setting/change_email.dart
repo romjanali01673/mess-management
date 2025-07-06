@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/services/asset_manager.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/home.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/services/asset_manager.dart';
 import 'package:provider/provider.dart';
 
 class ChangeEmail extends StatefulWidget {

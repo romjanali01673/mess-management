@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/fund_model.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/model/fund_model.dart';
 import 'package:provider/provider.dart';
 
 class FundProvider extends ChangeNotifier{
@@ -15,7 +15,7 @@ class FundProvider extends ChangeNotifier{
   FundModel? _fundModel;
   double _blance = 0;
 
-  int limit = 200;
+  int limit = 100;
   List<FundModel> currentDocs = [];
   DocumentSnapshot? _firstDoc;
   DocumentSnapshot? _lastDoc;
@@ -176,9 +176,7 @@ class FundProvider extends ChangeNotifier{
         currentDocs = snapshot.docs.map((x)=> FundModel.fromMap(x.data())).toList();
         _firstDoc = snapshot.docs.first;
         _lastDoc = snapshot.docs.last;
-        if(snapshot.docs.length==limit){
-          _hasMoreForward = true;
-        }
+        _hasMoreForward = snapshot.docs.length==limit;
         _hasMoreBackward = false;
     }
   } catch (e) {
@@ -241,7 +239,6 @@ class FundProvider extends ChangeNotifier{
         //   print(x.id);
         // });
           currentDocs = (snapshot.docs.map((x)=>FundModel.fromMap(x.data())).toList());
-          currentDocs.removeRange(0, snapshot.docs.length);
 
           notifyListeners();
           _firstDoc = snapshot.docs.first;
@@ -281,7 +278,9 @@ class FundProvider extends ChangeNotifier{
           int i =0;
           snapshot.docs.map((x){
             currentDocs.insert(i, FundModel.fromMap(x.data()));
-            currentDocs.removeLast();
+            if(currentDocs.length>limit){
+              currentDocs.removeLast(); // because this value will not sync.
+            }            
             i++;
           }).toList();
           notifyListeners();

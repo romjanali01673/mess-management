@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/model/joining_model.dart';
-import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/model/joining_model.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddMemberScreen extends StatefulWidget{
@@ -139,7 +139,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Name :"),
+                    Text("Name :",
+                      style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
                       child: Text(userModel!.fname)
                     )
@@ -149,7 +151,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Id :"),
+                    Text("Id :",
+                      style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
                       child: Text(userModel!.uId)
                     )
@@ -159,7 +163,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Phone :"),
+                    Text("Phone :",
+                      style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
                       child: Text(userModel!.number)
                     )
@@ -169,7 +175,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Email :"),
+                    Text("Email :",
+                      style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
                       child: Text(userModel!.email)
                     )
@@ -180,7 +188,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 20,
                   children: [
-                    Text("Address :"),
+                    Text("Address :",
+                      style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
                       child: Text(userModel!.fullAddress)
                     )

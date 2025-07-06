@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/mess/add_rule.dart';
-import 'package:meal_hisab/mess/close_mess_hisab.dart';
-import 'package:meal_hisab/mess/join_or_leave.dart';
-import 'package:meal_hisab/mess/mess_create.dart';
-import 'package:meal_hisab/mess/mess_delete.dart';
-import 'package:meal_hisab/mess/mess_update.dart';
-import 'package:meal_hisab/pre_data/pre_data.dart';
-import 'package:meal_hisab/model/rule_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/mess/add_rule.dart';
+import 'package:mess_management/mess/close_mess_hisab.dart';
+import 'package:mess_management/mess/join_or_leave.dart';
+import 'package:mess_management/mess/mess_create.dart';
+import 'package:mess_management/mess/mess_delete.dart';
+import 'package:mess_management/mess/mess_update.dart';
+import 'package:mess_management/pre_data/pre_data.dart';
+import 'package:mess_management/model/rule_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class MessScreen extends StatefulWidget{
@@ -78,13 +78,6 @@ class _MessScreenState extends State<MessScreen>{
                       },
                       selected: messScreemItemGrpup==Mess.mess,
                       icon: Icons.info_outline_rounded
-                    ),
-                    getMenuItems(
-                      label: "Pre Data", 
-                      ontap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>PreDataScreen()));
-                      },
-                      icon: Icons.preview
                     ),
                     getMenuItems(
                       label: "Close Mess Estimate", 
@@ -190,47 +183,51 @@ class _MessScreenState extends State<MessScreen>{
                         // 
                         Text(
                           "Mess Name: ${messProvider.getMessModel!.messName}",
-                          style : getTextStyleForSubTitleL()
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold)
                         ),
                         Text(
                           "Mess Id: ${messProvider.getMessModel!.messId}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Menager Name: ${messProvider.getMessModel!.menagerName}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Menager Id: ${messProvider.getMessModel!.menagerId}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Menager Email: ${messProvider.getMessModel!.menagerEmail}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Menager Phone: ${messProvider.getMessModel!.menagerPhone}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Act Menager Name: ${messProvider.getMessModel!.actMenagerName}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Act Menager Id: ${messProvider.getMessModel!.actMenagerId}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Number Of Member: ${messProvider.getMessModel!.messMemberList.length}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "Meal Session Id: ${messProvider.getMessModel!.mealSessionId}",
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Mess Address: ${messProvider.getMessModel!.messAddress}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                         if(messProvider.getMessModel!.createdAt != null) Text(// because ait first when we create a mess we did not read data from firebase just set given data to current mess data. for this mement we gat a error for null Timestamp
                           "Created At: ${DateFormat("hh:mm a dd-MM-yyyy").format(messProvider.getMessModel!.createdAt!.toDate().toLocal())}",
-                          style : getTextStyleForSubTitleL(),
+                          style : getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -344,8 +341,12 @@ class _MessScreenState extends State<MessScreen>{
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("ID: ${ruleModel.tnxId}\n"),
-                                Text("${ruleModel.description}"),
+                                Text("ID: ${ruleModel.tnxId}\n",
+                                  style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                Text("${ruleModel.description}",
+                                  style: getTextStyleForSubTitleM(),
+                                ),
                               ],
                             ),
                           ),

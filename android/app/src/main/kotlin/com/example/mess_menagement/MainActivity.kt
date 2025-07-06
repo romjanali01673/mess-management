@@ -1,4 +1,4 @@
-package com.example.meal_hisab
+package com.engromjanali.mess_management
 
 import io.flutter.embedding.android.FlutterActivity
 

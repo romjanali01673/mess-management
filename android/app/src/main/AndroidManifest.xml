@@ -1,18 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="meal_hisab"
+        android:label="Mess Management"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
-        <!-- <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/> -->
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Ucrop.CropTheme"/> <!--this line is updated-->
-        
+        android:name="com.yalantis.ucrop.UCropActivity"
+        android:screenOrientation="portrait"
+        android:theme="@style/Ucrop.CropTheme"/> <!--this line is updated-->
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

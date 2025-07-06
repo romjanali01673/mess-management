@@ -3,44 +3,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meal_hisab/bazer/bazer_list.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/deposit/my_deposit.dart';
-import 'package:meal_hisab/fund/fund.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/meal/my_meal_list.dart';
-import 'package:meal_hisab/model/member_summary_model.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/bazer/bazer_list.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/deposit/my_deposit.dart';
+import 'package:mess_management/fund/fand_list.dart';
+import 'package:mess_management/fund/fund.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/meal/my_meal_list.dart';
+import 'package:mess_management/model/member_summary_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
-class Options extends StatefulWidget{
+class MemberSummary extends StatefulWidget{
   final MemberSummaryModel memberSummaryModel;
-  const Options({super.key,required this.memberSummaryModel});
+  const MemberSummary({super.key,required this.memberSummaryModel});
 
   @override
-  State<Options> createState()=>_OptionsState();
+  State<MemberSummary> createState()=>_MemberSummaryState();
 }
 
-class _OptionsState extends State<Options>{
+class _MemberSummaryState extends State<MemberSummary>{
 
   Set<String> optionList={"Deposit", "bazer", "Meal", "Fund",};
   String selectedOption = "";
-  bool found = true;
 
 
   @override
   initState(){
-    if(widget.memberSummaryModel.status == Constants.Temporary){
-      found = false;
-    }
-    
     super.initState();
   }
 
   Widget build(BuildContext context){
-    final authProvider = context.read<AuthenticationProvider>(); 
-    final messProvider = context.read<MessProvider>(); 
+    // final authProvider = context.read<AuthenticationProvider>(); 
+    // final messProvider = context.read<MessProvider>(); 
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -50,10 +46,12 @@ class _OptionsState extends State<Options>{
         backgroundColor: Colors.grey,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child:found?  Column(
-            children: [
-              Card(
+        child: NestedScrollView(
+          floatHeaderSlivers: true,
+          headerSliverBuilder: (context, innerBoxIsScrolled){
+            return [
+              SliverToBoxAdapter(
+                child: Card(
                 color: Colors.grey.shade50,
                 child: Column(
                   children: [
@@ -69,6 +67,36 @@ class _OptionsState extends State<Options>{
                           children: [
                             
                             // rich text work like a parentTextStyle.copyWith(), mean if use color in child, other all proparty will be same excipt color,
+                            Text.rich(
+                              TextSpan(
+                                style: getTextStyleForSubTitleXL(), 
+                                children: [
+                                  TextSpan(
+                                    text: "Full Name: ",
+                                    style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: widget.memberSummaryModel.fname,
+                                  ),
+                                ]
+                              )
+                            ),
+
+                            Text.rich(
+                              TextSpan(
+                                style: getTextStyleForSubTitleXL(), 
+                                children: [
+                                  TextSpan(
+                                    text: "User Id: ",
+                                    style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: widget.memberSummaryModel.uId,
+                                  ),
+                                ]
+                              )
+                            ),
+
                             Text.rich(
                               TextSpan(
                                 style: getTextStyleForSubTitleXL(), 
@@ -221,7 +249,7 @@ class _OptionsState extends State<Options>{
                                 style: getTextStyleForSubTitleXL(), 
                                 children: [
                                   TextSpan(
-                                    text: "Total Meal: ",
+                                    text: "Total Meal Of Mess: ",
                                     style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
@@ -352,109 +380,47 @@ class _OptionsState extends State<Options>{
                   ],
                 ),
               ),
-              if(selectedOption=="") Center(
-                child: Text("Select an options to see it's details"),
               ),
-              if(selectedOption==optionList.first) SizedBox(
-                height: 600,
-                child: Column(
-                  children: [
-                    MyDeposit(
-                      fromPreMember: true, 
-                      messId: widget.memberSummaryModel.messId,
-                      mealSessionId: widget.memberSummaryModel.mealSessionId,
-                      uId: authProvider.getUserModel!.uId,
-                    ),
-                  ],
-                )
-              ),
-              if(selectedOption==optionList.elementAt(1)) SizedBox(
-                height: 600,
-                child: Column(
-                  children: [
-                    BazerListScreen(
-                      fromPreMember: true, 
-                      messId: widget.memberSummaryModel.messId,
-                      mealSessionId: widget.memberSummaryModel.mealSessionId,
-                      fromDate:widget.memberSummaryModel.joindAt, 
-                      toDate:widget.memberSummaryModel.closedAt, 
-                    ),
-                  ],
-                )
-              ),
-              if(selectedOption==optionList.elementAt(2)) SizedBox(
-                height: 600,
-                child: Column(
-                  children: [
-                    MyMealList(
-                      fromPreMember: true, 
-                      messId: widget.memberSummaryModel.messId,
-                      mealSessionId: widget.memberSummaryModel.mealSessionId,
-                      uId: authProvider.getUserModel!.uId,
-                    ),
-                  ],
-                )
-              ),
-              if(selectedOption==optionList.elementAt(3)) SizedBox(
-                height: 600,
-                child: Column(
-                  children: [
-                    FundHome(
-                      fromPreMember: true, 
-                      messId: widget.memberSummaryModel.messId,
-                      fromDate:widget.memberSummaryModel.joindAt, 
-                      toDate:widget.memberSummaryModel.closedAt, 
-                      // toDate:Timestamp.fromDate(DateTime.now().add(const Duration(days: 90)))
-                    ),
-                  ],
-                )
-              )
-            ],
+            ];
+          },
+          body: selectedOption==""? Center(
+            child: Text("Select an options to see it's details"),
           )
-          :   
-          Center(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 400,
-                ),
-                ElevatedButton(
-                  onPressed: ()async{
-                    if(widget.memberSummaryModel.messId != authProvider.getUserModel!.currentMessId){
-                      showMessageDialog(
-                        context: context, 
-                        title: "Info", 
-                        Discreption: "you are not in the mess. that's why you can't genarate your \"summary\". please wait until menager close meal session.",
-                      );
-                    }
-                    else{
-                      // genarate member summary
-                      await messProvider.genarateMemberSummary(
-                        uId: authProvider.getUserModel!.uId,
-                        memberSummaryModel: widget.memberSummaryModel,
-                        onFail: (message) {
-                          showSnackber(context: context, content: "failed");
-                        },
-                        onSuccess: () {
-                          showSnackber(context: context, content: "successed");
-                          authProvider.getUserProfileData(onFail: (_){});
-                        },
-                      );
-                    }
-                  }, 
-                  child: Text("Genarate"),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-                Text(
-                  "Your meal summary hasn't genarate yet.\n Click to the genarate button to genarate your meal summary.",
-                  textAlign: TextAlign.center,  
-                ),
-              ],
-            ),
-          ),
+          :
+          (selectedOption==optionList.first)? MyDeposit(
+            fromPreMember: true, 
+            messId: widget.memberSummaryModel.messId,
+            mealSessionId: widget.memberSummaryModel.mealSessionId,
+            uId: widget.memberSummaryModel.uId,
+          )
+          :
+          (selectedOption==optionList.elementAt(1))? BazerListScreen(
+            fromPreMember: true, 
+            messId: widget.memberSummaryModel.messId,
+            mealSessionId: widget.memberSummaryModel.mealSessionId,
+            fromDate:widget.memberSummaryModel.joindAt, 
+            toDate:widget.memberSummaryModel.closedAt, 
+          )
+          :
+          (selectedOption==optionList.elementAt(2))? MyMealList(
+            fromPreMember: true, 
+            messId: widget.memberSummaryModel.messId,
+            mealSessionId: widget.memberSummaryModel.mealSessionId,
+            uId: widget.memberSummaryModel.uId,
+          )
+          :
+          FundList(
+            fromPreMember: true, 
+            messId: widget.memberSummaryModel.messId,
+            fromDate:widget.memberSummaryModel.joindAt, 
+            toDate:widget.memberSummaryModel.closedAt, 
+            // toDate:Timestamp.fromDate(DateTime.now().add(const Duration(days: 90)))
+          )
         )
+        
+        
+        
+        
       ),
     );
   }

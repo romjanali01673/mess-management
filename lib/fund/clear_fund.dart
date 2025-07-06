@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meal_hisab/helper/helper_method.dart';
-import 'package:meal_hisab/helper/ui_helper.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/fund_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
+import 'package:mess_management/helper/helper_method.dart';
+import 'package:mess_management/helper/ui_helper.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/fund_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class ClearFund extends StatefulWidget {
@@ -34,10 +34,10 @@ class _ClearFundState extends State<ClearFund> {
     AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
     MessProvider messProvider = context.read<MessProvider>();
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Clear Fund"),
-        backgroundColor: Colors.grey,
-      ),
+      // appBar: AppBar(
+      //   title: Text("Clear Fund"),
+      //   backgroundColor: Colors.grey,
+      // ),
     body:  Container(
       width: double.infinity,
       color: Colors.red,

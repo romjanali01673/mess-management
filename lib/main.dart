@@ -1,23 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mess_management/authantication/Sign_up.dart';
+import 'package:mess_management/authantication/landing_screen.dart';
+import 'package:mess_management/authantication/sign_in.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/firebase_options.dart';
+import 'package:mess_management/home.dart';
+import 'package:mess_management/tab_bar.dart';
+import 'package:mess_management/test.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:meal_hisab/authantication/Sign_up.dart';
-import 'package:meal_hisab/authantication/landing_screen.dart';
-import 'package:meal_hisab/authantication/sign_in.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/firebase_options.dart';
-import 'package:meal_hisab/home.dart';
-import 'package:meal_hisab/mess/close_mess_hisab.dart';
-import 'package:meal_hisab/providers/authantication_provider.dart';
-import 'package:meal_hisab/providers/bazer_provider.dart';
-import 'package:meal_hisab/providers/colse_mess_hisab_provider.dart';
-import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/fund_provider.dart';
-import 'package:meal_hisab/providers/firstScreen_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
-import 'package:meal_hisab/providers/mess_provider.dart';
-import 'package:meal_hisab/providers/notice_provider.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/bazer_provider.dart';
+import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/fund_provider.dart';
+import 'package:mess_management/providers/firstScreen_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/providers/notice_provider.dart';
+import 'package:mess_management/video_page.dart';
+
 import 'package:provider/provider.dart';
 
 // void main() {
@@ -34,7 +34,6 @@ void main()async{
     MultiProvider(
       providers: [
         // add all provider here
-        // ChangeNotifierProvider(create: (_) => ColseMessHisabProvider()),
         ChangeNotifierProvider(create: (_) => NoticeProvider()),
         ChangeNotifierProvider(create: (_) => FirstScreenProvider()),
         ChangeNotifierProvider(create: (_) => FundProvider()),
@@ -75,9 +74,9 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // home:  HomeScreen(),
+      // home:  TestScreen(),
       initialRoute: Constants.LandingScreen,
-      // initialRoute: Constants.mealSessionList,
+      // home: MyVideoUI(),
       routes: {  
         Constants.HomeScreen : (context) => const HomeScreen(),
         Constants.logInScreen:(context)=> const SignInScreen(),

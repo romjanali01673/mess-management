@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
@@ -7,8 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/user_model.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
@@ -16,18 +17,18 @@ class AuthenticationProvider extends ChangeNotifier {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final FirebaseStorage firebaseStorage= FirebaseStorage.instance;
   final FirebaseFirestore firebaseFirestore= FirebaseFirestore.instance;
-  
+  StreamSubscription ? _messSubscription;
+
   bool _isLoading = false;
   bool _isSignedIn = false;
 
-  String? _uId;
   UserModel? _userModel;
 
   // get ---------------------
 
   bool get isLoading => _isLoading;
-  String? get uid {
-    return _uId;
+  String? get getUid {
+    return _userModel?.uId;
   }
   UserModel? get getUserModel=> _userModel;
 
@@ -48,6 +49,15 @@ class AuthenticationProvider extends ChangeNotifier {
   void setLoading({required bool val}){
     _isLoading = val;
     notifyListeners();
+  }
+
+  void setUid({required String uId}){
+    if(_userModel==null){
+      _userModel = UserModel.fromMap({Constants.uId : uId});
+    }
+    else{
+      _userModel!.uId = uId;
+    }
   }
 
   void setUserModel({   
@@ -84,13 +94,30 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // function here ---------------------------------------
   
+  void listenMyProfile({required String uId}){
+    _messSubscription?.cancel(); // পুরানো subscription থাকলে বন্ধ করো
+
+    _messSubscription = firebaseFirestore
+        .collection(Constants.users)
+        .doc(getUid)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        _userModel = UserModel.fromMap(data);
+        notifyListeners();
+        debugPrint("listenTomy Profile-1" +"notifyListener called");
+      }
+    });
+  }
+
 
   // store uid to firestore
   // authToken we will get from userCurdential.user!.uid
   Future<void> storeUid ({required String authToken, required String uid,required Function(String) onFail})async{
     try {
       await firebaseFirestore.collection(Constants.uId).doc(authToken).set({Constants.uId:uid});
-      _uId = uid;
+      setUid(uId: uid);
       notifyListeners();
     } catch (e) {
       onFail(e.toString());
@@ -104,7 +131,7 @@ class AuthenticationProvider extends ChangeNotifier {
         .collection(Constants.uId)
         .doc(firebaseAuth.currentUser!.uid)//"firebaseAuth.currentUser" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout.
         .get();
-      _uId = snapshot[Constants.uId];
+      setUid(uId: snapshot[Constants.uId]);
       debugPrint(snapshot[Constants.uId].toString()+ "get uid from firestore");
       notifyListeners();
     } catch (e) {
@@ -137,7 +164,7 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       firebaseFirestore 
         .collection(Constants.users)
-        .doc(uid)
+        .doc(getUid)
         .set(
           {
             Constants.sessionKey : DateTime.now().millisecondsSinceEpoch.toString()
@@ -212,17 +239,17 @@ class AuthenticationProvider extends ChangeNotifier {
     try{
       documentSnapshot = await firebaseFirestore
         .collection(Constants.users)
-        .doc(uid) 
+        .doc(getUid) 
         .get(const GetOptions( source: Source.serverAndCache)); 
     }catch (e){
       onFail(e.toString()+"getUserProfileData");
+      return false;
     }
-    if(documentSnapshot!=null &&  documentSnapshot!.exists){
+    if(documentSnapshot.exists && documentSnapshot.data() !=null ){
       // user exist 
       _userModel = UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
 
     return true;
-      
     }
     else{
       return false;
@@ -332,7 +359,7 @@ class AuthenticationProvider extends ChangeNotifier {
       if(fileImage!=null){
         // upload image to firestore storage and  assign the given link in currentUser
         String imageUrl = await storeFileImageToStorage(
-          ref: "${Constants.userImages}/$_uId",
+          ref: "${Constants.userImages}/$getUid",
           file: fileImage,
           onFail: (val){
             // image up failed
@@ -345,7 +372,7 @@ class AuthenticationProvider extends ChangeNotifier {
       // save data to firestore
       await firebaseFirestore
         .collection(Constants.users)
-        .doc(uid)
+        .doc(getUid)
         .set(currentUser.toMap());
 
       onSuccess();
@@ -373,7 +400,7 @@ class AuthenticationProvider extends ChangeNotifier {
       if(fileImage!=null){
         // upload image to firestore storage and  assign the given link in currentUser
         String imageUrl = await storeFileImageToStorage(
-          ref: "${Constants.userImages}/$_uId",
+          ref: "${Constants.userImages}/$getUid",
           file: fileImage,
           onFail: (val){
             // image up failed

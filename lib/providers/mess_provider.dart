@@ -5,17 +5,17 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meal_hisab/constants.dart';
-import 'package:meal_hisab/model/joining_model.dart';
-import 'package:meal_hisab/model/member_summary_model.dart';
-import 'package:meal_hisab/model/mess_model.dart';
-import 'package:meal_hisab/model/mess_summary_model.dart';
-import 'package:meal_hisab/model/notice_model.dart';
-import 'package:meal_hisab/model/rule_model.dart';
-import 'package:meal_hisab/model/user_model.dart';
-import 'package:meal_hisab/providers/deposit_provider.dart';
-import 'package:meal_hisab/providers/firstScreen_provider.dart';
-import 'package:meal_hisab/providers/meal_provider.dart';
+import 'package:mess_management/constants.dart';
+import 'package:mess_management/model/joining_model.dart';
+import 'package:mess_management/model/member_summary_model.dart';
+import 'package:mess_management/model/mess_model.dart';
+import 'package:mess_management/model/mess_summary_model.dart';
+import 'package:mess_management/model/notice_model.dart';
+import 'package:mess_management/model/rule_model.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/firstScreen_provider.dart';
+import 'package:mess_management/providers/meal_provider.dart';
 
 
 class MessProvider extends ChangeNotifier {
@@ -155,7 +155,7 @@ class MessProvider extends ChangeNotifier {
   }
 
   // insert mess data to firestore
-  Future<void> createMess({required Function(String) onFail, Function()? onSuccess, required MessModel messModel,required String uId})async{
+  Future<void> createMess({required Function(String) onFail, Function()? onSuccess, required MessModel messModel,required Map<String,dynamic> member})async{
     final batch = firebaseFirestore.batch();
     setIsloading(true);
     try{
@@ -171,7 +171,7 @@ class MessProvider extends ChangeNotifier {
       batch.set(      
         firebaseFirestore
         .collection(Constants.users)
-        .doc(uId),
+        .doc(member[Constants.uId]),
         {
           Constants.currentMessId : messModel.messId ,
           Constants.mealSessionId: messModel.mealSessionId,
@@ -185,7 +185,7 @@ class MessProvider extends ChangeNotifier {
       batch.set(
         firebaseFirestore
         .collection(Constants.users)
-        .doc(uId)
+        .doc(member[Constants.uId])
         .collection(Constants.messList)
         .doc(messModel.messId),
         {
@@ -197,6 +197,8 @@ class MessProvider extends ChangeNotifier {
       
       // add meal hisab id to my profile 
       MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+        fname: member[Constants.fname],
+        uId: member[Constants.uId],
         mealSessionId: messModel.mealSessionId, 
         messId: messModel.messId, 
         messName: messModel.messName, 
@@ -211,7 +213,7 @@ class MessProvider extends ChangeNotifier {
       batch.set(
         firebaseFirestore
         .collection(Constants.users)
-        .doc(uId)
+        .doc(member[Constants.uId])
         .collection(Constants.messList)
         .doc(messModel.messId)
         .collection(Constants.mealSessionList)
@@ -250,7 +252,7 @@ class MessProvider extends ChangeNotifier {
       _messModel = messModel;
       setMessModel(createdAt:Timestamp.fromDate(DateTime.now()));
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch(e){
       onFail(e.toString());
       setIsloading(false);
@@ -287,7 +289,7 @@ class MessProvider extends ChangeNotifier {
           ],
         ),
       );
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch(e){
       onFail(e.toString());
     }
@@ -306,7 +308,7 @@ class MessProvider extends ChangeNotifier {
   //       SetOptions(merge: true),
         
   //     );
-  //     onSuccess!=null? onSuccess():(){};
+  //     onSuccess?.call();
   //   } catch(e){
   //     onFail(e.toString());
   //   }
@@ -345,7 +347,7 @@ class MessProvider extends ChangeNotifier {
       await batch.commit();
       _messModel= null;
       notifyListeners();
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
 
     } catch(e){
       onFail(e.toString());
@@ -527,7 +529,7 @@ class MessProvider extends ChangeNotifier {
       await batch.commit();
       _messModel = null;
       notifyListeners();
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch(e){
       onFail(e.toString());
     }
@@ -558,7 +560,7 @@ class MessProvider extends ChangeNotifier {
     if(documentSnapshot!=null && documentSnapshot.exists){
       _messModel = MessModel.fromMap(documentSnapshot!.data() as Map<String,dynamic>);
       notifyListeners();
-      onSuccess!=null?onSuccess():(){};
+      onSuccess?.call();
     }
   }
   // get mess data 
@@ -566,7 +568,7 @@ class MessProvider extends ChangeNotifier {
     debugPrint("getMessMemberList called");
     
     await getMessData(onFail: onFail, messId: messId);
-    onSuccess!=null?onSuccess():(){};
+    onSuccess?.call();
     return getMessModel!.messMemberList;
   }
 
@@ -583,7 +585,7 @@ class MessProvider extends ChangeNotifier {
         }
       );
 
-      onSuccess!=null?onSuccess():(){};
+      onSuccess?.call();
       setMessModel(
         menagerName: adimnName,
         menagerId: adminId,
@@ -607,7 +609,7 @@ class MessProvider extends ChangeNotifier {
         },
         SetOptions(mergeFields: [Constants.actMenagerId, Constants.actMenagerName]),
       );
-      onSuccess!=null?onSuccess():(){};
+      onSuccess?.call();
       setMessModel(
         actMenagerName: secondAdimnName,
         actMenagerId: secondAdminId,
@@ -692,6 +694,8 @@ class MessProvider extends ChangeNotifier {
         // start meal 
 
         MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+          fname:member[Constants.uId] ,
+          uId: member[Constants.uId],
           mealSessionId: messModel.mealSessionId, 
           messId: messModel.messId, 
           messName: messModel.messName, 
@@ -717,7 +721,7 @@ class MessProvider extends ChangeNotifier {
         );
 
         await batch.commit();                                 
-        onSuccess!=null? onSuccess():(){};
+        onSuccess?.call();
       
       }
     }catch (e){
@@ -751,7 +755,7 @@ class MessProvider extends ChangeNotifier {
   Future<void> changeJoiningInvaitationStatus({required Function(String) onFail,required String uId, required String invaitationsId, Function()? onSuccess,required String status})async{
     try{
       await firebaseFirestore.collection(Constants.invaitations).doc(uId).collection(Constants.myInvaitationList).doc(invaitationsId).update({Constants.status:status});
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     }catch (e){
       onFail(e.toString());
     }
@@ -819,7 +823,7 @@ class MessProvider extends ChangeNotifier {
         .collection(Constants.myInvaitationList)
         .doc(joiningModel.invaitationId)
         .set(joiningModel.toMap());
-        onSuccess!=null?onSuccess():(){};
+        onSuccess?.call();
       }
       else{
         onFail("Already Invited");
@@ -891,7 +895,7 @@ class MessProvider extends ChangeNotifier {
           ruleModel.toMap(),
         );
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
       debugPrint(e.toString());
@@ -917,7 +921,7 @@ class MessProvider extends ChangeNotifier {
           )
         );
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
       debugPrint(e.toString());
@@ -935,7 +939,7 @@ class MessProvider extends ChangeNotifier {
         .doc(tnxId)
         .delete();
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
       debugPrint(e.toString());
@@ -956,7 +960,7 @@ class MessProvider extends ChangeNotifier {
       list =  qSnapshot.docs.map((snapshot){
         return  RuleModel.fromMap(snapshot.data() as Map<String,dynamic>);
       }).toList();
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
       debugPrint(e.toString());
@@ -988,12 +992,12 @@ class MessProvider extends ChangeNotifier {
         memberList = ((snapshot.data() as Map<String,dynamic>)[Constants.messMemberList] as List<dynamic>).map((x)=>x as Map<String,dynamic>).toList();
         memberList.removeWhere((x)=>leavedMemberIds.contains(x[Constants.uId]));// remove leaved member data from the list
         
-        for(var x in memberList){
+        for(var member in memberList){
           // change current meal hisab id
           batch.update(
             firebaseFirestore
             .collection(Constants.users)
-            .doc(x[Constants.uId]),
+            .doc(member[Constants.uId]),
             {
               Constants.mealSessionId:newmealSessionId,
             },
@@ -1001,6 +1005,8 @@ class MessProvider extends ChangeNotifier {
 
           // add new meal session id in mealSessionList
           MemberSummaryModel memberSummaryModel= MemberSummaryModel(
+            fname: member[Constants.fname],
+            uId: member[Constants.uId],
             mealSessionId: newmealSessionId, 
             messId: messModel.messId, 
             messName: messModel.messName, 
@@ -1015,7 +1021,7 @@ class MessProvider extends ChangeNotifier {
           batch.set(
             firebaseFirestore
             .collection(Constants.users)
-            .doc(x[Constants.uId])
+            .doc(member[Constants.uId])
             .collection(Constants.messList)
             .doc(messId)
             .collection(Constants.mealSessionList)
@@ -1079,8 +1085,7 @@ class MessProvider extends ChangeNotifier {
 
 
         await batch.commit();
-        setMessModel(mealSessionId: "");
-        onSuccess!=null? onSuccess() : (){};
+        onSuccess?.call();
       }
       else{
         // safety if get faild when read.
@@ -1117,7 +1122,35 @@ class MessProvider extends ChangeNotifier {
     return list;
   }
 
-  Future<List<Map<String,dynamic>>> getAMembermealSessionIdListForASpacificMess({
+  Future<MemberSummaryModel?> getAMemberMealSummaryForASpacificMess({
+    required String uId,
+    required String messId,
+    required String mealSessionId,
+    required Function(String) onFail,
+    Function()? onSuccess,
+  }) async{
+    MemberSummaryModel? memberSummaryModel;
+
+    DocumentSnapshot snapshot =await firebaseFirestore
+      .collection(Constants.users)
+      .doc(uId)
+      .collection(Constants.messList)
+      .doc(messId)
+      .collection(Constants.mealSessionList)
+      .doc(mealSessionId)
+      .get();
+  
+    if (snapshot.exists && snapshot.data() != null){
+      memberSummaryModel = MemberSummaryModel.fromMap(snapshot.data() as Map<String,dynamic>);
+    }
+    else{
+      onFail("Data Not Found");
+    }
+    onSuccess?.call();
+    return memberSummaryModel;
+  }
+
+  Future<List<Map<String,dynamic>>> getAMemberMealSessionListForASpacificMess({
     required String uId,
     required String messId,
     required Function(String) onFail,
@@ -1137,6 +1170,30 @@ class MessProvider extends ChangeNotifier {
       try {
           list.add(x.data() as Map<String, dynamic>);
       } catch (e) {
+        onFail(e.toString());
+      }
+    }
+    onSuccess?.call();
+    return list;
+  }
+
+  Future<List<Map<String,dynamic>>> getAllMessSummaryModelForASpacificMess({
+    required String messId,
+    required Function(String) onFail,
+    Function()? onSuccess,
+  }) async{
+    List<Map<String,dynamic>> list = [];
+
+    QuerySnapshot qSnapshot =await firebaseFirestore
+      .collection(Constants.mess)
+      .doc(messId)
+      .collection(Constants.mealSessionList)
+      .get();
+  
+    for (DocumentSnapshot x in qSnapshot.docs){
+      try {
+          list.add(x.data() as Map<String, dynamic>);
+      } catch (e) {
         onFail("Failed to get data for ID $x: $e");
       }
     }
@@ -1146,10 +1203,8 @@ class MessProvider extends ChangeNotifier {
   }
 
   // genarate member summary
-
   Future<void> genarateMemberSummary({
-    required String uId,
-    required MemberSummaryModel memberSummaryModel,
+    required MessSummaryModel messSummaryModel,
     required Function(String) onFail,
     Function()? onSuccess,
   })async{
@@ -1173,18 +1228,18 @@ class MessProvider extends ChangeNotifier {
     final batch= firebaseFirestore.batch();
 
     try {
-      if(flag) totalDepositOfMess =      await firstScreenProvider.getTotalDeposit(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
-      if(flag) totalBazerCost =          await firstScreenProvider.getTotalBazer(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
-      if(flag) totalMealOfMess =         await firstScreenProvider.getTotalMeal(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
-      if(flag) currentFundBlance =       await firstScreenProvider.getFundBlance(messId: memberSummaryModel.messId, onFail: (message){onFail(message); flag = false;},);
+      if(flag) totalDepositOfMess =      await firstScreenProvider.getTotalDeposit(messId: messSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: messSummaryModel.mealSessionId);
+      if(flag) totalBazerCost =          await firstScreenProvider.getTotalBazer(messId: messSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: messSummaryModel.mealSessionId);
+      if(flag) totalMealOfMess =         await firstScreenProvider.getTotalMeal(messId: messSummaryModel.messId, onFail: (message){onFail(message); flag = false;}, mealSessionId: messSummaryModel.mealSessionId);
+      if(flag) currentFundBlance =       await firstScreenProvider.getFundBlance(messId: messSummaryModel.messId, onFail: (message){onFail(message); flag = false;},);
       
       double mealRate = totalBazerCost / (totalMealOfMess==0? 1:totalMealOfMess);
 
       DocumentSnapshot snapshot = await firebaseFirestore
         .collection(Constants.mess)
-        .doc(memberSummaryModel.messId)
+        .doc(messSummaryModel.messId)
         .collection(Constants.mealSessionList)
-        .doc(memberSummaryModel.mealSessionId)
+        .doc(messSummaryModel.mealSessionId)
         .get();
 
       if(snapshot.exists && snapshot.data()!=null){
@@ -1193,19 +1248,21 @@ class MessProvider extends ChangeNotifier {
 
 
         // set final member summary for every member of this session.
-        for(var x in preMessSummaryModel.messMemberList){
-          if(flag) getTotalDepositOfMember = await depositProvider.getTotalDepositOfAMember(messId: memberSummaryModel.messId, uId: x[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
-          if(flag) getTotalMealOfMember =    await mealProvider.getTotalMealOfMember(messId: memberSummaryModel.messId, uId: x[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: memberSummaryModel.mealSessionId);
+        for(var member in preMessSummaryModel.messMemberList){
+          if(flag) getTotalDepositOfMember = await depositProvider.getTotalDepositOfAMember(messId: messSummaryModel.messId, uId: member[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: messSummaryModel.mealSessionId);
+          if(flag) getTotalMealOfMember =    await mealProvider.getTotalMealOfMember(messId: messSummaryModel.messId, uId: member[Constants.uId], onFail: (message){onFail(message); flag = false;}, mealSessionId: messSummaryModel.mealSessionId);
 
           // data get failed,
           // stop progress
           if(!flag) return;
 
           MemberSummaryModel newMemberSummaryModel = MemberSummaryModel(
-            mealSessionId: memberSummaryModel.mealSessionId,
-            messId: memberSummaryModel.messId, 
-            messName: memberSummaryModel.messName, 
-            joindAt: memberSummaryModel.joindAt,
+            fname: member[Constants.fname],
+            uId: member[Constants.uId],
+            mealSessionId: messSummaryModel.mealSessionId,
+            messId: messSummaryModel.messId, 
+            messName: messSummaryModel.messName, 
+            joindAt: messSummaryModel.joindAt,
             closedAt: preMessSummaryModel.closedAt, //update closedAt 
 
             totalMeal: getTotalMealOfMember, 
@@ -1221,11 +1278,11 @@ class MessProvider extends ChangeNotifier {
           batch.set(
             firebaseFirestore 
               .collection(Constants.users)
-              .doc(x[Constants.uId])
+              .doc(member[Constants.uId])
               .collection(Constants.messList)
-              .doc(memberSummaryModel.messId)
+              .doc(messSummaryModel.messId)
               .collection(Constants.mealSessionList)
-              .doc(memberSummaryModel.mealSessionId),
+              .doc(messSummaryModel.mealSessionId),
 
             newMemberSummaryModel.toMap()
           );
@@ -1253,7 +1310,7 @@ class MessProvider extends ChangeNotifier {
         );
 
         await batch.commit();
-        onSuccess!=null? onSuccess():(){};
+        onSuccess?.call();
       }
     } catch (e) {
       onFail(e.toString());
