@@ -87,10 +87,17 @@ class FirstScreenProvider extends ChangeNotifier{
   }
 
 
-
-
-
-
+  void reset(){
+    _isLoading = false;
+    blance = 0;
+    _myTotalMeal = 0;
+    _myTotalDeposit = 0;
+    _totalMealOfMess = 0;
+    _totalBazerCost = 0;
+    _remainingFundBlance = 0;
+    _totalDepositOfMess = 0;
+    _pindNoticeForHome = null;
+  }
 
 
 

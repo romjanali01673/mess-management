@@ -166,8 +166,8 @@ class _AddNoticeState extends State<AddNotice> {
                         await noticeProvider.addANotice(
                           noticeModel: NoticeModel(
                             noticeId: DateTime.now().millisecondsSinceEpoch.toString(), 
-                            title: titleController.text.toString(), 
-                            description: descController.text.toString()
+                            title: titleController.text.toString().trim(), 
+                            description: descController.text.toString().trim(),
                           ), 
                           currentMessMemberUidList: messProvider.
                             getMessModel!.

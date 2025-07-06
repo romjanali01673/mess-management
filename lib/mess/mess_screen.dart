@@ -251,6 +251,7 @@ class _MessScreenState extends State<MessScreen>{
             FutureBuilder(
               future: messProvider.getMessRules(messId:authProvider.getUserModel!.currentMessId, onFail:(_){}),
               builder: (context, AsyncSnapshot<List<RuleModel>?> snapshot) {
+                bool showDetails = false;
                 if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
                   return Center(child: showCircularProgressIndicator());
                 }
@@ -260,98 +261,111 @@ class _MessScreenState extends State<MessScreen>{
                 else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
                   return Center(child: Text('Nothing.'));
                 }
-                return ListView.builder(
-                  shrinkWrap: true, // ← This is the key
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context,index){
-                    RuleModel ruleModel = snapshot.data![index];
-                    return Card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.red,
-                              child: Text(index.toString()),
-                            ),
-                            title: Text("${ruleModel.title}",style : getTextStyleForTitleS()),
-                            subtitle: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(messProvider.getMessModel!.createdAt!.toDate().toLocal())}",style: getTextStyleForSubTitleM()),
-                            trailing: PopupMenuButton(
-                              icon: Icon(Icons.more_vert),
-                              itemBuilder: (context) =>[  
-                                PopupMenuItem(
-                                  value: 0,
-                                  child: ListTile(
-                                    title: Text("Edit",style : getTextStyleForTitleM()),
-                                    leading: Icon(Icons.edit, color: Colors.green,),
-                                  ), 
-                                  onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule(preRuleModel: ruleModel,)));
-                                  },
+                return StatefulBuilder(
+                  builder: (context, setLocalState) {
+                    return ListView.builder(
+                      shrinkWrap: true, // ← This is the key
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context,index){
+                        RuleModel ruleModel = snapshot.data![index];
+                        return Card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                onTap: (){
+                                  setLocalState((){
+                                    showDetails = !showDetails;
+                                  });
+                                },
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.red,
+                                  child: Text((index+1).toString()),
                                 ),
-                              
-                                PopupMenuItem(
-                                  value: 1,
-                                  // onTap: (){
-                                  //   // if i use this function. we don't need to Navigator.pop()
-                                  // },
-                                  child: ListTile(
-                                    title: Text("Delete",style : getTextStyleForTitleM()),
-                                    leading: Icon(Icons.delete, color: Colors.red,),
-                                    onTap: ()async{
-                                      Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
-                                      bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
-                                        title: Text("Do you want to delete?",style : getTextStyleForTitleM()),
-                                        actionsAlignment: MainAxisAlignment.start,
-                                        actions: [
-                                          TextButton(child: Text("No"), onPressed: (){
-                                            Navigator.pop(context, false);
-                                          },),
-                                          TextButton(child: Text("Yes") , onPressed: (){
-                                          Navigator.pop(context, true);
-                                          },),
-                                        ],
-                                      ));
-                                      if(confirm!=null && confirm){
-                                        debugPrint("Confirmed ------------");
-                                        await messProvider.deleteAMessRule(
-                                          messId: authProvider.getUserModel!.currentMessId, 
-                                          tnxId: ruleModel.tnxId, 
-                                          onFail: (message ) {
-                                            print("failed");
-                                            showSnackber(context: context, content: "Deletion Failed!\n$message");
-                                          },
-                                          onSuccess: (){
-                                            print("success");
-                                            setState(() {
-                                              showSnackber(context: context, content: "Deletion Successed.");
-                                            });
+                                title: Text("${ruleModel.title}",style : getTextStyleForTitleS()),
+                                subtitle: Text("${DateFormat("hh:mm a dd-MM-yyyy").format(messProvider.getMessModel!.createdAt!.toDate().toLocal())}",style: getTextStyleForSubTitleM()),
+                                trailing: PopupMenuButton(
+                                  icon: Icon(Icons.more_vert),
+                                  itemBuilder: (context) =>
+                                  !(amIAdmin(messProvider: messProvider, authProvider: authProvider)||amIactmenager(messProvider: messProvider, authProvider: authProvider)) ?
+                                  []
+                                  :
+                                  [  
+                                    PopupMenuItem(
+                                      value: 0,
+                                      child: ListTile(
+                                        title: Text("Edit",style : getTextStyleForTitleM()),
+                                        leading: Icon(Icons.edit, color: Colors.green,),
+                                      ), 
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule(preRuleModel: ruleModel,)));
+                                      },
+                                    ),
+                                  
+                                    PopupMenuItem(
+                                      value: 1,
+                                      // onTap: (){
+                                      //   // if i use this function. we don't need to Navigator.pop()
+                                      // },
+                                      child: ListTile(
+                                        title: Text("Delete",style : getTextStyleForTitleM()),
+                                        leading: Icon(Icons.delete, color: Colors.red,),
+                                        onTap: ()async{
+                                          Navigator.pop(context); // if i use this function. we have to Navigator.pop() for close listview and can't called parent/PopupMenuItem's ontap function
+                                          bool? confirm = await showDialog(context: context, builder: (content)=>AlertDialog(
+                                            title: Text("Do you want to delete?",style : getTextStyleForTitleM()),
+                                            actionsAlignment: MainAxisAlignment.start,
+                                            actions: [
+                                              TextButton(child: Text("No"), onPressed: (){
+                                                Navigator.pop(context, false);
+                                              },),
+                                              TextButton(child: Text("Yes") , onPressed: (){
+                                              Navigator.pop(context, true);
+                                              },),
+                                            ],
+                                          ));
+                                          if(confirm!=null && confirm){
+                                            debugPrint("Confirmed ------------");
+                                            await messProvider.deleteAMessRule(
+                                              messId: authProvider.getUserModel!.currentMessId, 
+                                              tnxId: ruleModel.tnxId, 
+                                              onFail: (message ) {
+                                                print("failed");
+                                                showSnackber(context: context, content: "Deletion Failed!\n$message");
+                                              },
+                                              onSuccess: (){
+                                                print("success");
+                                                setState(() {
+                                                  showSnackber(context: context, content: "Deletion Successed.");
+                                                });
+                                              }
+                                            );
                                           }
-                                        );
-                                      }
-                                    },
-                                  ), 
+                                        },
+                                      ), 
+                                    ),
+                                  ]
                                 ),
-                              ]
-                            ),
+                              ),
+                              if(showDetails)Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("ID: ${ruleModel.tnxId}\n",
+                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("${ruleModel.description}",
+                                      style: getTextStyleForSubTitleM(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("ID: ${ruleModel.tnxId}\n",
-                                  style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                Text("${ruleModel.description}",
-                                  style: getTextStyleForSubTitleM(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      }
                     );
                   }
                 );

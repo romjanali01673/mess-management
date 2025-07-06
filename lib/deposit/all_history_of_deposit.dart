@@ -2,10 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mess_management/constants.dart';
+import 'package:mess_management/helper/helper_method.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/model/deposit_model.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 
 class AllHistoryOfDeposit extends StatefulWidget {
@@ -21,9 +23,19 @@ class _AllHistoryOfDepositState extends State<AllHistoryOfDeposit> {
   @override
   Widget build(BuildContext context) {
     final depositProvider  = context.read<DepositProvider>();
+    final messProvider  = context.read<MessProvider>();
     final authProvider  = context.read<AuthenticationProvider>();
     return SingleChildScrollView(
-      child: Column(
+      child: 
+      (!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)))?
+      SizedBox(
+        height: 500,
+        child: Center(
+          child: Text("Required Administrator Power!"),
+        ),
+      )
+      :
+      Column(
         children: [
               StatefulBuilder(
                 builder: (context, setLocalState) {

@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:mess_management/helper/helper_method.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
-import 'package:mess_management/providers/colse_mess_hisab_provider.dart';
 import 'package:mess_management/providers/mess_provider.dart';
 import 'package:provider/provider.dart';
 

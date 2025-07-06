@@ -46,7 +46,18 @@ class NoticeProvider extends ChangeNotifier{
   bool get getHasMoreBackword => _hasMoreBackward;
 
   void reset(){
+    _noticeSubscription = null;
+    _isLoading = false;
+    _hasUnseen = false;
     _noticeModel = null;
+
+    limit = 20;
+    _noticeList=[];
+    _firstDoc = null;
+    _lastDoc = null;
+
+    _hasMoreForward = true;
+    _hasMoreBackward = false;  
   }
 
   void setNoticeList(List<NoticeModel> list){
@@ -153,6 +164,9 @@ class NoticeProvider extends ChangeNotifier{
         _lastDoc = snapshot.docs.last;
         _hasMoreForward = snapshot.docs.length==limit;
         _hasMoreBackward = false;
+    }
+    else{
+      _hasMoreForward = false;
     }
     makeAllNoticeSeen(uid: uId??"not-given", messId:messId);
   } catch (e) {

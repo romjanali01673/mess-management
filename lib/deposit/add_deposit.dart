@@ -285,6 +285,7 @@ class _AddDepositState extends State<AddDeposit> {
                         onSuccess: (){ 
                           formKey.currentState!.reset();
                           showSnackber(context: context, content: "Update Success!");
+                          Navigator.pop(context);
                         }
                       );
                       // we should clear pre data other wise pre grabage data can make wrong submesion

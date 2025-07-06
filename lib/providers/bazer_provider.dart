@@ -48,7 +48,19 @@ class BazerProvider extends ChangeNotifier{
 
 
   void reset(){
-    _bazerModel = null;
+    bazerListener= null;
+
+    _isLoading = false;
+    _bazerModel= null;
+    _cost = 0;
+
+    limit = 50;
+    currentDocs = [];
+    _firstDoc= null;
+    _lastDoc= null;
+
+    _hasMoreForward = true;
+    _hasMoreBackward = false;
   }
 
 
@@ -182,10 +194,11 @@ class BazerProvider extends ChangeNotifier{
         currentDocs = snapshot.docs.map((x)=> BazerModel.fromMap(x.data())).toList();
         _firstDoc = snapshot.docs.first;
         _lastDoc = snapshot.docs.last;
-        if(snapshot.docs.length==limit){
-          _hasMoreForward = true;
-        }
+        _hasMoreForward = snapshot.docs.length==limit;
         _hasMoreBackward = false;
+    }
+    else{
+      _hasMoreForward = false;
     }
   } catch (e) {
   }

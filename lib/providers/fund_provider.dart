@@ -47,7 +47,19 @@ class FundProvider extends ChangeNotifier{
   bool get getHasMoreBackword => _hasMoreBackward;
 
   void reset(){
+    fundListener = null;
+    fundListener2 = null;
+    _isLoading = false;
     _fundModel = null;
+    _blance = 0;
+
+    limit = 100;
+    currentDocs = [];
+    _firstDoc = null;
+    _lastDoc = null;
+
+    _hasMoreForward = true;
+    _hasMoreBackward = false;  
   }
 
   @override
@@ -178,6 +190,9 @@ class FundProvider extends ChangeNotifier{
         _lastDoc = snapshot.docs.last;
         _hasMoreForward = snapshot.docs.length==limit;
         _hasMoreBackward = false;
+    }
+    else{
+      _hasMoreForward = false;
     }
   } catch (e) {
   }
@@ -473,7 +488,7 @@ class FundProvider extends ChangeNotifier{
         tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
         amount: getBlance, 
         title: "Previous Transaction Has Cleared!", 
-        description: "All previous N (N<=900) transactions have been cleared. You will no longer be able to view them. From now on, only new transactions will be available.\n\nNote: The deposited amount reflects the Current remaining balance of the fund.", 
+        description: "All previous N (number of transactions) transactions have been cleared. You will no longer be able to view them. From now on, only new transactions will be available.\n\nNote: The deposited amount reflects the Current remaining balance of the fund.", 
         type: Constants.add,
       );
           

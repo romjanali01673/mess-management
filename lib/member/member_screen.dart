@@ -162,8 +162,8 @@ class _MemberScreenState extends State<MemberScreen> {
                   child: ListTile(
                     contentPadding: EdgeInsets.only(left: 10),
                     leading: CircleAvatar(
-                      child: Text(index.toString()),
                       backgroundColor: memberType==Constants.member? Colors.amber :Colors.red,
+                      child: Text((index+1).toString()),
                     ),
                     title: Text(memberData[Constants.fname],style : getTextStyleForTitleM()),
                     subtitle: Text("${memberData[Constants.uId]}   ($memberType)"),

@@ -10,8 +10,8 @@ class DepositProvider extends ChangeNotifier{
 
   bool _isLoading = false;
   DepositModel? _depositModel;
-  double _totalDeposit = -1;
-  double _totalDepositOfMess = -1;
+  double _totalDeposit = 0;
+  double _totalDepositOfMess = 0;
 
   //set -------------
 
@@ -41,6 +41,8 @@ class DepositProvider extends ChangeNotifier{
 
   void reset(){
     _depositModel = null;
+    _totalDeposit = 0;
+    _totalDepositOfMess = 0;
   }
 
   // function -----------

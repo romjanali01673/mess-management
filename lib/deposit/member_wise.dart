@@ -218,7 +218,7 @@ class _MemberWiseState extends State<MemberWise> {
                                               leading: Icon(Icons.edit),
                                             ), 
                                             onTap: () {
-                                              // Navigator.push(context, MaterialPageRoute(builder: (context)=>AddDeposit(preDepositModel: depositModel, preMemberData: memberData,)));
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddDeposit(preDepositModel: depositModel, preMemberData: memberData,)));
                                             },
                                           ),
                                 

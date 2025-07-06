@@ -40,7 +40,11 @@ class MealProvider extends ChangeNotifier{
   List get getListOfMember => _listOfmember!;
 
   void reset(){
-    _mealModel = null;
+    _isLoading = false;
+    _mealModel  = null;
+    _totalMeal = 0;
+    _totalMealOfMess = 0;
+    _listOfmember  = null;
   }
 
 

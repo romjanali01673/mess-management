@@ -68,6 +68,7 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
         ],
       ),
       body:SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
             if (noticeProvider.isLoading) 
@@ -77,6 +78,7 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
               // return Text("sdf");
                ListView.builder(
                 shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: noticeProvider.getNoticeList.length,
                 itemBuilder: (context, index) {
                   bool showDesc = false;
@@ -88,6 +90,7 @@ class _NoticeAndAnnouncementScreenState extends State<NoticeAndAnnouncementScree
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ListTile(
+                              
                               contentPadding: EdgeInsets.only(left: 8),
                               onTap: () {
                                 setLocalState((){

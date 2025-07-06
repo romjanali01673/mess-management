@@ -218,9 +218,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                   date = null;
                               
                                   showSnackber(context: context, content: "Meal Update Success");
-                                  setState(() {
-                                    
-                                  });
+                                  Navigator.pop(context);
                                 }, 
                               );
                             }

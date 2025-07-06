@@ -8,9 +8,11 @@ import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/bazer_provider.dart';
 import 'package:mess_management/providers/deposit_provider.dart';
+import 'package:mess_management/providers/firstScreen_provider.dart';
 import 'package:mess_management/providers/fund_provider.dart';
 import 'package:mess_management/providers/meal_provider.dart';
 import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/providers/notice_provider.dart';
 import 'package:mess_management/setting/change_email.dart';
 import 'package:mess_management/setting/change_password.dart';
 import 'package:mess_management/setting/edit_info.dart';
@@ -60,6 +62,8 @@ Future<void> logoutAndReset(BuildContext context) async {
     Provider.of<DepositProvider>(context, listen: false).reset();
     Provider.of<FundProvider>(context, listen: false).reset();
     Provider.of<MealProvider>(context, listen: false).reset();
+    Provider.of<NoticeProvider>(context, listen: false).reset();
+    Provider.of<FirstScreenProvider>(context, listen: false).reset();
 
     Navigator.of(context).pushNamedAndRemoveUntil(
       Constants.LandingScreen, // or your login screen

@@ -665,7 +665,7 @@ class MessProvider extends ChangeNotifier {
 
 
                                                 
-        // update current mess id
+        // update current mess id, meal session id
         batch.update(
           firebaseFirestore
           .collection(Constants.users)
@@ -763,14 +763,19 @@ class MessProvider extends ChangeNotifier {
 
   // get mess invaitations list
   Future<List<JoiningModel?>?> getInvaitationsList({required String uId,required Function(String) onFail})async{
-    List<JoiningModel?>? list;
+    List<JoiningModel>? list;
     try {
-      QuerySnapshot snapshot = await firebaseFirestore.collection(Constants.invaitations).doc(uId).collection(Constants.myInvaitationList).get();
+      QuerySnapshot snapshot = await 
+        firebaseFirestore
+        .collection(Constants.invaitations)
+        .doc(uId)
+        .collection(Constants.myInvaitationList)
+        .orderBy(Constants.invaitedTime, descending: true)
+        .limit(100)
+        .get();
       
       list = snapshot.docs.map((doc){
-        if(doc.exists){
-          return JoiningModel.fromMap(doc.data() as Map<String, dynamic>);
-        }
+        return JoiningModel.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
 
       // if(snapshot.exist){
@@ -782,32 +787,7 @@ class MessProvider extends ChangeNotifier {
     } catch (e) {
       onFail(e.toString());
     }
-    return list;
-  }
-
-  Future<bool> checkAlreadyInvaited({required String uId, required String messId})async{
-    try {
-      QuerySnapshot snapshot = await firebaseFirestore.collection(Constants.invaitations).doc(uId).collection(Constants.myInvaitationList).get();
-      
-      snapshot.docs.map((doc){
-        if(doc.exists && doc.data()!=null){
-          JoiningModel joiningModel = JoiningModel.fromMap(doc.data() as Map<String, dynamic>);
-          if(joiningModel.messId == messId && joiningModel.status == JoiningStatus.panding){
-            return true;
-          }
-        }
-      }).toList();
-
-      // if(snapshot.exist){
-      //   // final map = snapshot.data() as Map<String,dynamic>;
-      //   // final objlist = map[Constants.myInvaitationList] as List<dynamic>;
-      //   // list = objlist.map((x)=>JoiningModel.fromMap(x as Map<String,dynamic>)).toList();
-      //   list = (((snapshot.data() as Map<String,dynamic>)[Constants.myInvaitationList]) as List<dynamic>).map((x)=> JoiningModel.fromMap(x as Map<String, dynamic>)).toList();
-      // }
-    }catch(e){
-      print("failed check already invited");
-    }
-    return false;
+    return list?.reversed.toList();
   }
 
   // send mess invaitation card
@@ -815,8 +795,7 @@ class MessProvider extends ChangeNotifier {
     try {
       // check already invited ?
 
-      bool flag =  await checkAlreadyInvaited(messId: joiningModel.messId, uId:memberUid );
-      if(!flag){
+      if(true){
         await firebaseFirestore 
         .collection(Constants.invaitations)
         .doc(memberUid)
@@ -825,11 +804,8 @@ class MessProvider extends ChangeNotifier {
         .set(joiningModel.toMap());
         onSuccess?.call();
       }
-      else{
-        onFail("Already Invited");
-      }
     } catch (e) {
-      debugPrint(e.toString());
+      onFail(e.toString());
     }
   }
 
@@ -965,7 +941,7 @@ class MessProvider extends ChangeNotifier {
       onFail(e.toString());
       debugPrint(e.toString());
     }
-    return list;
+    return list?.reversed.toList();
   }
 
   Future<void> closeMessHisab({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
