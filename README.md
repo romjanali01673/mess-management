@@ -41,14 +41,14 @@ Home
 
 
 Drawer 
-![Drawer](ss/home/drawer.png)
+![Drawer](ss/home/drawer.jpeg)
 
 
 
 # Mess
 
 About Mess
-![about_mess](ss/mess/about_mess.png)
+![about_mess](ss/mess/about_mess.jpg)
 
 
 Add Mess Rule
@@ -79,7 +79,7 @@ Transfer Ownership
 # Notices 
 
 Notices
-![Notices](ss/notices.png)
+![Notices](ss/notices.jpg)
 
 
 
@@ -90,32 +90,30 @@ Find And Add Member
 
 
 Member List
-![Member List](ss/member/member1.png)
+![Member List](ss/member/member1.jpeg)
 ![Member List](ss/member/member2.png)
 
 
 
 # Deposit 
 
+
 Add Deposit 
-![](ss/deposit_entry.png)
+![Add Deposit](ss/deposit/deposit_entry2.jpg)
+![Add Deposit](ss/deposit/deposit_entry.png)
 
-
-Depsoit History Member Wise
-![Add Deposit](ss/deposit/deposit_history_memberWise.png)
 
 
 My Deposit List
-![My Deposit List](ss/deposit/my_depost.png)
-
-
-Add Deposit
-![add_deposit](ss/deposit/add_deposit.png)
+![My Deposit List](ss/deposit/myDeposit.jpg)
 
 
 All Deposit History
-![All Deposit History](ss/deposit/all_deposit_history.png)
+![All Deposit History](ss/deposit/AllDepositTnx.jpg)
 
+
+Depsoit History Member Wise
+![My Deposit List](ss/deposit/memberWise.jpg)
 
 
 # Meal 
@@ -142,12 +140,16 @@ Member Meal List
 # Fund 
 
 Add Fund
-![add_fund](ss/fund/add_fund.png)
+![add_fund](ss/fund/add_fund.jpg)
+
+
+Add Fund
+![clear fund](ss/fund/clear_fund.jpg)
 
 
 
 Fund Transaction List
-![Fund Transaction List](ss/fund/fund.png)
+![Fund Transaction List](ss/fund/fundTnxList.jpg)
 
 
 
