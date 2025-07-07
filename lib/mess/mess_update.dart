@@ -94,14 +94,14 @@ class _MessUpdateState extends State<MessUpdate> {
   Widget build(BuildContext context) {
     final messProvider = context.watch<MessProvider>();
 
-    return Expanded(
-      child: Container(
-        height: double.infinity,
-        width: double.infinity,
-        color: Colors.amber.shade100,
-        padding: EdgeInsets.all(4),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        backgroundColor:Colors.amber.shade100,
+        body: SingleChildScrollView(
           child: Column(
             spacing: 10,
             children: [
@@ -193,6 +193,10 @@ class _MessUpdateState extends State<MessUpdate> {
                     showSnackber(context: context, content: "you are not mess meneger");
                   }
                 }
+              ),
+          
+              SizedBox(
+                height: 300,
               ),
             ],
           ),
@@ -308,9 +312,9 @@ class _MessUpdateState extends State<MessUpdate> {
                       ),
                       child: TextFormField(
                         controller: messNameController,
-                      onTapOutside: (event) {// close keyboard
-                        FocusScope.of(context).unfocus();
-                      },
+                      // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
                       onChanged: (value){
                         // email = value.trim();
                       },
@@ -342,9 +346,9 @@ class _MessUpdateState extends State<MessUpdate> {
                       onChanged: (value){
       
                       },
-                      onTapOutside: (event) {// close keyboard
-                        FocusScope.of(context).unfocus();
-                      },
+                      // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
                       validator: (value) {
                         return addressValidator(value.toString());
                       },
@@ -421,9 +425,9 @@ class _MessUpdateState extends State<MessUpdate> {
                       ),
                       child: TextFormField(
                         controller: authorityPhoneController,
-                        onTapOutside: (event) {// close keyboard
-                        FocusScope.of(context).unfocus();
-                      },
+                        // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
                       onChanged: (value){
                         // email = value.trim();
                       },
@@ -452,9 +456,9 @@ class _MessUpdateState extends State<MessUpdate> {
                       ),
                       child: TextFormField(
                         controller: authorityEmailController,
-                        onTapOutside: (event) {// close keyboard
-                        FocusScope.of(context).unfocus();
-                      },
+                        // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                        // },
                       onChanged: (value){
                         // email = value.trim();
                       },

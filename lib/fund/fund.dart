@@ -1,22 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:mess_management/constants.dart';
 import 'package:mess_management/fund/clear_fund.dart';
 import 'package:mess_management/fund/fand_list.dart';
 import 'package:mess_management/fund/fund_entry.dart';
-import 'package:mess_management/helper/helper_method.dart';
-import 'package:mess_management/helper/ui_helper.dart';
-import 'package:mess_management/model/fund_model.dart';
-import 'package:mess_management/providers/authantication_provider.dart';
-import 'package:mess_management/providers/fund_provider.dart';
-import 'package:mess_management/providers/mess_provider.dart';
-import 'package:mess_management/ui_helper/ui_helper.dart';
-import 'package:provider/provider.dart';
+
 
 class FundScreen extends StatefulWidget {
   const FundScreen({super.key});
@@ -26,27 +14,27 @@ class FundScreen extends StatefulWidget {
 }
 
 
-class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
+// class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+//   final TabBar _tabBar;
 
-  _SliverTabBarDelegate(this._tabBar);
+//   _SliverTabBarDelegate(this._tabBar);
 
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
+//   @override
+//   double get minExtent => _tabBar.preferredSize.height;
+//   @override
+//   double get maxExtent => _tabBar.preferredSize.height;
 
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Colors.white, // Optional: background color
-      child: _tabBar,
-    );
-  }
+//   @override
+//   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+//     return Container(
+//       color: Colors.white, // Optional: background color
+//       child: _tabBar,
+//     );
+//   }
 
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
-}
+//   @override
+//   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
+// }
 
 class _FundScreenState extends State<FundScreen> with SingleTickerProviderStateMixin {
   TabController? _tabController;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mess_management/constants.dart';
+import 'package:mess_management/fund/fand_list.dart';
 import 'package:mess_management/helper/helper_method.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/mess/add_rule.dart';
@@ -20,138 +21,114 @@ class MessScreen extends StatefulWidget{
 
   @override
   State<MessScreen>createState()=>_MessScreenState();
-
 }
 
-class _MessScreenState extends State<MessScreen>{
-  Mess messScreemItemGrpup = Mess.mess;
-  bool showComment = false;
+class _MessScreenState extends State<MessScreen> with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+
+  final List<String> tabs = const [
+    "About Mess", 
+    "Close Mess Estimate",
+    "Join/Leave", 
+    "Update", 
+    "Delete", 
+    "Create",
+  ];
+  final List<Icon> icons =const [
+    Icon(Icons.info_outline),
+    Icon(Icons.settings_power_outlined),
+    Icon(Icons.library_add),
+    Icon(Icons.update),
+    Icon(Icons.delete),
+    Icon(Icons.create),
+  ];
 
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    // Delay getting screen size until layout is built
-    WidgetsBinding.instance.addPostFrameCallback((_)async {
-      await Future.delayed(Duration(milliseconds: 100));
-    });
+    _tabController = TabController(length: tabs.length, vsync: this);
   }
 
   @override
-  Widget build(BuildContext context){
-    MessProvider messProvider = context.read<MessProvider>();
-    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
-    
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(messProvider.getMessModel?.messName?? "Mess Name"),
-        backgroundColor: Colors.grey,
-        actions: [
-          if(messScreemItemGrpup==Mess.mess)
-          IconButton(
-            onPressed: () {
-              if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
-                showSnackber(context: context, content: "Required Administrator Power");
-                return;
-              }
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule()));
-            },
-            icon: Icon(Icons.add, color: Colors.black, size: 35,)
-          ),
-        ],
-      ),
-      body: Container(
-        color: Colors.green.shade50,
-        child: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                  spacing: 10,
-                  children: [
-                    getMenuItems(
-                      label: "About Mess", 
-                      ontap: (){
-                        setState(() {
-                          messScreemItemGrpup = Mess.mess;
-                        });
-                      },
-                      selected: messScreemItemGrpup==Mess.mess,
-                      icon: Icons.info_outline_rounded
-                    ),
-                    getMenuItems(
-                      label: "Close Mess Estimate", 
-                      ontap: (){
-                        // navigate "Close Mess Estimate" page
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MessCloseScreen()));
-        
-                      },
-                      icon: Icons.settings_power_outlined
-                    ),
-                    getMenuItems(
-                      label: "Join/leave", 
-                      ontap: (){
-                        setState(() {
-                          messScreemItemGrpup = Mess.joinOrleave;
-                          
-                        });
-                      },
-                      selected: messScreemItemGrpup==Mess.joinOrleave,
-                      icon: (Icons.library_add),
-                    ),
-                    getMenuItems(
-                      label: "Update Mess", 
-                      ontap: (){
-                        setState(() {
-                          messScreemItemGrpup = Mess.messUpdate;
-                        });
-                      },
-                      selected: messScreemItemGrpup==Mess.messUpdate,
-                      icon: Icons.update_sharp
-                    ),
-                    getMenuItems(
-                      label: "Delete Mess", 
-                      ontap: (){
-                        setState(() {
-                          messScreemItemGrpup = Mess.messDelete;
-                        });
-                      },
-                      selected: messScreemItemGrpup==Mess.messDelete,
-                      icon: Icons.delete
-                    ),
-                    getMenuItems(
-                      label: "Create Mess", 
-                      ontap: (){
-                        setState(() {
-                          messScreemItemGrpup = Mess.messCreate;
-                        });
-                      },
-                      selected: messScreemItemGrpup==Mess.messCreate,
-                      icon: Icons.create
-                    ),
-                  ],
-                ),
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, scrollable){
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.grey,
+              title: AnimatedBuilder(
+                animation: _tabController!,
+                builder: (context, child) {
+                  return Text(tabs[_tabController!.index]);
+                },
+              ),
+              actions: [
+                IconButton(
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>AddRule()));
+                  }, 
+                  icon: Icon(Icons.add),
+                )
+              ],
+              floating: true,
+              snap: true,
+              pinned: true,
+              bottom: TabBar(
+                controller: _tabController,
+                isScrollable: true,// must assign otherwise get an error
+                tabAlignment: TabAlignment.start,
+                labelColor: Colors.black,
+                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                unselectedLabelColor: Colors.black,
+                unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                indicatorColor: Colors.black,
+                tabs:tabs.map((e)=> Tab(text: e.toString() , icon:icons[tabs.indexOf(e)],)).toList(),
+              ),
             ),
-            messScreemItemGrpup==Mess.messCreate? MessCreate()
-            :
-            messScreemItemGrpup==Mess.messDelete? MessDelete()
-            :
-            messScreemItemGrpup==Mess.messUpdate? MessUpdate()
-            :
-            messScreemItemGrpup==Mess.joinOrleave? JoinOrLeave()
-            :
-            getMessInSideData()
+            
+          ];
+        },
+        
+        body:TabBarView(
+          controller: _tabController,
+          children: [
+            AboutMess(),
+            MessCloseScreen(),
+            JoinOrLeave(),
+            // MyWidget(),
+            // MyWidget(),
+            // MyWidget(),
+            MessUpdate(),
+            MessDelete(),
+            MessCreate(),
           ],
-        ),
+        )
       ),
     );
   }
+}
 
-  Widget getMessInSideData(){
+
+class AboutMess extends StatefulWidget {
+  const AboutMess({super.key});
+
+  @override
+  State<AboutMess> createState() => _AboutMessState();
+}
+
+class _AboutMessState extends State<AboutMess> {
+  @override
+  Widget build(BuildContext context) {
+    
     final authProvider = context.read<AuthenticationProvider>();
     final messProvider = context.read<MessProvider>();
-    return Expanded(
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Colors.lightGreen.shade50,
+      body: SingleChildScrollView(
         child: Column(
           children: [
             Card(
@@ -373,7 +350,21 @@ class _MessScreenState extends State<MessScreen>{
             )
           ],
         ),
-      )
+      ),
     );
+  }
+}
+
+class MyWidget extends StatefulWidget {
+  const MyWidget({super.key});
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return  SingleChildScrollView(child: Placeholder(color: Colors.red,));
   }
 }

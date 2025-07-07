@@ -50,15 +50,18 @@ class _AddRuleState extends State<AddRule> {
     MessProvider messProvider = context.read<MessProvider>();
 
     
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Add Rule", style: getTextStyleForTitleXL(),),
-        backgroundColor: Colors.grey,
-      ),
-      body: Container(
-        height: double.infinity,
-        color: Colors.green.shade50,
-        child: SingleChildScrollView(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        backgroundColor: Colors.green.shade50,
+        appBar: AppBar(
+          title: Text("Add Rule", style: getTextStyleForTitleXL(),),
+          backgroundColor: Colors.grey,
+        ),
+        body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
@@ -70,9 +73,9 @@ class _AddRuleState extends State<AddRule> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: titleController,
-                        onTapOutside: (event) {// close keyboard
-                          FocusScope.of(context).unfocus();
-                        },
+                        // onTapOutside: (event) {// close keyboard
+                          // FocusScope.of(context).unfocus();
+                        // },
                         
                         textInputAction: TextInputAction.next,
                         autofocus: true,
@@ -82,7 +85,7 @@ class _AddRuleState extends State<AddRule> {
                         decoration: InputDecoration(
                           label: Text("Title"),
                           border: OutlineInputBorder(
-
+              
                           )
                         )
                         
@@ -93,9 +96,9 @@ class _AddRuleState extends State<AddRule> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: descController,
-                        onTapOutside: (event) {// close keyboard
-                          FocusScope.of(context).unfocus();
-                        },
+                        // onTapOutside: (event) {// close keyboard
+                          // FocusScope.of(context).unfocus();
+                        // },
                         maxLines: 10,
                         textInputAction: TextInputAction.newline,
                         validator: (value) {
@@ -115,7 +118,7 @@ class _AddRuleState extends State<AddRule> {
               SizedBox(
                 height: 50,
               ),
-
+              
               messProvider.isLoading? 
               SizedBox.square(
                 child: CircularProgressIndicator(

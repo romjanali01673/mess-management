@@ -59,9 +59,9 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                           },
                             controller: searchController,
                             keyboardType: TextInputType.number,
-                            onTapOutside: (event) {// close keyboard
-                              FocusScope.of(context).unfocus();
-                            },
+                            // onTapOutside: (event) {// close keyboard
+                              // FocusScope.of(context).unfocus();
+                            // },
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly, // Only allows digits
                             ],

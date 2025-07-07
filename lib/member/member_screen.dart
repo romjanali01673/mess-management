@@ -259,10 +259,7 @@ class _MemberScreenState extends State<MemberScreen> {
                                 }
                                 // change member status
                                 memberData[Constants.status] = (memberData[Constants.status] == Constants.disable)? Constants.enable:Constants.disable ;
-                                final list = messProvider.getMessModel!.messMemberList;
-                                list[list.indexWhere((test)=>test[Constants.uId]==memberData[Constants.uId])] = memberData;
-                                messProvider.setMessModel(messMemberList: list);
-                                await messProvider.changeMemberStatus();
+                                await messProvider.changeMemberStatus(member:  memberData);
                                 
                               },
                             )

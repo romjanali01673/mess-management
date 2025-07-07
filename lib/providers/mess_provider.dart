@@ -106,20 +106,24 @@ class MessProvider extends ChangeNotifier {
   
 
   void listenToMess({required String messId}) {
-    _messSubscription?.cancel(); // পুরানো subscription থাকলে বন্ধ করো
+ try {
+      _messSubscription?.cancel(); // পুরানো subscription থাকলে বন্ধ করো
 
-    _messSubscription = firebaseFirestore
-        .collection(Constants.mess)
-        .doc(messId)
-        .snapshots()
-        .listen((snapshot) {
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        _messModel = MessModel.fromMap(data);
-        notifyListeners();
-        debugPrint("listenToMess-1" +"notifyListener called");
-      }
-    });
+      _messSubscription = firebaseFirestore
+          .collection(Constants.mess)
+          .doc(messId)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.exists) {
+          final data = snapshot.data() as Map<String, dynamic>;
+          _messModel = MessModel.fromMap(data);
+          notifyListeners();
+          debugPrint("listenToMess-1" +"notifyListener called");
+        }
+      });
+    } catch (e) {
+      
+    }
   }
 
  
@@ -313,6 +317,30 @@ class MessProvider extends ChangeNotifier {
   //     onFail(e.toString());
   //   }
   // }
+
+
+  Future<void> fun()async{
+    final x =await firebaseFirestore.
+      collection(Constants.mess)
+      .doc("1751809113692")
+      // .doc(getMessModel!.messId)
+      .collection(Constants.mealSessionList)
+      .doc(getMessModel!.mealSessionId)
+      .get();
+    var messModel  =  MessModel(messId: "1751809113692",messName: "Higher Society", messAddress: "messAddress", menagerId: "1751626583875", menagerName: "md romjan ali", menagerPhone: "menagerPhone", menagerEmail: "menagerEmail", actMenagerId: "actMenagerId", actMenagerName: "actMenagerName", mealSessionId: "mealSessionId", messMemberList: []);
+    await firebaseFirestore.
+      collection(Constants.mess)
+      // .doc(getMessModel!.messId)
+      .doc("1751809113692")
+      .set(
+        // messModel.toMap()
+        {
+
+        Constants.messMemberList: ((x.data() as Map<String,dynamic>)[Constants.messMemberList]),
+        },
+        SetOptions(merge: true),
+      );
+  }
 
   // remove from Mess- Id To Member Profile / leave
   Future<void> leaveFromMess({required Function(String) onFail, Function()? onSuccess,required String memberUid, required String messId})async{
@@ -549,7 +577,6 @@ class MessProvider extends ChangeNotifier {
       
     if(!(isDisposed==null || !isDisposed())) return;
       
-
     }catch (e){
       if(!(isDisposed==null || !isDisposed())) return;
         onFail("No Data Found.\n${e.toString()}");
@@ -770,7 +797,6 @@ class MessProvider extends ChangeNotifier {
         .collection(Constants.invaitations)
         .doc(uId)
         .collection(Constants.myInvaitationList)
-        .orderBy(Constants.invaitedTime, descending: true)
         .limit(100)
         .get();
       
@@ -811,14 +837,17 @@ class MessProvider extends ChangeNotifier {
 
 
   // change status member
-  Future<void> changeMemberStatus()async{
+  Future<void> changeMemberStatus({required Map<String,dynamic> member})async{
     if(_isOnline == false){
       debugPrint("cancel for offline ");
       return;
     } 
     try {
       // update changed/new member list. where already changed the member status
-      await firebaseFirestore.collection(Constants.mess).doc(getMessModel!.messId).update({Constants.messMemberList: getMessModel!.messMemberList});
+      await firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId)
+        .update({Constants.messMemberList: FieldValue.arrayUnion([member])});
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -929,7 +958,7 @@ class MessProvider extends ChangeNotifier {
     try {
       QuerySnapshot qSnapshot  = await firebaseFirestore
         .collection(Constants.mess)
-        .doc(getMessModel!.messId)
+        .doc(messId)
         .collection(Constants.rules)
         .get();
 

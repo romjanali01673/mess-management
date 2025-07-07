@@ -7,6 +7,7 @@ import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/home.dart';
 import 'package:mess_management/model/user_model.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
 import 'package:mess_management/services/asset_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -87,113 +88,115 @@ class _ChangeEmailState extends State<ChangeEmail> {
         backgroundColor: Colors.grey,
       ),
         
-        body: FutureBuilder(
-          future: authProvider.getMemberData(uId: authProvider.getUserModel!.uId),
-          builder: (context, AsyncSnapshot<UserModel?> snapshot) { 
-            if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
-              return Center(child: showCircularProgressIndicator());
-            }
-            else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } 
-            else if (!snapshot.hasData || snapshot.data == null) {
-              return Center(child: Text('Data Not Found'));
-            }
-            emailController.text = snapshot.data!.email;
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Form(
-                    key: FormKey,
-                    child: Column(
-                      children: [
-                
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
-                            ),
-                            Checkbox(
-                              value: checked, 
-                              onChanged: (val){
-                              setState(() {
-                                checked = !checked;
-                              });
-                            }),
-                          ],
-                        ),
-                  
-                        
-                       Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.grey.shade300,
-                                              border: Border(bottom: BorderSide(color: Colors.black))
-                                            ),
-                                            margin: EdgeInsets.all(10),
-                                            child: TextFormField(
-                                              controller: emailController,
-                                              enabled: checked,
-                                              
-                                              
-                                              validator: (value) {
-                                                return emailValidator(value.toString());
-                                              },
-                                              keyboardType: TextInputType.text,
-                                              textInputAction: TextInputAction.next,
-                                              decoration: InputDecoration(
-                                                label: Text("Email"),
-                                                border: InputBorder.none,
-                                  
-                                              ),
-                                            ),
-                                          ),
-                        
-                       Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.grey.shade300,
-                                              border: Border(bottom: BorderSide(color: Colors.black))
-                                            ),
-                                            margin: EdgeInsets.all(10),
-                                            child: TextFormField(
-                                              controller: passController,
-                                              enabled: checked,
-                                              
-                                              
-                                              validator: (value) {
-                                                return passValidator(value.toString());
-                                              },
-                                              keyboardType: TextInputType.text,
-                                              textInputAction: TextInputAction.next,
-                                              decoration: InputDecoration(
-                                                label: Text("Current Password"),
-                                                border: InputBorder.none,
-                                  
-                                              ),
-                                            ),
-                                          ),
-                            
-                       
-                                          SizedBox(
-                                            height: 40,
-                                          ),
-                      ],
+        body: SingleChildScrollView(
+          child: FutureBuilder(
+            future: authProvider.getMemberData(uId: authProvider.getUserModel!.uId),
+            builder: (context, AsyncSnapshot<UserModel?> snapshot) { 
+              if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's safe 
+                return Center(child: showCircularProgressIndicator());
+              }
+              else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } 
+              else if (!snapshot.hasData || snapshot.data == null) {
+                return Center(child: Text('Data Not Found'));
+              }
+              emailController.text = snapshot.data!.email;
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  getButton(label: "Update", ontap: (){
-                    updateInfo();
-                  }),
-                ],
-              ),
-            );
-          }
+                    Form(
+                      key: FormKey,
+                      child: Column(
+                        children: [
+                  
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Do You Want To Edit?", style: TextStyle(fontSize: 25),),
+                              ),
+                              Checkbox(
+                                value: checked, 
+                                onChanged: (val){
+                                setState(() {
+                                  checked = !checked;
+                                });
+                              }),
+                            ],
+                          ),
+                    
+                          
+                         Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10),
+                                                color: Colors.grey.shade300,
+                                                border: Border(bottom: BorderSide(color: Colors.black))
+                                              ),
+                                              margin: EdgeInsets.all(10),
+                                              child: TextFormField(
+                                                controller: emailController,
+                                                enabled: checked,
+                                                
+                                                
+                                                validator: (value) {
+                                                  return emailValidator(value.toString());
+                                                },
+                                                keyboardType: TextInputType.text,
+                                                textInputAction: TextInputAction.next,
+                                                decoration: InputDecoration(
+                                                  label: Text("Email"),
+                                                  border: InputBorder.none,
+                                    
+                                                ),
+                                              ),
+                                            ),
+                          
+                         Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10),
+                                                color: Colors.grey.shade300,
+                                                border: Border(bottom: BorderSide(color: Colors.black))
+                                              ),
+                                              margin: EdgeInsets.all(10),
+                                              child: TextFormField(
+                                                controller: passController,
+                                                enabled: checked,
+                                                
+                                                
+                                                validator: (value) {
+                                                  return passValidator(value.toString());
+                                                },
+                                                keyboardType: TextInputType.text,
+                                                textInputAction: TextInputAction.next,
+                                                decoration: InputDecoration(
+                                                  label: Text("Current Password"),
+                                                  border: InputBorder.none,
+                                    
+                                                ),
+                                              ),
+                                            ),
+                              
+                         
+                                            SizedBox(
+                                              height: 40,
+                                            ),
+                        ],
+                      ),
+                    ),
+                    getButton(label: "Update", ontap: (){
+                      updateInfo();
+                    }),
+                  ],
+                ),
+              );
+            }
+          ),
         ),
     );
   }

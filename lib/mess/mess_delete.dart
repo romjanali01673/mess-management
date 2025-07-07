@@ -91,49 +91,55 @@ class _MessDeleteState extends State<MessDelete> {
   Widget build(BuildContext context) {
     final messProvider = context.watch<MessProvider>();
 
-    return Container(
-      child: Column(
-        children: [
-          messProvider.isLoading?  showCircularProgressIndicator()
-          :
-          messProvider.getMessModel!=null?
-          Card(
-            color: Colors.red.shade500,
-            child: ListTile(
-              title: Text(messProvider.getMessModel!.messName),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Id :${messProvider.getMessModel!.messId} "),
-                  Text("Address :${messProvider.getMessModel!.messAddress} "),
-                ],
+    return Scaffold(
+      backgroundColor: Colors.red.shade50,
+      body: SingleChildScrollView(
+        child: Align(
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              messProvider.isLoading?  showCircularProgressIndicator()
+              :
+              messProvider.getMessModel!=null?
+              Card(
+                color: Colors.red.shade500,
+                child: ListTile(
+                  title: Text(messProvider.getMessModel!.messName),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Id :${messProvider.getMessModel!.messId} "),
+                      Text("Address :${messProvider.getMessModel!.messAddress} "),
+                    ],
+                  ),
+                )
+              )
+              :
+              SizedBox(
+                child: Text("No Mess Found!", style: TextStyle(color: Colors.red),),
               ),
-            )
-          )
-          :
-          SizedBox(
-            child: Text("No Mess Found!", style: TextStyle(color: Colors.red),),
+              SizedBox(
+                height: 100,
+              ),
+              messProvider.isLoading?
+              SizedBox.square(
+                dimension: 50,
+                child: CircularProgressIndicator(),
+              )
+              :
+              getMaterialButton(
+                context: context,
+                label: "Delete", 
+                ontap: ()async{
+                  bool? res = await showConfirmDialog(context: context, title: "Do You Want to Delete This Mess");
+                  if(res??false){
+                    _deleteMess();
+                  }
+                }
+              )
+            ],
           ),
-          SizedBox(
-            height: 100,
-          ),
-          messProvider.isLoading?
-          SizedBox.square(
-            dimension: 50,
-            child: CircularProgressIndicator(),
-          )
-          :
-          getMaterialButton(
-            context: context,
-            label: "Delete", 
-            ontap: ()async{
-              bool? res = await showConfirmDialog(context: context, title: "Do You Want to Delete This Mess");
-              if(res??false){
-                _deleteMess();
-              }
-            }
-          )
-        ],
+        ),
       ),
     );
   }

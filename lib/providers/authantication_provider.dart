@@ -97,7 +97,8 @@ class AuthenticationProvider extends ChangeNotifier {
   void listenMyProfile({required String uId}){
     _messSubscription?.cancel(); // পুরানো subscription থাকলে বন্ধ করো
 
-    _messSubscription = firebaseFirestore
+    try {
+      _messSubscription = firebaseFirestore
         .collection(Constants.users)
         .doc(getUid)
         .snapshots()
@@ -109,6 +110,9 @@ class AuthenticationProvider extends ChangeNotifier {
         debugPrint("listenTomy Profile-1" +"notifyListener called");
       }
     });
+    } catch (e) {
+      
+    }
   }
 
 

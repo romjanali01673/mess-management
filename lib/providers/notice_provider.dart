@@ -74,8 +74,8 @@ class NoticeProvider extends ChangeNotifier{
   // function -----------
 
   void listenToNotice({required String messId}){
-      _noticeSubscription?.cancel();// cancle pre if have
-
+  _noticeSubscription?.cancel();// cancle pre if have
+  try {
       _noticeSubscription = firebaseFirestore
         .collection(Constants.notice)
         .doc(messId)
@@ -138,7 +138,10 @@ class NoticeProvider extends ChangeNotifier{
           }
         }  
       }
-    );
+    );    
+    } catch (e) {
+      
+    }
   }
 
 

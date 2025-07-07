@@ -136,212 +136,219 @@ class _MessCreateState extends State<MessCreate> {
     final messProvider = context.watch<MessProvider>();
 
 
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              spacing: 10,
-              children: [
-                const Text("Welcome \nYou are going to create your own mess", textAlign: TextAlign.center,),
-                
-                FadeInUp(
-                  duration: Duration(milliseconds: 100),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        backgroundColor: Colors.amber.shade50,
+        body: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                spacing: 10,
+                children: [
+                  const Text("Welcome \nYou are going to create your own mess", textAlign: TextAlign.center,),
+                  
+                  FadeInUp(
+                    duration: Duration(milliseconds: 100),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                        controller: messNameController,
+                      // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
+                      onChanged: (value){
+                        // email = value.trim();
+                      },
+                      validator: (value) {
+                        return nameValidator(value.toString());
+                      },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        label: Text("Mess Name"),
+                        border: InputBorder.none,
+                                      
+                      ),
                     ),
-                    child: TextFormField(
-                      controller: messNameController,
-                    onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (value){
-                      // email = value.trim();
-                    },
-                    validator: (value) {
-                      return nameValidator(value.toString());
-                    },
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      label: Text("Mess Name"),
-                      border: InputBorder.none,
-                                    
-                    ),
-                  ),
-                  ),
-                ),
-            
-                FadeInUp(
-                  duration: Duration(milliseconds: 300),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: TextFormField(
-                      controller: messAddressController,
-                    onChanged: (value){
-
-                    },
-                    onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                    },
-                    validator: (value) {
-                      return addressValidator(value.toString());
-                    },
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      label: Text("Mess Address"),
-                      border: InputBorder.none,
-                                    
                     ),
                   ),
-                  ),
-                ),
-            
-                FadeInUp(
-                  duration: Duration(milliseconds: 600),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
+              
+                  FadeInUp(
+                    duration: Duration(milliseconds: 300),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                        controller: messAddressController,
+                      onChanged: (value){
+      
+                      },
+                      // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
+                      validator: (value) {
+                        return addressValidator(value.toString());
+                      },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        label: Text("Mess Address"),
+                        border: InputBorder.none,
+                                      
+                      ),
                     ),
-                    child: TextFormField(
-                      controller: messOwnerNameController,
+                    ),
+                  ),
+              
+                  FadeInUp(
+                    duration: Duration(milliseconds: 600),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                        controller: messOwnerNameController,
+                        // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                        // },
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          enabled: false,
+                          label: Text("Mess Owner Name"),
+                          border: InputBorder.none,  
+                        ),
+                      ),
+                    ),
+                  ),
+              
+                  FadeInUp(
+                    duration: Duration(milliseconds: 900),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                        controller: messOwnerIdController,
+                        //   onTapOutside: (event) {// close keyboard
+                        //   FocusScope.of(context).unfocus();
+                        // },
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          enabled: false,
+                          label: Text("Mess Owner Id"),
+                          border: InputBorder.none,
+                                      
+                        ),
+                      ),
+                    ),
+                  ),
+              
+                  FadeInUp(
+                    duration: Duration(milliseconds: 1200),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                      controller: authorityPhoneController,
                       // onTapOutside: (event) {// close keyboard
                       // FocusScope.of(context).unfocus();
                       // },
+                      onChanged: (value){
+                        // email = value.trim();
+                      },
+                      validator: (value) {
+                        return numberVAladator(value.toString());
+                      },
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
-                        enabled: false,
-                        label: Text("Mess Owner Name"),
-                        border: InputBorder.none,  
-                      ),
-                    ),
-                  ),
-                ),
-            
-                FadeInUp(
-                  duration: Duration(milliseconds: 900),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: TextFormField(
-                      controller: messOwnerIdController,
-                      //   onTapOutside: (event) {// close keyboard
-                      //   FocusScope.of(context).unfocus();
-                      // },
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        enabled: false,
-                        label: Text("Mess Owner Id"),
+                        label: Text("Autrority Phone"),
                         border: InputBorder.none,
-                                    
+                                      
                       ),
                     ),
+                    ),
                   ),
-                ),
+              
+                  FadeInUp(
+                    duration: Duration(milliseconds: 1500),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.grey)),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: TextFormField(
+                        controller: authorityEmailController,
+                        // onTapOutside: (event) {// close keyboard
+                        // FocusScope.of(context).unfocus();
+                      // },
+                      onChanged: (value){
+                        // email = value.trim();
+                      },
+                      validator: (value) {
+                        return emailValidator(value.toString().trim());
+                      },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        label: Text("Autrority Email"),
+                        border: InputBorder.none,
+                                      
+                      ),
+                    ),
+                    ),
+                  ),
             
-                FadeInUp(
-                  duration: Duration(milliseconds: 1200),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: TextFormField(
-                      controller: authorityPhoneController,
-                      onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (value){
-                      // email = value.trim();
-                    },
-                    validator: (value) {
-                      return numberVAladator(value.toString());
-                    },
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      label: Text("Autrority Phone"),
-                      border: InputBorder.none,
-                                    
-                    ),
-                  ),
-                  ),
-                ),
-            
-                FadeInUp(
-                  duration: Duration(milliseconds: 1500),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: TextFormField(
-                      controller: authorityEmailController,
-                      onTapOutside: (event) {// close keyboard
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (value){
-                      // email = value.trim();
-                    },
-                    validator: (value) {
-                      return emailValidator(value.toString().trim());
-                    },
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      label: Text("Autrority Email"),
-                      border: InputBorder.none,
-                                    
-                    ),
-                  ),
-                  ),
-                ),
-          
-                messProvider.isLoading?
-                SizedBox.square(
-                  dimension: 50,
-                  child: CircularProgressIndicator()
-                )
-                : 
-                getMaterialButton(
-                  context: context,
-                  label: "Create", 
-                  ontap:(){
-                    _createMess();
-                  }
-                )
-
-              ],
+                  messProvider.isLoading?
+                  SizedBox.square(
+                    dimension: 50,
+                    child: CircularProgressIndicator()
+                  )
+                  : 
+                  getMaterialButton(
+                    context: context,
+                    label: "Create", 
+                    ontap:(){
+                      _createMess();
+                    }
+                  )
+      
+                ],
+              ),
             ),
           ),
-        ),
-      ),  
+        ),  
+      ),
     );
   }
 }

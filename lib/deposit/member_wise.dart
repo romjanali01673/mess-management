@@ -63,29 +63,11 @@ class _MemberWiseState extends State<MemberWise> {
       return  Center(child: Text("Required Administrator Power"),);
     }
 
-    return FutureBuilder(
-      future:messProvider.getMessData(
-        onFail: (message) { 
-          showSnackber(context: context, content: message);
-        },
-        messId: authProvider.getUserModel!.currentMessId,
-        isDisposed: ()=> _isDisposed,
-        onSuccess: (){
-          debugPrint("get mess data success");
-        },
-      ),
-      builder:(context, AsyncSnapshot snapshot) { 
-        if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's save 
-          return Center(child: CircularProgressIndicator());
-        }
-        
-        else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
-          return Center(child: Text('No member found.'));
-        }
-        else{
-          List<Map<String,dynamic>> data = messProvider.getMessModel!.messMemberList;
-          // return Text("data");
-          return ListView.builder(
+    List<Map<String,dynamic>> data = messProvider.getMessModel!.messMemberList;
+    return messProvider.getMessModel!.messMemberList.isEmpty?
+      Center(child: Text('No member found.'))
+      :
+      ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             itemCount: data.length,
@@ -110,8 +92,8 @@ class _MemberWiseState extends State<MemberWise> {
                                 contentPadding: EdgeInsets.only(left: 10),
                                 
                                 leading: CircleAvatar(
-                                  child: Text(index.toString()),
                                   backgroundColor: memberType==Constants.member? Colors.amber :Colors.red,
+                                  child: Text((index+1).toString()),
                                 ),
                                 title: Text(memberData[Constants.fname]),
                                 subtitle: Text("${memberData[Constants.uId]}   ($memberType)"),
@@ -293,11 +275,5 @@ class _MemberWiseState extends State<MemberWise> {
             },
           );
         }
-      } 
-    );
-  
-  }
-
-
 }
 
