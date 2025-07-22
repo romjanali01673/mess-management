@@ -212,6 +212,7 @@ class DepositProvider extends ChangeNotifier{
   // add a deposit transaction to database 
   Future<void> addADepositTransaction({required DepositModel depositModel, required String uId,  required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
+    setIsLoading(value: true);
         try {
 
           // add member diposite transaction
@@ -268,11 +269,13 @@ class DepositProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         } 
+        setIsLoading(value: false);
   }
 
   // update a deposit transaction to database 
   Future<void> updateADepositTransaction({required DepositModel depositModel, required String uId,required double extraAmount, required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
+    setIsLoading(value: true);
         try {
           
           // add new data data 
@@ -337,6 +340,7 @@ class DepositProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         } 
+        setIsLoading(value: false);
   }
 
   // delete a deposit transaction to database 

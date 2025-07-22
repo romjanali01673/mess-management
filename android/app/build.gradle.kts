@@ -14,6 +14,8 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
+
+        isCoreLibraryDesugaringEnabled = true // added reference of local notifications.
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -23,6 +25,9 @@ android {
     }
 
     defaultConfig {
+
+        multiDexEnabled = true // added reference of local notifications.
+        
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.engromjanali.mess_management"
         // You can update the following values to match your application needs.
@@ -31,6 +36,7 @@ android {
         targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        compileSdk = 35
     }
 
     buildTypes {
@@ -41,6 +47,15 @@ android {
         }
     }
 }
+
+// reference of local notifications package
+dependencies {
+    implementation("androidx.window:window:1.0.0")
+    implementation("androidx.window:window-java:1.0.0")
+    
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}
+
 
 flutter {
     source = "../.."

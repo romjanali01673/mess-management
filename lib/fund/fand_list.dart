@@ -1,6 +1,8 @@
 
 
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -146,6 +148,9 @@ void _handleScroll() {
             // controller:widget.fromPreMember? null : _scrollController,
             child: Column(
             children: [
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
               if(!widget.fromPreMember) child!,     // the child will not rebuild    
               if(fundProvider.isLoading) showCircularProgressIndicator(),    
               if (fundProvider.getFundModelList.isEmpty)  Center(child: Text('No Transaction found.'))

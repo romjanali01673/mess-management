@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -32,6 +34,9 @@ class _MyDepositState extends State<MyDeposit> {
     return SingleChildScrollView(
       child: Column(
         children: [
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
          if(!widget.fromPreMember) StatefulBuilder(
            builder: (context, setLocalState) {
              return Card(
@@ -78,7 +83,7 @@ class _MyDepositState extends State<MyDeposit> {
               );
            }
          ),
-
+    
           // here my deposit list.
           FutureBuilder(
             future: widget.fromPreMember? depositProvider.getMemberDepositList(//get Member Deposit List For A Spacific Session

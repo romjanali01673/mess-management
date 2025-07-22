@@ -62,6 +62,9 @@ class _MessCloseScreenState extends State<MessCloseScreen> {
           child: Column(
             children: [
               SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
+              SizedBox(
                 height: 400,
               ),
               Align(

@@ -205,23 +205,16 @@ class FirstScreenProvider extends ChangeNotifier{
     double deposit = 0.0;
     setIsLoading(value: true);
     try {
-      QuerySnapshot querySnapshot =  await firebaseFirestore
-        .collection(Constants.deposit)
+      DocumentSnapshot snapshot= await firebaseFirestore.collection(Constants.deposit)
         .doc(messId)
         .collection(Constants.mealSessionList)
         .doc(mealSessionId)
         .collection(Constants.members)
         .doc(uId)
-        .collection(Constants.listOfDepositTnx)
         .get();
       
-      querySnapshot.docs.map((snapshot){
-        print(snapshot.id);
-        if(snapshot.exists && snapshot.data() != null){
-          deposit += double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.amount]).toString());
-        }
-      }).toList();
-      
+
+      deposit += double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.blance]).toString());      
       
       print("my deposit $deposit");
       onSuccess!=null? onSuccess() : (){};

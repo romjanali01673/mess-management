@@ -15,7 +15,7 @@ class FundProvider extends ChangeNotifier{
   FundModel? _fundModel;
   double _blance = 0;
 
-  int limit = 100;
+  int limit = 50;
   List<FundModel> currentDocs = [];
   DocumentSnapshot? _firstDoc;
   DocumentSnapshot? _lastDoc;
@@ -53,7 +53,7 @@ class FundProvider extends ChangeNotifier{
     _fundModel = null;
     _blance = 0;
 
-    limit = 100;
+    // limit = 50;
     currentDocs = [];
     _firstDoc = null;
     _lastDoc = null;
@@ -372,6 +372,7 @@ class FundProvider extends ChangeNotifier{
   // add a fund transaction to database 
   Future<void> addAFundTransaction({required FundModel fundModel,required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     debugPrint("add fund called");
+    setIsLoading(value: true);
     final batch = firebaseFirestore.batch();
 
         try {
@@ -411,12 +412,13 @@ class FundProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         } 
+        setIsLoading(value: false);
   }
 
   // update a fund transaction to database 
   Future<void> updateAFundTransaction({required FundModel fundModel,required String messId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-
+    setIsLoading(value: true);
     try {
 
       batch.set(
@@ -452,6 +454,7 @@ class FundProvider extends ChangeNotifier{
     } catch (e) {
       onFail(e.toString());
     } 
+    setIsLoading(value: false);
   }
     
   
@@ -461,6 +464,7 @@ class FundProvider extends ChangeNotifier{
   // delete a fund transaction
   Future<void> deleteAFundTransaction({required String messId, required String tnxId,required double extraAmount, required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
+    setIsLoading(value: true);
     try {
       batch.delete(
         firebaseFirestore.collection(Constants.fund).doc(messId).collection(Constants.listOfFundTnx).doc(tnxId),
@@ -476,6 +480,7 @@ class FundProvider extends ChangeNotifier{
     } catch (e) {
       onFail(e.toString());
     }
+    setIsLoading(value: false);
   }
 
   // delete a fund transaction
@@ -500,7 +505,7 @@ class FundProvider extends ChangeNotifier{
         .count()
         .get();
           
-      int i = aQuerySnapshot.count!;
+      int i = aQuerySnapshot.count??0;
 
       while(i>0){
         try {
@@ -508,7 +513,7 @@ class FundProvider extends ChangeNotifier{
             .collection(Constants.fund)
             .doc(messId)
             .collection(Constants.listOfFundTnx)
-            .limit(800)
+            .limit(limit)
             .get();
 
           await Future.wait(qSnapshot.docs.map((x) => x.reference.delete()));

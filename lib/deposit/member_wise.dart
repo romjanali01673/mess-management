@@ -44,6 +44,7 @@ class _MemberWiseState extends State<MemberWise> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            
              getHistoryMemberWise()
           ],
         ),

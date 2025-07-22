@@ -134,7 +134,7 @@ Widget getButton({required String label, required Function() ontap, Icon? icon})
 Widget showCircularProgressIndicator(){
   return Center(
     child: SizedBox.square(
-      dimension: 50,
+      dimension: 40,
       child: CircularProgressIndicator(),
     ),
   );
@@ -163,6 +163,53 @@ Widget showPrice({required dynamic value , int maxWidth = 100}) {
         style: const TextStyle(fontSize: 18),
       ),
     ),
+  );
+}
+
+ButtonStyle getTextbuttonStyle(){
+  return ElevatedButton.styleFrom(
+    foregroundColor: const Color.fromARGB(255, 35, 96, 90),
+    backgroundColor: Colors.transparent.withAlpha(10),
+    shadowColor: Colors.transparent, // remove shadow too
+    elevation: 0, // remove elevation
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    side: BorderSide(
+      color: Colors.white,
+      width: 2,
+      style: BorderStyle.solid
+    ), 
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10)
+    )
+  );
+}
+
+
+Widget getCustomIcon({double size = 25, double iconSize=20, IconData iconData = Icons.close, Color borderColor = Colors.black, Color iconColor = Colors.black, Color backgroundColor = Colors.transparent,required Function() ontap}){
+  return Container(
+    height: 25,
+    width: 25,
+    margin: EdgeInsets.all(4),
+    decoration: BoxDecoration(
+      color: backgroundColor,
+          border: Border.all(
+        color: borderColor, 
+        width: 2,           
+      ),
+      shape: BoxShape.circle
+    ),
+    child: GestureDetector(
+      onTap: ontap, 
+      child: Icon(iconData,size: iconSize, color: iconColor,)
+    ),
+  );
+}
+
+Widget getVerticalDevider({Color? color,double width=1 , double height = 20}){
+  return Container(
+    height: height,
+    width: width,
+    color:color?? Colors.grey.shade300,
   );
 }
 

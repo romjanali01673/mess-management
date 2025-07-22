@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,7 @@ class _AddFundState extends State<AddFund> {
     titleController.text = widget.preFundModel!.title;
     descriptionController.text = widget.preFundModel!.description;
     amountController.text = widget.preFundModel!.amount.toString();
+    isAdd = widget.preFundModel?.type == Constants.add;
   }
 
   @override
@@ -67,8 +70,8 @@ class _AddFundState extends State<AddFund> {
   @override
   Widget build(BuildContext context) {
     final fundProvider = context.watch<FundProvider>();
-    final authProvider = context.watch<AuthenticationProvider>();
-    final messProvider = context.watch<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
 
     return GestureDetector(
       onTap: () {
@@ -89,28 +92,49 @@ class _AddFundState extends State<AddFund> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
-      
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Cost"),
-                    Switch(
-                      
-                      value: isAdd, 
-                      onChanged: (val){
-                        if(!isUpdate){
-                          setState(() {
-                            isAdd = val;
-                          });
-                        }
-                        else{
-                          showSnackber(context: context, content: "For Update \"Entry Type\" Can't Be Changed");
-                        }
-                      },
-                    ),
-                    Text("Add"),
-                  ],
+                SizedBox(
+                  height:Platform.isIOS? 40:10,
                 ),
+                SwitchListTile(
+                  
+                  title: Text("Tnx Type"),
+                  subtitle: isAdd? Text("Add") : Text("Cost"),
+                  value: isAdd,
+                  onChanged: (val){
+                    if(!isUpdate){
+                      setState(() {
+                        isAdd = val;
+                      });
+                    }
+                    else{
+                      showSnackber(context: context, content: "For Update \"Entry Type\" Can't Be Changed");
+                    }
+                  },
+                  secondary: Icon(Icons.playlist_add_check_circle), //Icon(Icons.dark_mode),
+                  activeColor: Colors.black,
+                  activeTrackColor: Colors.blue,
+                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     Text("Cost"),
+                //     Switch(
+                      
+                //       value: isAdd, 
+                //       onChanged: (val){
+                //         if(!isUpdate){
+                //           setState(() {
+                //             isAdd = val;
+                //           });
+                //         }
+                //         else{
+                //           showSnackber(context: context, content: "For Update \"Entry Type\" Can't Be Changed");
+                //         }
+                //       },
+                //     ),
+                //     Text("Add"),
+                //   ],
+                // ),
       
                
           
@@ -197,6 +221,8 @@ class _AddFundState extends State<AddFund> {
                   height: 50,
                 ),
       
+                fundProvider.isLoading? showCircularProgressIndicator()
+                : 
                 getButton(
                   label: isUpdate?"Update":"Submit", 
                   ontap: ()async{
@@ -225,6 +251,7 @@ class _AddFundState extends State<AddFund> {
                           onSuccess: (){ 
                             formKey.currentState!.reset();
                             showSnackber(context: context, content: "Update Success!");
+                            Navigator.of(context).pop();
                           }, 
                         );
                         // we should clear pre data other wise pre grabage data can make wrong submesion

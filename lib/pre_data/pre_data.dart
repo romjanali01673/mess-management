@@ -36,7 +36,10 @@ class _PreDataScreenState extends State<PreDataScreen> {
             onPressed: (){
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MealSessionList()));
             }, 
-            icon: Icon(Icons.admin_panel_settings))
+            icon: Icon(Icons.admin_panel_settings),
+            color: Colors.black,
+            iconSize: 40,
+          )
         ],
       ),
       body: SafeArea(

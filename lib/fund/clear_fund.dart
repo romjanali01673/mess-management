@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mess_management/helper/helper_method.dart';
@@ -45,6 +47,9 @@ class _ClearFundState extends State<ClearFund> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(
+            height:Platform.isIOS? 40:10,
+          ),
           ElevatedButton(
             onPressed: ()async{
             if(!amIAdmin(messProvider: messProvider, authProvider: authProvider)){

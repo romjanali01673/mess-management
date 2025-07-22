@@ -27,7 +27,7 @@ class JoiningModel{
       invaitationId: data[Constants.invaitationId]??"",
       messName: data[Constants.messName] ?? "", 
       messId: data[Constants.messId] ?? "", 
-      status: data[Constants.status] ?? JoiningStatus.panding, 
+      status: data[Constants.status] ?? JoiningStatus.pending, 
       description: data[Constants.description] ?? "", 
       messAddress: data[Constants.messAddress] ?? "", 
       invaitedTime: data[Constants.invaitedTime],

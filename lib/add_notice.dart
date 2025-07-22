@@ -135,6 +135,8 @@ class _AddNoticeState extends State<AddNotice> {
                 ),
               )
               :
+              noticeProvider.isLoading? showCircularProgressIndicator()
+              : 
               getButton(
                 label: isUpdate ? "Update":"Submit", 
                 ontap: ()async{

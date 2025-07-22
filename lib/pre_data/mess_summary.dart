@@ -74,6 +74,7 @@ class _MessSummaryState extends State<MessSummary>{
                                 children: [
                                   TextSpan(
                                     text: "Mess Name: ",
+                                    
                                     style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -67,12 +69,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
         }, 
         memberUid: authProvider.getUserModel!.uId,
         messId: authProvider.getUserModel!.currentMessId,
-        onSuccess: (){
-          //remove current mess id from your user id.
-          // because auth provider hold current mess id in user model. it will not replace until you relunch/login the app. 
-          // clear manually
-          authProvider.setUserModel(currentMessId: "");
-          // on success show a "success message"
+        onSuccess: (){        
           showSnackber(context: context, content: "Leaved from the Mess");
         },
       );
@@ -96,9 +93,10 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: Column(
-            spacing: 10,
             children: [
-              
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
               messProvider.isLoading? SizedBox.square(dimension: 50,child: CircularProgressIndicator(),)
               :
               getMaterialButton(icon: Icons.run_circle ,context: context, label: "Leave Current Mess", ontap: ()async{
@@ -137,6 +135,7 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                         return Card(
                           color: Colors.green.shade100,
                           child: Column(
+                            spacing: 10,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ListTile(
@@ -155,38 +154,34 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                     PopupMenuItem(
                                       child: Text("Join"),
                                       onTap: ()async{
+                                        if(joiningModel.status!=JoiningStatus.pending){
+                                          showSnackber(context: context, content: "You Can't Join because Mess Status: ${joiningModel.status}");
+                                          return;
+                                        }
                                         if(authProvider.getUserModel!.currentMessId==""){
                                           bool? res = await showConfirmDialog(
                                             context: context, 
                                             title: "Do you Want to join?",
                                           ); 
                                           if(res??false){
-                                            // join to the new mess
-                                            if(joiningModel.status==JoiningStatus.panding){
-                                              //   // you are valid join to the mess
-                                              messProvider.joiningToInvaitatedMess(
-                                                messId: joiningModel.messId, 
-                                                member: {
-                                                  Constants.uId:authProvider.getUserModel!.uId,
-                                                  Constants.fname:authProvider.getUserModel!.fname,
-                                                  Constants.status:Constants.enable,
-                                                  },
-                                                invaitationsId: joiningModel.invaitationId, 
-                                                status:JoiningStatus.joined,
-                                                onFail: (message){
-                                                  showSnackber(context: context, content: "Mess Joining Failed\n$message");
-                                                }, 
-                                                onSuccess: ()async{
-                                                  showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
-                                                  await authProvider.getUserProfileData(onFail: (_){});
-                                                }, 
-                                              );  
-                                            }
-                                            else
-                                            {
-                                              // the invaitations no longer valid.
-                                              showSnackber(context: context, content: "You Can't Join because Mess Status: ${joiningModel.status}");
-                                            }
+                                            // you are valid join to the mess
+                                            messProvider.joiningToInvaitatedMess(
+                                              messId: joiningModel.messId, 
+                                              member: {
+                                                Constants.uId:authProvider.getUserModel!.uId,
+                                                Constants.fname:authProvider.getUserModel!.fname,
+                                                Constants.status:Constants.enable,
+                                                },
+                                              invaitationsId: joiningModel.invaitationId, 
+                                              status:JoiningStatus.joined,
+                                              onFail: (message){
+                                                showSnackber(context: context, content: "Mess Joining Failed\n$message");
+                                              }, 
+                                              onSuccess: ()async{
+                                                showSnackber(context: context, content: "Welcome. \nYou have joinded to the mess");
+                                                await authProvider.getUserProfileData(onFail: (_){});
+                                              }, 
+                                            );  
                                           }
                                         }
                                         else{
@@ -197,6 +192,10 @@ class _JoinOrLeaveState extends State<JoinOrLeave> {
                                     PopupMenuItem(
                                       child: Text("Declain"),
                                       onTap: ()async{
+                                        if(joiningModel.status!=JoiningStatus.pending){
+                                          showSnackber(context: context, content: "You Can't Declain because Mess Status: ${joiningModel.status}");
+                                          return;
+                                        }
                                         // change invaitation ststus
                                         bool? res = await showConfirmDialog(context: context, title: "Do you want to declain this invaitations.");
                                         if(res??false){

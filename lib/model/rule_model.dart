@@ -5,7 +5,7 @@ class RuleModel{
   String tnxId;
   String title;
   String description;
-  Timestamp? CreatedAt;
+  Timestamp? createdAt;
 
 
   RuleModel(
@@ -13,7 +13,7 @@ class RuleModel{
       required this.tnxId,
       required this.title,
       required this.description,
-      this.CreatedAt
+      this.createdAt
     }
   );
 
@@ -22,7 +22,7 @@ class RuleModel{
       tnxId: data[Constants.tnxId]?? "", 
       title: data[Constants.title]?? "", 
       description: data[Constants.description] ??"",
-      CreatedAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
+      createdAt: data[Constants.createdAt]??Timestamp.fromDate(DateTime.now()), 
     );
   }
 
@@ -31,7 +31,7 @@ class RuleModel{
       Constants.tnxId: tnxId,
       Constants.title: title,
       Constants.description : description,
-      Constants.createdAt: FieldValue.serverTimestamp(),
+      Constants.createdAt: createdAt?? FieldValue.serverTimestamp(),
     };
   }
 }

@@ -25,6 +25,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
 
   var dateController  = TextEditingController();
   List<TextEditingController> listOfTexteditingController=[];
+  // [{uid, fname, meal}]
   List<Map<String, dynamic>> listOfMeal=[];
   List<Map<String,dynamic>> memberData =[];
 
@@ -44,7 +45,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
 
       memberData = widget.preMealModel!.listOfMeal;           
       // set here the list of meal.
-      listOfMeal = List.generate(memberData!.length,(_)=><String,dynamic>{Constants.meal:0});
+      listOfMeal = List.generate(memberData!.length,(index)=><String,dynamic>{Constants.meal : memberData[index][Constants.meal].toString()});
       listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
       
       for(int i =0; i<memberData.length; i++){
@@ -96,7 +97,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final mealProvider  = context.watch<MealProvider>();
-    final authProvider  = context.watch<AuthenticationProvider>();
+    final authProvider  = context.read<AuthenticationProvider>();
     final messProvider  = context.read<MessProvider>();
 
     return GestureDetector(
@@ -179,12 +180,14 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: memberData!.length+1,
+                    itemCount: memberData.length+1,
                     itemBuilder: (context, index){
                                 
                       // the button will be shown in last when we reach in last 
                       if(index==memberData.length){
-                        return  getMenuItems(
+                        return mealProvider.isLoading? showCircularProgressIndicator()
+                        :  
+                        getMenuItems(
                           label: isUpdate?"Update":"Submit", 
                           ontap: ()async{
                             if(date == null){
@@ -291,7 +294,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                             ),
                             SizedBox(
                               width: 100,
+                              
                               child: TextFormField(
+                                autofocus: false,
                                 controller: listOfTexteditingController[index],
                                 // onTapOutside: (event) {// close keyboard
                                 //   FocusScope.of(context).unfocus();

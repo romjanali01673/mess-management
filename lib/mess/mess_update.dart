@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -105,7 +107,9 @@ class _MessUpdateState extends State<MessUpdate> {
           child: Column(
             spacing: 10,
             children: [
-              const Text("Note \nYou are going to Update your mess.", textAlign: TextAlign.center,),
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
               Row(
                 children: [
                   const Text("Transfer Ownership-"),

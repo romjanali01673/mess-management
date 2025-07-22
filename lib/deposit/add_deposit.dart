@@ -1,6 +1,9 @@
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mess_management/constants.dart';
 import 'package:mess_management/helper/helper_method.dart';
@@ -71,6 +74,7 @@ class _AddDepositState extends State<AddDeposit> {
     selectedItem  = widget.preMemberData![Constants.fname].toString()+"\n"+widget.preMemberData![Constants.uId].toString();
     descriptionController.text = widget.preDepositModel!.description;
     amountController.text = widget.preDepositModel!.amount.toString();
+    isAdd = widget.preDepositModel?.type == Constants.add;
   }
 
   @override
@@ -95,8 +99,8 @@ class _AddDepositState extends State<AddDeposit> {
   @override
   Widget build(BuildContext context) {
     final depositProvider = context.watch<DepositProvider>();
-    final messProvider = context.watch<MessProvider>();
-    final authProvider = context.watch<AuthenticationProvider>();
+    final messProvider = context.read<MessProvider>();
+    final authProvider = context.read<AuthenticationProvider>();
 
     return GestureDetector(
       onTap: () {
@@ -104,245 +108,242 @@ class _AddDepositState extends State<AddDeposit> {
       },
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
+        backgroundColor: Colors.green.shade50,
         resizeToAvoidBottomInset: true,
         appBar: isUpdate? AppBar(
           title: Text("Edit Deposit", style: getTextStyleForTitleXL(),),
           backgroundColor: Colors.grey,
         ):null,
-        body: Container(
-          height: double.infinity,
-          color: Colors.green.shade50,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
-            child: Column(
-              children: [
-      
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Refund"),
-                    Switch(
-                      
-                      value: isAdd, 
-                      onChanged: (val){
-                        if(!isUpdate){
-                          setState(() {
-                            isAdd = val;
-                          });
-                        }
-                        else{
-                          showSnackber(context: context, content: "For Update \"Entry Type\" Can't Be Changed");
-                        }
-                      },
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
+
+              SwitchListTile(          
+                title: Text("Tnx Type"),
+                subtitle: isAdd? Text("Add") : Text("Refund"),
+                value: isAdd,
+                onChanged: (val){
+                  if(!isUpdate){
+                    setState(() {
+                      isAdd = val;
+                    });
+                  }
+                  else{
+                    showSnackber(context: context, content: "For Update \"Entry Type\" Can't Be Changed");
+                  }
+                },
+                secondary: Icon(Icons.playlist_add_check_circle), //Icon(Icons.dark_mode),
+                activeColor: Colors.black,
+                activeTrackColor: Colors.blue,
+              ),
+                
+              Container(
+                margin: EdgeInsets.all(10),
+                // child: FutureBuilder(
+                //   future: future, 
+                //   builder: builder,
+                // ),
+                child: DropdownSearch<String>(
+                  enabled: (!isUpdate),
+                  key: dropdownKey, // Needed for reset
+                  asyncItems: (String filter) => _getAllMemberData(),
+                  selectedItem : selectedItem ,
+                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                      labelText: Constants.selectedMember,
+                      border: OutlineInputBorder(),
                     ),
-                    Text("Add"),
-                  ],
-                ),
-      
-                Container(
-                  margin: EdgeInsets.all(10),
-                  // child: FutureBuilder(
-                  //   future: future, 
-                  //   builder: builder,
-                  // ),
-                  child: DropdownSearch<String>(
-                    enabled: (!isUpdate),
-                    key: dropdownKey, // Needed for reset
-                    asyncItems: (String filter) => _getAllMemberData(),
-                    selectedItem : selectedItem ,
-                    dropdownDecoratorProps: const DropDownDecoratorProps(
-                      dropdownSearchDecoration: InputDecoration(
-                        labelText: Constants.selectedMember,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    popupProps: PopupProps.menu(
-                      showSearchBox: true,
-                          
-                      // Disable specific item visually and functionally
-                      itemBuilder: (context, item, isSelected) {
-                        bool isDisabled = disabledItems.contains(item);
-                        return IgnorePointer(
-                          ignoring: isDisabled,
-                          child: ListTile(
-                            title: Text(
-                              item,
-                              style: TextStyle(
-                                color: isDisabled ? Colors.grey : Colors.black,
-                              ),
+                  ),
+                  popupProps: PopupProps.menu(
+                    showSearchBox: true,
+                        
+                    // Disable specific item visually and functionally
+                    itemBuilder: (context, item, isSelected) {
+                      bool isDisabled = disabledItems.contains(item);
+                      return IgnorePointer(
+                        ignoring: isDisabled,
+                        child: ListTile(
+                          title: Text(
+                            item,
+                            style: TextStyle(
+                              color: isDisabled ? Colors.grey : Colors.black,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    // always use this function it's tested
-                    // otherwise we get error because there are few bug here
-                    onChanged: (value) {
-                      if (value != null && disabledItems.contains(value)) {
-                      // Reset visually and logically
-                        dropdownKey.currentState?.clear(); // clears the selection
-                        debugPrint("Selected disable: $selectedItem ");                    
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("This Member is disabled.")),
-                        );
-                      } 
-                      else {
-                        if(value!=null){
-                          // here we receive only enabled value.
-                          setState(() {
-                            selectedItem  = value.toString();
-                          });
-                          debugPrint("Selected enable: $value");
-                        }
-                      }
+                        ),
+                      );
                     },
                   ),
-                ),
-          
-                Form(
-                  key: formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: descriptionController,
-                          // onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                          maxLines: 5,
-                          textInputAction: TextInputAction.newline,
-                          autofocus: true,
-                          focusNode: focusDiscreption,
-                          onFieldSubmitted: (value){
-                            FocusScope.of(context).requestFocus(focusAmount);
-                          },
-                          // validator: (value) {
-                          //   if(value.toString().trim()==""){
-                          //     return "";
-                          //   }
-                          //   return null;
-                          // },
-      
-                          decoration: FromFieldDecoration(
-                            hintText: "Write About The Deposit",
-                            label: "Discreption (Optional)",
-                          )
-                        ),
-                      ),
-                  
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: amountController,
-                          // onTapOutside: (event) {
-                          //   FocusScope.of(context).unfocus();
-                          // },
-                          autofocus: true,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.number,
-                          focusNode: focusAmount,
-                          onFieldSubmitted: (value){
-                            FocusScope.of(context).unfocus();
-                          },
-                          validator: (value) {
-                            return validatePrice(value.toString());
-                          },
-                          decoration: FromFieldDecoration(
-                            hintText: "How Much?",
-                            label: "Amount",
-                          )
-                        ),
-                      ),
-                    ],
-                  )
-                ),   
-      
-                SizedBox(
-                  height: 50,
-                ),
-      
-                getButton(
-                  label: isUpdate?"Update":"Submit", 
-                  ontap: ()async{
-                    if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
-                      showSnackber(context: context, content: "Required Administrator Power");
-                      return;
-                    }
-      
-                    bool valided  = (formKey.currentState!.validate() && selectedItem != Constants.selectedMember );
-                    
-                    if(valided){
-                      if(isUpdate){
-                        await depositProvider.updateADepositTransaction(
-                          depositModel: DepositModel(
-                            tnxId: widget.preDepositModel!.tnxId, 
-                            amount: double.parse(amountController.text.toString()), 
-                            description: descriptionController.text.toString(), 
-                            type: widget.preDepositModel!.type, 
-                          ), 
-                          extraAmount: double.parse(amountController.text.toString()) - widget.preDepositModel!.amount ,
-                          uId: widget.preMemberData![Constants.uId].toString(), 
-                          messId: authProvider.getUserModel!.currentMessId, 
-                          mealSessionId: authProvider.getUserModel!.mealSessionId,
-                          onFail: (message ) { 
-                            showSnackber(context: context, content: "Updaate Failed! \n$message");
-                          },
-                          onSuccess: (){ 
-                            formKey.currentState!.reset();
-                            showSnackber(context: context, content: "Update Success!");
-                            Navigator.pop(context);
-                          }
-                        );
-                        // we should clear pre data other wise pre grabage data can make wrong submesion
-                        isUpdate = false;
-                        amountController.clear();
-                        descriptionController.clear();
-                        selectedItem  = Constants.selectedMember; // importent because dropdown key was rest but variable still hold pre value
-                        dropdownKey.currentState!.clear();
-      
+                  // always use this function it's tested
+                  // otherwise we get error because there are few bug here
+                  onChanged: (value) {
+                    if (value != null && disabledItems.contains(value)) {
+                    // Reset visually and logically
+                      dropdownKey.currentState?.clear(); // clears the selection
+                      debugPrint("Selected disable: $selectedItem ");                    
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("This Member is disabled.")),
+                      );
+                    } 
+                    else {
+                      if(value!=null){
+                        // here we receive only enabled value.
                         setState(() {
-                              
+                          selectedItem  = value.toString();
                         });
+                        debugPrint("Selected enable: $value");
                       }
-                      else{
-                        await depositProvider.addADepositTransaction(
-                          depositModel: DepositModel(
-                            tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
-                            amount: double.parse(amountController.text.toString()), 
-                            description: descriptionController.text.toString(), 
-                            type: isAdd? Constants.deposit : Constants.refund, 
-                          ), 
-                          uId: selectedItem .split("\n")[1], 
-                          messId: authProvider.getUserModel!.currentMessId, 
-                          mealSessionId: authProvider.getUserModel!.mealSessionId,
-                          onFail: (message ) { 
-                            showSnackber(context: context, content: "Deposit Failed! \n$message");
-                          },
-                          onSuccess: (){ 
-                            formKey.currentState!.reset();
-                            showSnackber(context: context, content: "Deposit Successed!");
-                          }
-                        );
-                        isUpdate = false;
-                        amountController.clear();
-                        descriptionController.clear();
-                        selectedItem  =  Constants.selectedMember;
-                        dropdownKey.currentState!.clear();
-      
-                        setState(() {
-                              
-                        });
-                      }
-                    }
-                    else{
-                      showSnackber(context: context, content: "Fill All Required Field");
                     }
                   },
                 ),
-              ],
-            ),
+              ),
+                  
+              Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: descriptionController,
+                        // onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                        maxLines: 5,
+                        textInputAction: TextInputAction.newline,
+                        autofocus: true,
+                        focusNode: focusDiscreption,
+                        onFieldSubmitted: (value){
+                          FocusScope.of(context).requestFocus(focusAmount);
+                        },
+                        // validator: (value) {
+                        //   if(value.toString().trim()==""){
+                        //     return "";
+                        //   }
+                        //   return null;
+                        // },
+              
+                        decoration: FromFieldDecoration(
+                          hintText: "Write About The Deposit",
+                          label: "Discreption (Optional)",
+                        )
+                      ),
+                    ),
+                
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: amountController,
+                        // onTapOutside: (event) {
+                        //   FocusScope.of(context).unfocus();
+                        // },
+                        autofocus: true,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.number,
+                        focusNode: focusAmount,
+                        onFieldSubmitted: (value){
+                          FocusScope.of(context).unfocus();
+                        },
+                        validator: (value) {
+                          return validatePrice(value.toString());
+                        },
+                        decoration: FromFieldDecoration(
+                          hintText: "How Much?",
+                          label: "Amount",
+                        )
+                      ),
+                    ),
+                  ],
+                )
+              ),   
+              
+              SizedBox(
+                height: 50,
+              ),
+              
+              depositProvider.isLoading? showCircularProgressIndicator()
+              : 
+              getButton(
+                label: isUpdate?"Update":"Submit", 
+                ontap: ()async{
+                  if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
+                    showSnackber(context: context, content: "Required Administrator Power");
+                    return;
+                  }
+              
+                  bool valided  = (formKey.currentState!.validate() && selectedItem != Constants.selectedMember );
+                  
+                  if(valided){
+                    if(isUpdate){
+                      await depositProvider.updateADepositTransaction(
+                        depositModel: DepositModel(
+                          tnxId: widget.preDepositModel!.tnxId, 
+                          amount: double.parse(amountController.text.toString()), 
+                          description: descriptionController.text.toString(), 
+                          type: widget.preDepositModel!.type, 
+                        ), 
+                        extraAmount: double.parse(amountController.text.toString()) - widget.preDepositModel!.amount ,
+                        uId: widget.preMemberData![Constants.uId].toString(), 
+                        messId: authProvider.getUserModel!.currentMessId, 
+                        mealSessionId: authProvider.getUserModel!.mealSessionId,
+                        onFail: (message ) { 
+                          showSnackber(context: context, content: "Updaate Failed! \n$message");
+                        },
+                        onSuccess: (){ 
+                          formKey.currentState!.reset();
+                          showSnackber(context: context, content: "Update Success!");
+                          Navigator.pop(context);
+                        }
+                      );
+                      // we should clear pre data other wise pre grabage data can make wrong submesion
+                      isUpdate = false;
+                      amountController.clear();
+                      descriptionController.clear();
+                      selectedItem  = Constants.selectedMember; // importent because dropdown key was rest but variable still hold pre value
+                      dropdownKey.currentState!.clear();
+              
+                      setState(() {
+                            
+                      });
+                    }
+                    else{
+                      await depositProvider.addADepositTransaction(
+                        depositModel: DepositModel(
+                          tnxId: DateTime.now().millisecondsSinceEpoch.toString(), 
+                          amount: double.parse(amountController.text.toString()), 
+                          description: descriptionController.text.toString(), 
+                          type: isAdd? Constants.deposit : Constants.refund, 
+                        ), 
+                        uId: selectedItem .split("\n")[1], 
+                        messId: authProvider.getUserModel!.currentMessId, 
+                        mealSessionId: authProvider.getUserModel!.mealSessionId,
+                        onFail: (message ) { 
+                          showSnackber(context: context, content: "Deposit Failed! \n$message");
+                        },
+                        onSuccess: (){ 
+                          formKey.currentState!.reset();
+                          showSnackber(context: context, content: "Deposit Successed!");
+                        }
+                      );
+                      isUpdate = false;
+                      amountController.clear();
+                      descriptionController.clear();
+                      selectedItem  =  Constants.selectedMember;
+                      dropdownKey.currentState!.clear();
+              
+                      setState(() {
+                            
+                      });
+                    }
+                  }
+                  else{
+                    showSnackber(context: context, content: "Fill All Required Field");
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),

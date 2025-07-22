@@ -51,47 +51,56 @@ class _FundScreenState extends State<FundScreen> with SingleTickerProviderStateM
   }
 
   @override
+  void dispose() {
+    _tabController?.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      floatHeaderSlivers: true,
-      headerSliverBuilder: (context, scrollable){
-        return [
-          SliverAppBar(
-            backgroundColor: Colors.grey,
-            title: AnimatedBuilder(
-              animation: _tabController!,
-              builder: (context, child) {
-                return Text(tabs[_tabController!.index]);
-              },
+    return Scaffold(
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, scrollable){
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.grey,
+              title: AnimatedBuilder(
+                animation: _tabController!,
+                builder: (context, child) {
+                  return Text(tabs[_tabController!.index]);
+                },
+              ),
+              actions: [],
+              floating: true,
+              snap: true,
+              pinned: true,
+              bottom: TabBar(
+                controller: _tabController,
+                isScrollable: true,// must assign otherwise get an error
+                tabAlignment: TabAlignment.start,
+                labelColor: Colors.black,
+                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                unselectedLabelColor: Colors.black,
+                unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                indicatorColor: Colors.black,
+                tabs:tabs.map((e)=> Tab(text: e.toString() , icon:icons[tabs.indexOf(e)],)).toList(),
+              ),
             ),
-            actions: [],
-            floating: true,
-            snap: true,
-            pinned: true,
-            bottom: TabBar(
-              controller: _tabController,
-              isScrollable: true,// must assign otherwise get an error
-              tabAlignment: TabAlignment.start,
-              labelColor: Colors.black,
-              labelStyle: TextStyle(fontWeight: FontWeight.bold),
-              unselectedLabelColor: Colors.black,
-              unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
-              indicatorColor: Colors.black,
-              tabs:tabs.map((e)=> Tab(text: e.toString() , icon:icons[tabs.indexOf(e)],)).toList(),
-            ),
-          ),
-          
-        ];
-      },
-      
-      body:TabBarView(
-        controller: _tabController,
-        children: [
-          FundList(),
-          AddFund(),
-          ClearFund(),
-        ],
-      )
+            
+          ];
+        },
+        
+        body:TabBarView(
+          controller: _tabController,
+          children: [
+            FundList(),
+            AddFund(),
+            ClearFund(),
+          ],
+        )
+      ),
     );
   }
 }

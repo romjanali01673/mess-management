@@ -224,7 +224,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>{
                             invaitationId: DateTime.now().millisecondsSinceEpoch.toString(), 
                             messName: messProvider.getMessModel!.messName, 
                             messId: messProvider.getMessModel!.messId, 
-                            status: JoiningStatus.panding, 
+                            status: JoiningStatus.pending, 
                             description: "Hello ${userModel!.fname}! \nWe’re inviting you to become a member of our mess. We work together to manage meals, expenses, and a smooth daily routine. Hope you’ll join us!", 
                             messAddress: messProvider.getMessModel!.messAddress, 
                           ),

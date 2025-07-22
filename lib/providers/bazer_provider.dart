@@ -383,6 +383,7 @@ class BazerProvider extends ChangeNotifier{
   Future<void> addABazerTransaction({required BazerModel bazerModel,required String messId,required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
+    setIsLoading(value: true);
         try {
             batch.set(
             firebaseFirestore
@@ -414,6 +415,7 @@ class BazerProvider extends ChangeNotifier{
         } catch (e) {
           onFail(e.toString());
         }  
+    setIsLoading(value: false);
   }
 
   
@@ -422,6 +424,7 @@ class BazerProvider extends ChangeNotifier{
   Future<void> updateABazerTransaction({required BazerModel bazerModel,required String messId,required String mealSessionId,required double extraAdd,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
     // fatch cost,
+    setIsLoading(value: true);
         try{
           batch.set(
             firebaseFirestore
@@ -462,8 +465,7 @@ class BazerProvider extends ChangeNotifier{
           onFail(e.toString());
           print(e.toString());
         }  
-      
-    
+    setIsLoading(value: false);
   }
 
   

@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mess_management/constants.dart';
@@ -37,6 +39,9 @@ class _AllHistoryOfDepositState extends State<AllHistoryOfDeposit> {
       :
       Column(
         children: [
+              SizedBox(
+                height:Platform.isIOS? 40:10,
+              ),
               StatefulBuilder(
                 builder: (context, setLocalState) {
                   return Card(

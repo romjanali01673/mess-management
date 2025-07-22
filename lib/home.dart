@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mess_management/bazer/bazer_screen.dart';
 import 'package:mess_management/constants.dart';
@@ -18,7 +19,9 @@ import 'package:mess_management/pre_data/pre_data.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/mess_provider.dart';
 import 'package:mess_management/providers/notice_provider.dart';
+import 'package:mess_management/services/notification_services.dart';
 import 'package:mess_management/setting/setting_secrren.dart';
+import 'package:mess_management/test.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool visibleCurrent = false;
   bool visibleNew = false;
   bool visibleConfirm = false;
+
+
 
 @override
   void initState(){
@@ -60,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       );
     }
-
   }
 
   void checkNotification()async{
@@ -128,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
           GestureDetector(
             onTap: (){
               showSnackber(context: context, content: "Currently Unavailable");
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentInputStyled()));
             },
             child: FaIcon(FontAwesomeIcons.facebookMessenger,color: Colors.black,size: 35,)),
           SizedBox(
@@ -146,14 +151,26 @@ class _HomeScreenState extends State<HomeScreen> {
           :
           [
             UserAccountsDrawerHeader(
+              
+              otherAccountsPictures:[
+                IconButton(
+                  onPressed: (){
+                    Clipboard.setData(ClipboardData(text: authProvider.getUserModel?.uId.toString()??""));
+                    Navigator.of(context).pop();
+                    showSnackber(context: context, content: 'Copyed!');
+                  }, 
+                  icon: Icon(Icons.copy)
+                )
+              ],
               accountName: Text(capitalizeEachWord(authProvider.getUserModel!.fname.toString()), textAlign: TextAlign.center,style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal),),
-              accountEmail: RichText(
-                text: TextSpan(
+              accountEmail: SelectableText.rich(
+                TextSpan(
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     // fontStyle: FontStyle.italic,
+                    overflow: TextOverflow.ellipsis
                   ),
                   children: [
                     TextSpan(text: "ID: "),
@@ -164,11 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     amIactmenager(messProvider: messProvider, authProvider: authProvider)? TextSpan(text:"(${Constants.actMenager})" )
                     :
                     TextSpan(text: "(${Constants.member})", style: TextStyle(fontSize: 14)),
-
-
+              
+              
                   ]
                 ),
               ),
+              currentAccountPictureSize:Size.square(60),
               currentAccountPicture: CircleAvatar(
                 
                 backgroundColor: Colors.blue,
@@ -195,16 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
-            getItems(
-              icon: FontAwesomeIcons.facebookMessenger, 
-              label: "Chat",
-              selected: false,
-              // selected: DrawerItemGroup==DrawerItem.Messenger, 
-              ontap: () {
-                Navigator.pop(context);
-                showSnackber(context: context, content: "Currently Unavailable");
-              }, 
-            ),
+
             getItems(
               icon: FontAwesomeIcons.m, 
               label: "Meal",

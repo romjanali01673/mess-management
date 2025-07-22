@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -117,7 +118,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                         child: Text(getFormatedPrice(value: firstScreenProvider.getBlance), style: getTextStyleForTitleM()),
                                                 
                                       ),
-                                      Text("Blance",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                      AutoSizeText(
+                                        "Blance",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -137,7 +145,15 @@ class _FirstScreenState extends State<FirstScreen> {
                                       child: Text(getFormatedPrice(value: firstScreenProvider.getTotalDepositOfMess), style: getTextStyleForTitleM()),
                                               
                                     ),
-                                    Text("Total Deposit Of Mess",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,maxLines: 2,  textScaler: TextScaler.linear(0.8),),
+                                    AutoSizeText(
+                                      "Total Deposit Of Mess",
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                      minFontSize: 10,
+                                    ),
+                                    // Text("Total Deposit Of Mess",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,maxLines: 2,  textScaler: TextScaler.linear(0.8),),
                                   ],
                                 ),
                               ),
@@ -162,7 +178,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                         child: Text(getFormatedPrice(value: firstScreenProvider.getMealRate), style: getTextStyleForTitleM()),
                                           
                                       ),
-                                      Text("Meal Rate",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "Meal Rate",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -188,7 +211,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                     child: Text(getFormatedPrice(value: firstScreenProvider.getMyTotalMeal), style: getTextStyleForTitleM()),
                                             
                                   ),
-                                  Text("My Total Meal ",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "My Total Meal",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                 ],
                               ),
                             ),
@@ -213,7 +243,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                     child: Text(getFormatedPrice(value: firstScreenProvider.getMyTotalDeposit), style: getTextStyleForTitleM()),
                                             
                                   ),
-                                  Text("Total Deposit TK",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "My Deposit",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                 ],
                               ),
                             ),
@@ -233,7 +270,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                     child: Text(getFormatedPrice(value: firstScreenProvider.getMyRemainingTk), style: getTextStyleForTitleM()),
                                             
                                   ),
-                                  Text("Remaining Tk",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "Remaining",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                 ],
                               ),
                             ),
@@ -256,7 +300,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                       child: Text(getFormatedPrice(value: firstScreenProvider.getTotalMealOfMess), style: getTextStyleForTitleM()),
                                         
                                     ),
-                                    Text("Total Meal Of Mess",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "Total Meal of Mess",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                   ],
                                 ),
                               ),
@@ -282,7 +333,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                             
                                   ),
                                   
-                                  Text("Total Bazer Cost",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "Bazer Cost",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                 ],
                               ),
                             ),
@@ -302,7 +360,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                     child: Text(getFormatedPrice(value: firstScreenProvider.getRemainingFundBlance), style: getTextStyleForTitleM()),
                                             
                                   ),
-                                  Text("Fund Blance",style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      AutoSizeText(
+                                        "Fund Blance",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                                 ],
                               ),
                             ),
@@ -327,7 +392,14 @@ class _FirstScreenState extends State<FirstScreen> {
                               spacing: 10,
                               children: [
                                 Icon(Icons.push_pin_rounded),
-                                Text("Pind Notice"),
+                                      AutoSizeText(
+                                        "Pind Notice",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
                               ],
                             ),
                             SizedBox(
@@ -342,22 +414,63 @@ class _FirstScreenState extends State<FirstScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   spacing: 20,
                                   children: [
-                                    Text(
-                                      "Notice Id:${firstScreenProvider.getPindedNoticeForHome!.noticeId}",
-                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                    Text.rich(
+                                      TextSpan(
+                                        style: getTextStyleForSubTitleXL(), 
+                                        children: [
+                                          TextSpan(
+                                            text: "Notice Id: ",
+                                            style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text:firstScreenProvider.getPindedNoticeForHome?.noticeId.toString(),
+                                          ),
+                                        ]
+                                      )
                                     ),
-                                    Text(
-                                      "Title: ${firstScreenProvider.getPindedNoticeForHome!.title}",
-                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                    Text.rich(
+                                      TextSpan(
+                                        style: getTextStyleForSubTitleXL(), 
+                                        children: [
+                                          TextSpan(
+                                            text: "Title: ",
+                                            style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text:(firstScreenProvider.getPindedNoticeForHome!.title).toString(),
+                                          ),
+                                        ]
+                                      )
                                     ),
-                                    Text(
-                                      "Description: ${firstScreenProvider.getPindedNoticeForHome!.description}",
-                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                    Text.rich(
+                                      TextSpan(
+                                        style: getTextStyleForSubTitleXL(), 
+                                        children: [
+                                          TextSpan(
+                                            text: "Description: ",
+                                            style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text:(firstScreenProvider.getPindedNoticeForHome?.description).toString(),
+                                          ),
+                                        ]
+                                      )
                                     ),
-                                    Text(
-                                      "Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(firstScreenProvider.getPindedNoticeForHome!.CreatedAt!.toDate().toLocal())}",
-                                      style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                    Text.rich(
+                                      TextSpan(
+                                        style: getTextStyleForSubTitleXL(), 
+                                        children: [
+                                          TextSpan(
+                                            text: "Time: ",
+                                            style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text:(DateFormat("hh:mm a dd-MM-yyyy").format(firstScreenProvider.getPindedNoticeForHome!.CreatedAt!.toDate().toLocal())).toString(),
+                                          ),
+                                        ]
+                                      )
                                     ),
+                                   
                                   ],
                                 )
                                 

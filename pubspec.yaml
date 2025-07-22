@@ -54,6 +54,16 @@ dependencies:
   image_picker: ^1.1.2
   shared_preferences: ^2.5.2
   # uuid: ^4.5.1
+  auto_size_text: ^3.0.0
+  pdf: ^3.11.3 #genarate pdf
+  printing: ^5.14.2 # for print
+  path_provider: ^2.1.5 # find file directory path.
+  screenshot: ^3.0.0
+
+  firebase_messaging: ^15.2.9
+  flutter_local_notifications: ^19.3.1
+  app_settings: ^5.1.1
+
 
 
 
@@ -78,7 +88,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "/assets/images/splash_logo.png2"
+  image_path: "assets/images/splash_logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 # For information on the generic Dart part of this file, see the
@@ -96,6 +106,41 @@ flutter:
   assets:
     - assets/images/
   #   - images/a_dot_ham.jpeg
+
+
+
+
+
+
+
+
+  # if i enable swift all project will be run in swift. for remove will remove from all projects.
+  # if it's "disable-swift-package-manager: true (default : false)" project run with cocoapods otherwise run with swift (only this projects). 
+  
+  # initially it was under of cocoapods after running this command "flutter config --enable-swift-package-manager" is now controlled by swift.
+  # for the first time everything will be setup autometically.
+  # 0. flutter clean.
+  # 1. add depandency: runner ->project ->runner -> package_depandency -> tap + -> add from local -> ios -> flutter -> ephemeral -> packages -> swift
+  # 2. product -> clean_build_folder.
+  
+  
+  # to remove swift control use this command "flutter config --no-enable-swift-package-manager". and have some task in xcode, check next line.
+  # 0. flutter clean.
+  # 1. runner ->project ->runner -> package_depandency -> swift_remove_depandency
+  # 2. runner ->terget ->runner -> genaral -> framwork, library and embated content ->  remove flutter swift package.
+  # 3. product -> scheme -> edit_scheme -> build -> pre_actions -> remove script
+  # 4. product -> clean_build_folder.
+
+  # for more details visit "app_settings" documentation.
+  disable-swift-package-manager: false 
+
+
+
+
+
+
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -122,3 +167,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  

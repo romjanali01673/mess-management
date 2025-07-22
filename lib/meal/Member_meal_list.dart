@@ -221,7 +221,7 @@ class _MemberMealListState extends State<MemberMealList> {
                         children: [
                           Text("Name: ${memberMealData![0][Constants.fname]}"),
                           Text("UId: ${selectedItem?[Constants.uId]}"),
-                          Text("Total Meal: ${mealProvider.getTotalMeal}", style: TextStyle(fontWeight: FontWeight.bold),),
+                          Text("Total Meal: ${getFormatedPrice(value: mealProvider.getTotalMeal)}", style: TextStyle(fontWeight: FontWeight.bold),),
                         ],
                       ),
                     ),
@@ -239,7 +239,7 @@ class _MemberMealListState extends State<MemberMealList> {
                             Text("Entry Time: ${DateFormat("hh:mm a dd-MM-yyyy").format(memberMealData![index][Constants.createdAt].toDate().toLocal())}"),
                           ],
                         ),
-                        trailing: Text("${memberMealData![index][Constants.meal]}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                        trailing: Text("${getFormatedPrice(value: memberMealData![index][Constants.meal])}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                       );
                     },
                   )

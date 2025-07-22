@@ -206,7 +206,7 @@ enum Mess{
 class JoiningStatus{
   static const String joined = "joined"; 
   static const String declain = "declain"; 
-  static const String panding = "panding"; 
+  static const String pending = "pending"; 
   static const String expaired = "expaired"; 
 }
 

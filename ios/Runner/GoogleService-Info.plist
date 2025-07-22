@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.engromjanali.messManagement</string>
+	<string>com.engromjanali.messMenagement</string>
 	<key>PROJECT_ID</key>
 	<string>mess-management-b82d9</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:12282274098:ios:47f01f9759154959eff72b</string>
+	<string>1:12282274098:ios:e06a2336aacd2361eff72b</string>
 </dict>
 </plist>

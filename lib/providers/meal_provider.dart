@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mess_management/constants.dart';
@@ -198,7 +200,8 @@ class MealProvider extends ChangeNotifier{
           mealModel.listOfMeal.map((e) {
 
             if(e[Constants.uId] == uId){
-              meal +=e[Constants.meal];
+              meal += double.parse(e[Constants.meal].toString());
+
               list ??= [];
               list!.add({
                 Constants.fname: e[Constants.fname],
@@ -218,6 +221,7 @@ class MealProvider extends ChangeNotifier{
       onFail(e.toString());
     }  
     _isLoading  = false;
+    print(list);
     return list?.reversed.toList();
   }
   
@@ -251,7 +255,7 @@ class MealProvider extends ChangeNotifier{
   // add a meal transaction to database 
   Future<void> addAMeal({required MealModel mealModel,required String messId, required String mealSessionId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-
+    setIsLoading(value: true);
     MealModel? flg = await checkMealModelAlreadyExist(messId: messId, mealSessionId: mealSessionId, date: mealModel.date, onFail: (_) {});
     if(flg==null){
       try {
@@ -288,11 +292,13 @@ class MealProvider extends ChangeNotifier{
     else{
       onFail("Already Added at this date");
     }
+    setIsLoading(value: false);
   }
 
   // update a meal from database 
   Future<void> updateAMeal({required MealModel mealModel,required String messId,required String mealSessionId,required double extraMeal,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
+    setIsLoading(value: true);
     // fatch cost,
     try {
       batch.set(
@@ -327,6 +333,7 @@ class MealProvider extends ChangeNotifier{
     } catch (e) {
       onFail(e.toString());
     }  
+    setIsLoading(value: false);
   }
 
   // delete a meal

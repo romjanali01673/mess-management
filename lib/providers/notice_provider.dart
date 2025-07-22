@@ -327,30 +327,48 @@ class NoticeProvider extends ChangeNotifier{
 
   // get all notice transaction list 
   Future<List<NoticeModel>?> getAllNoticeList({required String messId,String? uId , required Function(String) onFail, Function()? onSuccess,})async{
-      print("getNoticeList called");
+    print("getNoticeList called");
+
+
     List<NoticeModel>? list;
     _isLoading = true;
-    try {
-      QuerySnapshot snapshot =  await firebaseFirestore
-        .collection(Constants.notice)
-        .doc(messId)
-        .collection(Constants.listOfNotice)
-        .limit(10)
-        .get();
 
-        print(messId);
-      print(snapshot.docs.toString()+"doc list");
-      list = snapshot.docs.map(
-        (doc){
-          NoticeModel noticeModel = NoticeModel.fromMap(doc.data() as Map<String, dynamic>);
-          return noticeModel;
-        }).toList();
-      onSuccess!=null? onSuccess() : (){};
-      makeAllNoticeSeen(messId:messId , uid: uId??"don't need to make seen");
-    } catch (e) {
-      onFail(e.toString());
-      print(e.toString());
-    }  
+    AggregateQuerySnapshot dc =await 
+      firebaseFirestore
+      .collection(Constants.notice)
+      .doc(messId)
+      .collection(Constants.listOfNotice)
+      .count()
+      .get();
+
+    int i = dc.count??0;
+    while(i>0){
+      try {
+        QuerySnapshot snapshot =  await firebaseFirestore
+          .collection(Constants.notice)
+          .doc(messId)
+          .collection(Constants.listOfNotice)
+          .limit(10)
+          .get();
+
+          print(messId);
+        print(snapshot.docs.toString()+"doc list");
+        list??=[];
+        list.addAll(snapshot.docs.map(
+          (doc){
+            NoticeModel noticeModel = NoticeModel.fromMap(doc.data() as Map<String, dynamic>);
+            return noticeModel;
+          }).toList());
+        onSuccess!=null? onSuccess() : (){};
+        makeAllNoticeSeen(messId:messId , uid: uId??"don't need to make seen");
+        i-=snapshot.docs.length;
+        if(snapshot.docs.isEmpty) break;
+      } catch (e) {
+        onFail(e.toString());
+        print(e.toString());
+        break;
+      }  
+    }
     _isLoading = false;
     return list;
   }
@@ -358,7 +376,7 @@ class NoticeProvider extends ChangeNotifier{
   // add a notice to database 
   Future<void> addANotice({required NoticeModel noticeModel,required List<String>currentMessMemberUidList, required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
-
+    setIsLoading(value: true);
     try {
       batch.set(
         firebaseFirestore.collection(Constants.notice)
@@ -388,7 +406,7 @@ class NoticeProvider extends ChangeNotifier{
   // delete a notice from database 
   Future<void> deleteANotice({required String messId, required String noticeId,Function()? onSuccess, required Function(String) onFail})async{
     final batch = firebaseFirestore.batch();
-
+    setIsLoading(value: true);
     try {
       batch.delete(
         firebaseFirestore.collection(Constants.notice)
@@ -402,11 +420,13 @@ class NoticeProvider extends ChangeNotifier{
     } catch (e) {
       onFail(e.toString());
     } 
+    setIsLoading(value: false);
   }
 
   // update a notice to database 
   Future<void> updateANotice({required NoticeModel noticeModel,required List<String> currentMessMemberUidList , required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     final batch = firebaseFirestore.batch();
+    setIsLoading(value: true);
     try {
       batch.set(
         firebaseFirestore.collection(Constants.notice)
@@ -431,6 +451,7 @@ class NoticeProvider extends ChangeNotifier{
     } catch (e) {
       onFail(e.toString());
     } 
+    setIsLoading(value: false);
   }
 
 

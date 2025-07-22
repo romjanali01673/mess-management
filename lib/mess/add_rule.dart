@@ -47,7 +47,7 @@ class _AddRuleState extends State<AddRule> {
     bool isUpdate = (widget.preRuleModel!=null);
 
     AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
-    MessProvider messProvider = context.read<MessProvider>();
+    MessProvider messProvider = context.watch<MessProvider>();
 
     
     return GestureDetector(
@@ -119,12 +119,7 @@ class _AddRuleState extends State<AddRule> {
                 height: 50,
               ),
               
-              messProvider.isLoading? 
-              SizedBox.square(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                ),
-              )
+              messProvider.isLoading? showCircularProgressIndicator()
               :
               getButton(
                 label: isUpdate ? "Update":"Submit", 
@@ -139,7 +134,7 @@ class _AddRuleState extends State<AddRule> {
                             tnxId: widget.preRuleModel!.tnxId, 
                             title: titleController.text.toString(), 
                             description: descController.text.toString(),
-                            CreatedAt: widget.preRuleModel!.CreatedAt,
+                            createdAt: widget.preRuleModel!.createdAt,
                           ), 
                           messId: authProvider.getUserModel!.currentMessId, 
                           onFail: (message) {  

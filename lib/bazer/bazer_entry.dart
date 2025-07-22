@@ -1,4 +1,5 @@
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:mess_management/model/bazer_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -81,19 +82,17 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
 
     final messProvider = context.read<MessProvider>();
     final authProvider = context.read<AuthenticationProvider>();
-    final bazerProvider = context.read<BazerProvider>();
+    final bazerProvider = context.watch<BazerProvider>();
 
 
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: Text("Bazer Entry", style: getTextStyleForTitleXL(),),
         backgroundColor: Colors.grey,
       ),
-      body: Container(
-        // color: Colors.amber,
-        height: double.infinity,
-        width: double.infinity,
+      body: SingleChildScrollView(
         child: Column(
           children: [
                 Container(
@@ -183,7 +182,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                   Expanded(
                     child: TextField(
                       onTap: () async{
-
+        
                         date = await showDatePicker(
                           // fieldHintText: "mm/dd/YYYY",
                           fieldLabelText: "Enter Date (MM/DD/YYYY)", // defalut "Enter Date"
@@ -242,7 +241,8 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
               ),
             ),
         
-            Expanded(
+            SizedBox(
+              height: 500,
               child: Stack(
                 children: [
                   Container(
@@ -251,7 +251,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.shade300,
+                      color: Color(0xFFF2F2F2),
                       border: Border(
                         
                       )
@@ -266,71 +266,168 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                               Text("SL NO", style: TextStyle(fontSize: 18),),
                               Text("Product", style: TextStyle(fontSize: 18),),
                               Text("Price", style: TextStyle(fontSize: 18),),
+                              Text("E/D", style: TextStyle(fontSize: 18),),
                             ],
                           ),
                         ),
                     
-                        Divider(
-                          
-                        ),
+                        Divider(),
                     
-                        // list of product is here.
+        
                         Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              // "row.asMap" make it a map where key is index and value is the map
-                              // "entries" store list of pair<key, value>
-                              // "entries.map((entry){})" entry is a pair
-                              children: bazerList.asMap().entries.map((entry){
-                                int index = entry.key;
-                                Map value = entry.value;
-                                return ListTile(
-                                  contentPadding: EdgeInsets.only(left: 5),
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.grey.shade500,
-                                    child: Text("${index}", style: TextStyle(fontSize: 20)),
-                                  ),
-                                  title: Text(value[Constants.product], style : getTextStyleForTitleM(), textAlign: TextAlign.center,),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(value[Constants.price], style: TextStyle(fontSize: 16),),
-                                      IconButton(
-                                        onPressed: ()async{
-                                          await showInputDialog(product: value[Constants.product], price:value[Constants.price], index: index);
-                                          setState(() {
-                                          });
-                                        }, 
-                                        icon: Icon(Icons.edit_square,color: Colors.green,)
-                                      ),
-                                      IconButton(
-                                        onPressed: (){
-                                          setState(() {
-                                            bazerList.removeAt(index);
-                                          });
-                                        }, 
-                                        icon: Icon(Icons.disabled_by_default_rounded,color: Colors.red.shade800,)
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: bazerList.length,
+                            itemBuilder: (context, index){
+                              Map<String,dynamic> value = bazerList[index];
+                              print(value);
+                              return 
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 2),
                                       ),
                                     ],
                                   ),
+                                  child: Row(
+                                    children: [
+                                  
+                                      SizedBox(
+                                        width: 40,
+                                        child: Center(
+                                          child: AutoSizeText(
+                                            "${index+1}",  
+                                            maxLines: 1,
+                                            textAlign: TextAlign.center,
+                                            style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                            minFontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                  
+                                  
+                                      // Divider
+                                      getVerticalDevider(color: Colors.grey.shade300,height:40 ,width: 1),
+                                  
+                                      // Amount input field
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(4),
+                                          child: AutoSizeText(
+                                            value[Constants.product],  
+                                            maxLines: 1,
+                                            textAlign: TextAlign.center,
+                                            style: getTextStyleForSubTitleL().copyWith(fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                            minFontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                  
+                                      getVerticalDevider(),
+                                  
+                                      // Amount
+                                      SizedBox(
+                                        width: 80,
+                                        child: Center(
+                                          child: AutoSizeText(
+                                            value[Constants.price],  
+                                            maxLines: 1,
+                                            textAlign: TextAlign.center,
+                                            style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                            minFontSize: 8,
+                                          ),
+                                        ),
+                                      ),
+                                  
+                                      getVerticalDevider(),
+                                  
+                                      getCustomIcon(
+                                        iconData: Icons.edit, 
+                                        ontap:()async{
+                                          await showInputDialog(product: value[Constants.product], price:value[Constants.price], index: index);
+                                          setState(() {
+                                          });
+                                        }
+                                      ),
+                                      getCustomIcon(
+                                        iconData: Icons.close, 
+                                        ontap: () {  
+                                          setState(() {
+                                            bazerList.removeAt(index);
+                                          });
+                                        }
+                                      ),
+                                    ]
+                                  )   
                                 );
-                                // return Row(
-                                //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                //   children: [
-                                //       Text("$index", style: TextStyle(fontSize: 16),),
-                                //       Text("${value["${BazerEntry.description}"]}",style: TextStyle(fontSize: 16),),
-                                //       Text("${value["${BazerEntry.price}"]}",style: TextStyle(fontSize: 16),),
-                                //     ],
-                                // );
-                              }).toList(),
-                              
-                            ),
+                            }
                           ),
-                        )
+                        ),
+                        // list of product is here.
+                        // Expanded(
+                        //   child: SingleChildScrollView(
+                        //     scrollDirection: Axis.vertical,
+                        //     child: Column(
+                        //       // "row.asMap" make it a map where key is index and value is the map
+                        //       // "entries" store list of pair<key, value>
+                        //       // "entries.map((entry){})" entry is a pair
+                        //       children: bazerList.asMap().entries.map((entry){
+                        //         int index = entry.key;
+                        //         Map value = entry.value;
+                        //         return ListTile(
+                        //           contentPadding: EdgeInsets.only(left: 5),
+                        //           leading: CircleAvatar(
+                        //             backgroundColor: Colors.grey.shade500,
+                        //             child: Text("${index}", style: TextStyle(fontSize: 20)),
+                        //           ),
+                        //           title: Text(value[Constants.product], style : getTextStyleForTitleM(), textAlign: TextAlign.center,),
+                        //           trailing: Row(
+                        //             mainAxisSize: MainAxisSize.min,
+                        //             children: [
+                        //               Text(value[Constants.price], style: TextStyle(fontSize: 16),),
+                        //               IconButton(
+                        //                 onPressed: ()async{
+                        //                   await showInputDialog(product: value[Constants.product], price:value[Constants.price], index: index);
+                        //                   setState(() {
+                        //                   });
+                        //                 }, 
+                        //                 icon: Icon(Icons.edit_square,color: Colors.green,)
+                        //               ),
+                        //               IconButton(
+                        //                 onPressed: (){
+                        //                   setState(() {
+                        //                     bazerList.removeAt(index);
+                        //                   });
+                        //                 }, 
+                        //                 icon: Icon(Icons.disabled_by_default_rounded,color: Colors.red.shade800,)
+                        //               ),
+                        //             ],
+                        //           ),
+                        //         );
+                        //         // return Row(
+                        //         //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        //         //   children: [
+                        //         //       Text("$index", style: TextStyle(fontSize: 16),),
+                        //         //       Text("${value["${BazerEntry.description}"]}",style: TextStyle(fontSize: 16),),
+                        //         //       Text("${value["${BazerEntry.price}"]}",style: TextStyle(fontSize: 16),),
+                        //         //     ],
+                        //         // );
+                        //       }).toList(),   
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
+
                   Positioned(
                     bottom: 0,
                     left: 1/2,
@@ -350,11 +447,12 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                 ],
               ),
             ),
-
+        
             SizedBox(
               height: 50,
             ),
-          
+            bazerProvider.isLoading? showCircularProgressIndicator()
+            : 
             getButton(
               label:  isUpdate?"update" : "save", 
               ontap: ()async{
@@ -405,7 +503,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       byWho: selectedItem!,
                     );
                     print(totalAmount.toString()+"a");
-
+        
                     isUpdate?
                     await bazerProvider.updateABazerTransaction(
                       bazerModel: bazerModel, 
@@ -425,7 +523,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                       }, 
                       extraAdd: (bazerModel.amount - widget.preBazerModel!.amount) ,
                     )
-
+        
                     :
                     await bazerProvider.addABazerTransaction(
                       bazerModel: bazerModel, 
@@ -438,7 +536,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                         showSnackber(context: context, content: "Bazer Entry Successed!");
                       }
                     );
-
+        
                     // success 
                     setState(() {
                       bazerList.clear();
@@ -519,19 +617,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
                 },
                 keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
                 textInputAction: TextInputAction.done,
-                validator: (value) {
-                  if(value.toString().trim()==""){
-                    return "";
-                  }
-                  int pr =0;
-                    try{
-                      pr = int.parse(value.toString().trim());
-                      print(pr);
-                    }catch (e){
-                      return "Invalid Argument";
-                    }
-                  return validatePrice(value.toString());
-                },
+                validator: (value) => validatePrice(value.toString()),
                 onChanged: (value){
                   price = value.trim();
                 },
