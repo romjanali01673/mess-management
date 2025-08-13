@@ -254,7 +254,10 @@ class _GroupMealListState extends State<GroupMealList> {
                                                   IconButton(
                                                     padding: EdgeInsets.all(0),
                                                     onPressed: ()async{
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=> MealEntryScreen(preMealModel: snapshot.data,)));
+                                                      await Navigator.push(context, MaterialPageRoute(builder: (context)=> MealEntryScreen(preMealModel: snapshot.data,)));
+                                                      setLocalState(() {
+                                                        
+                                                      },);
                                                     }, 
                                                     color: Colors.green.shade500,
                                                     icon:Icon(Icons.edit),

@@ -45,13 +45,13 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
 
       memberData = widget.preMealModel!.listOfMeal;           
       // set here the list of meal.
-      listOfMeal = List.generate(memberData!.length,(index)=><String,dynamic>{Constants.meal : memberData[index][Constants.meal].toString()});
+      listOfMeal = List.generate(memberData!.length,(index)=><String,dynamic>{Constants.meal : memberData[index][Constants.meal]});
       listOfTexteditingController = List.generate(memberData!.length, (_) => TextEditingController());
       
       for(int i =0; i<memberData.length; i++){
         listOfTexteditingController[i].text =memberData[i][Constants.meal].toString(); 
       }
-
+      
       setState(() {
         
       });
@@ -207,7 +207,7 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                 
                                 print(mealModel.toMap());
                                 
-                                mealProvider.updateAMeal(
+                                await mealProvider.updateAMeal(
                                   mealModel: mealModel, 
                                   extraMeal: mealModel.totalMeal - widget.preMealModel!.totalMeal,
                                   messId: authProvider.getUserModel!.currentMessId, 
@@ -239,9 +239,9 @@ class _MealEntryScreenState extends State<MealEntryScreen> {
                                   listOfMeal: listOfMeal, 
                                   totalMeal: getTotalMeal(),
                                 );
-                                print(mealModel.toMap());
-                                print(authProvider.getUserModel!.mealSessionId);
-                                mealProvider.addAMeal(
+                                // print(mealModel.toMap());
+                                // print(authProvider.getUserModel!.mealSessionId);
+                                await mealProvider.addAMeal(
                                   mealModel: mealModel, 
                                   messId: authProvider.getUserModel!.currentMessId, 
                                   mealSessionId: authProvider.getUserModel!.mealSessionId, 

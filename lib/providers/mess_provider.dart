@@ -838,17 +838,31 @@ class MessProvider extends ChangeNotifier {
 
 
   // change status member
-  Future<void> changeMemberStatus({required Map<String,dynamic> member})async{
+  Future<void> changeMemberStatus({required Map<String,dynamic> preMemberData,required Map<String,dynamic> newMemberData,})async{
     if(_isOnline == false){
       debugPrint("cancel for offline ");
       return;
     } 
     try {
+      final batch = firebaseFirestore.batch();
       // update changed/new member list. where already changed the member status
-      await firebaseFirestore
+      batch.update(
+        firebaseFirestore
         .collection(Constants.mess)
-        .doc(getMessModel!.messId)
-        .update({Constants.messMemberList: FieldValue.arrayUnion([member])});
+        .doc(getMessModel!.messId),
+      
+        {Constants.messMemberList: FieldValue.arrayRemove([preMemberData])}
+      );
+      batch.update(
+        firebaseFirestore
+        .collection(Constants.mess)
+        .doc(getMessModel!.messId),
+      
+        {Constants.messMemberList: FieldValue.arrayUnion([newMemberData])}
+      );
+    
+      await batch.commit();
+      
     } catch (e) {
       debugPrint(e.toString());
     }

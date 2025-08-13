@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:mess_management/constants.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
@@ -25,6 +26,17 @@ class _LandingScreenState extends State<LandingScreen> {
     checkAuthenticationState();
     super.initState();
     notificationServices.requestNotificationPermission();
+    notificationServices.getDeviceToken((errorMessage){
+      // SchedulerBinding.instance.addPostFrameCallback((_){
+      //   if(mounted)
+      //   showSnackber(context: context, content: errorMessage);
+      // });
+    
+    }).then(
+      (token){
+        debugPrint("DeviceToken: $token");
+      }
+    );
   }
 
   void checkAuthenticationState()async{

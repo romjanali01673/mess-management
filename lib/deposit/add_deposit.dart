@@ -74,7 +74,7 @@ class _AddDepositState extends State<AddDeposit> {
     selectedItem  = widget.preMemberData![Constants.fname].toString()+"\n"+widget.preMemberData![Constants.uId].toString();
     descriptionController.text = widget.preDepositModel!.description;
     amountController.text = widget.preDepositModel!.amount.toString();
-    isAdd = widget.preDepositModel?.type == Constants.add;
+    isAdd = widget.preDepositModel?.type == Constants.deposit;
   }
 
   @override
@@ -123,7 +123,7 @@ class _AddDepositState extends State<AddDeposit> {
 
               SwitchListTile(          
                 title: Text("Tnx Type"),
-                subtitle: isAdd? Text("Add") : Text("Refund"),
+                subtitle: isAdd? Text("Deposit") : Text("Refund"),
                 value: isAdd,
                 onChanged: (val){
                   if(!isUpdate){
@@ -211,7 +211,7 @@ class _AddDepositState extends State<AddDeposit> {
                         // onTapOutside: (event) => FocusScope.of(context).unfocus(),
                         maxLines: 5,
                         textInputAction: TextInputAction.newline,
-                        autofocus: true,
+                        // autofocus: true,
                         focusNode: focusDiscreption,
                         onFieldSubmitted: (value){
                           FocusScope.of(context).requestFocus(focusAmount);
@@ -237,7 +237,7 @@ class _AddDepositState extends State<AddDeposit> {
                         // onTapOutside: (event) {
                         //   FocusScope.of(context).unfocus();
                         // },
-                        autofocus: true,
+                        // autofocus: true,
                         maxLines: 1,
                         textAlign: TextAlign.center,
                         textInputAction: TextInputAction.done,

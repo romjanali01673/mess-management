@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mess_management/constants.dart';
@@ -16,6 +18,10 @@ class FirstScreenProvider extends ChangeNotifier{
   double _totalDepositOfMess = 0;
 
   NoticeModel? _pindNoticeForHome;
+
+  List<Map<String,dynamic>> _allMemberDepositAmountList = [];
+  // uid , meal
+  Map<String,double> _allMemberMeal={};
 
 
 
@@ -39,6 +45,9 @@ class FirstScreenProvider extends ChangeNotifier{
   double get getTotalBazerCost =>  _totalBazerCost;
   double get getRemainingFundBlance => _remainingFundBlance;
   double get getTotalDepositOfMess => _totalDepositOfMess;
+
+  List<Map<String,dynamic>> get getAllMemberDepositAmountList => _allMemberDepositAmountList;
+  Map<String,double> get getAllMemberMealCountList => _allMemberMeal;
 
   NoticeModel? get  getPindedNoticeForHome=> _pindNoticeForHome;
 
@@ -100,6 +109,65 @@ class FirstScreenProvider extends ChangeNotifier{
   }
 
 
+
+  Future<void> getAllMemberDepositAmount({required String messId,required String mealSessionId, required Function(String) onFail, Function()? onSuccess,})async{
+    print("called getAllMemberDepositAmount");
+    _allMemberDepositAmountList = [];
+    setIsLoading(value: true);
+    try {
+      QuerySnapshot querySnapshot =  await firebaseFirestore
+        .collection(Constants.deposit)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .collection(Constants.members)
+        .get();
+
+        querySnapshot.docs.map((doc){
+          _allMemberDepositAmountList.add({
+            Constants.amount : (doc.data() as Map<String, dynamic>)[Constants.blance],
+            Constants.uId : doc.id,
+          });
+        }).toList();
+
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      onFail(e.toString());
+    }  
+    setIsLoading(value: false);
+  }
+
+  Future<void> getAllMemberMeal({required String messId,required String mealSessionId, required Function(String) onFail, Function()? onSuccess,})async{
+    print("called getAllMemberMeal");
+    _allMemberMeal = {};
+    setIsLoading(value: true);
+    try {
+      QuerySnapshot querySnapshot =  await 
+        firebaseFirestore
+        .collection(Constants.meal)
+        .doc(messId)
+        .collection(Constants.mealSessionList)
+        .doc(mealSessionId)
+        .collection(Constants.listOfMealTnx)
+        .get();
+      
+      querySnapshot.docs.map((snapshot){
+        if(snapshot.exists && snapshot.data() != null){
+          (((snapshot.data() as Map<String,dynamic>)[Constants.listOfMeal]) as List<dynamic>).map((x){
+            Map<String,dynamic> mp = x as Map<String,dynamic>;
+
+            _allMemberMeal[mp[Constants.uId]] = (_allMemberMeal[mp[Constants.uId]] ?? 0) + double.parse(mp[Constants.meal].toString());
+          }).toList();
+        }
+      }).toList();
+                  
+      onSuccess!=null? onSuccess() : (){};
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString()+" getAllMemberMeal");
+    }  
+    setIsLoading(value: false);
+  }
 
   Future<double> getFundBlance({required String messId,required Function(String) onFail, Function()? onSuccess,})async{
     print("called total fund");

@@ -238,6 +238,9 @@ class _MemberWiseState extends State<MemberWise> {
                                                     },
                                                     onSuccess: (){
                                                       showSnackber(context: context, content: "Deposit Has Deleted");
+                                                      setState(() {
+                                                        
+                                                      });
                                                     }
                                                   );
                                                 }

@@ -148,7 +148,7 @@ class _AddFundState extends State<AddFund> {
                           controller: titleController,
                           // onTapOutside: (event) => FocusScope.of(context).unfocus(),
                           textInputAction: TextInputAction.next,
-                          autofocus: true,
+                          // autofocus: true,
                           focusNode: focusTitle,
                           onFieldSubmitted: (value){
                             FocusScope.of(context).requestFocus(focusDiscreption);

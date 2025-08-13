@@ -459,6 +459,8 @@ class _MessSummaryState extends State<MessSummary>{
                           showSnackber(context: context, content: "failed");
                         },
                         onSuccess: () {
+                          setState(() {
+                          });
                           showSnackber(context: context, content: "successed");
                           authProvider.getUserProfileData(onFail: (_){});
                         },

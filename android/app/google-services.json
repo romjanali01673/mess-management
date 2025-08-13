@@ -23,25 +23,6 @@
           "other_platform_oauth_client": []
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:12282274098:android:7898e437e8f89ccaeff72b",
-        "android_client_info": {
-          "package_name": "com.engromjanali.mess_menagement"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAgqmJur5ZGIpO-WdyxEiVIlyps2jzTZ6k"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
     }
   ],
   "configuration_version": "1"

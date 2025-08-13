@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:mess_management/helper/ui_helper.dart';
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -12,7 +13,7 @@ class NotificationServices {
     
     if(Platform.isAndroid){
       await AppSettings.openAppSettings(
-        // type: AppSettingsType.notification, // android navigate to notification permision page.
+        type: AppSettingsType.notification, // android navigate to notification permision page.
         asAnotherTask: true,
       );
     }
@@ -45,5 +46,19 @@ class NotificationServices {
       openAppSettings();
     }
   }
+
+  // for ios semolator we have to 
+  Future<String> getDeviceToken(Function(String) onFail)async{
+    String? deviceToken;
+    try {
+      deviceToken =  await messaging.getToken();
+    } catch (e) {
+      onFail(e.toString());
+      debugPrint(e.toString());
+    }
+    return deviceToken??"";
+  }
+
+
 
 }
