@@ -103,7 +103,7 @@ class _PreDataScreenState extends State<PreDataScreen> {
                               mainAxisAlignment:MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "The List Of Meal Hisab",
+                                  "The List Of Meal Session",
                                   style: getTextStyleForTitleM(),
                                 ),
                                 Icon(Icons.arrow_downward)

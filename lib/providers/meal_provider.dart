@@ -67,7 +67,7 @@ class MealProvider extends ChangeNotifier{
 
       if(snapshot.exists){
         _listOfmember =  (snapshot.data() as Map<String,dynamic>)[Constants.messMemberList];
-        onSuccess!=null? onSuccess():(){};
+        onSuccess?.call();
       }
       else{
         onFail("No Data Found!");
@@ -91,7 +91,7 @@ class MealProvider extends ChangeNotifier{
 
       if(snapshot.exists){
         double d = double.parse(((snapshot.data() as Map<String,dynamic>)[Constants.totalMeal]).toString());
-        onSuccess!=null? onSuccess():(){};
+        onSuccess?.call();
         setTotalMealOfMess(meal: d);
       }
       else{
@@ -363,7 +363,7 @@ class MealProvider extends ChangeNotifier{
 
       await batch.commit();
       setTotalMealOfMess(meal: getTotalMealOfMess -extraMeal);
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
     }
@@ -383,7 +383,7 @@ class MealProvider extends ChangeNotifier{
 
       await batch.commit();
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
     }

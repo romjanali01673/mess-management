@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
           GestureDetector(
             onTap: (){
               showSnackber(context: context, content: "Currently Unavailable");
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>OptimizedNestedSliverList()));
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=>OptimizedNestedSliverList()));
             },
             child: FaIcon(FontAwesomeIcons.facebookMessenger,color: Colors.black,size: 35,)),
           SizedBox(

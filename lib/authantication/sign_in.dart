@@ -7,6 +7,7 @@ import 'package:mess_management/constants.dart';
 import 'package:mess_management/helper/helper_method.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
+import 'package:mess_management/services/notification_services.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -46,6 +47,16 @@ class _SignInScreenState extends State<SignInScreen> {
           isSuccess = false;
         });
         if(isSuccess){
+          await NotificationServices.getInstance.getDeviceToken(
+            (_){
+              isSuccess =false;
+              showSnackber(context: context, content: "User Data fatch Error");
+            },
+            authProvider
+          );
+        }
+        
+        if(isSuccess){
           await authProvider.setSessionKey(
             onSuccess: (){
               isSuccess = true;
@@ -58,9 +69,13 @@ class _SignInScreenState extends State<SignInScreen> {
         }
           
         if(isSuccess){
-          isSuccess = await authProvider.getUserProfileData(onFail: (message){
-            showSnackber(context: context, content: "somthing Wrong\n try again!");
-          });
+          isSuccess = await authProvider.getUserProfileData(
+            isFromServer: true,
+            onFail: (message){
+              showSnackber(context: context, content: "somthing Wrong\n try again!");
+              isSuccess = false;
+            }
+          );
         }
 
         if(isSuccess){

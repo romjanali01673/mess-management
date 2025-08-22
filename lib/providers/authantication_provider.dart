@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -155,6 +153,7 @@ class AuthenticationProvider extends ChangeNotifier {
       UserModel userM = UserModel.fromMap(mp);
 
       onSuccess(userM.sessionKey == getUserModel!.sessionKey);
+
       print(getUserModel!.sessionKey+"firestore");
       print(userM.sessionKey+"shared pref");
     } catch (e) {
@@ -166,18 +165,20 @@ class AuthenticationProvider extends ChangeNotifier {
   // set session key to firestore
   Future<void> setSessionKey({required Function(String) onFail,Function()? onSuccess})async{
     try {
+      setUserModel(sessionKey: DateTime.now().millisecondsSinceEpoch.toString());
+
       firebaseFirestore 
         .collection(Constants.users)
         .doc(getUid)
         .set(
-          {
-            Constants.sessionKey : DateTime.now().millisecondsSinceEpoch.toString()
-          },
+          
+          getUserModel!.toMap(),
+          
           SetOptions(
-            merge: true
+            mergeFields: [Constants.sessionKey],
           ),
         );
-        onSuccess!=null? onSuccess() :(){} ;
+        onSuccess?.call();
     } catch (e) {
       onFail(e.toString());
     }
@@ -198,7 +199,7 @@ class AuthenticationProvider extends ChangeNotifier {
     debugPrint("1");
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      Map<String,dynamic> mp = getUserModel!.toMap();
+      Map<String,dynamic> mp = getUserModel!.toMap(); 
       mp[Constants.createdAt] = getUserModel!.createdAt!.toDate().toIso8601String();
       await sharedPreferences.setString(Constants.userModel, jsonEncode(mp));
     debugPrint("2");
@@ -232,8 +233,25 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
 
+  Future<void> setDeviceToken(String? token, {Function(String)? onFail})async{
+    try {
+      debugPrint("Device Token hase called");
+      await firebaseFirestore
+      .collection(Constants.users)
+      .doc(getUid)
+      .set(
+        {Constants.deviceId : token}, 
+        SetOptions(merge: true)
+      );
+      debugPrint("Device Token hase done");
+    } catch (e) {
+      onFail?.call(e.toString());
+      debugPrint("Device Token hase error: $e");
+    }
+  }
+
   // check user exist
-  Future<bool> getUserProfileData({required Function(String) onFail})async{
+  Future<bool> getUserProfileData({required Function(String) onFail, bool isFromServer = false})async{
     // way 1
     // await firebaseFirestore.collection(Constants.users).doc(uid).get().then((DocumentSnapshot documentSnapshot){
       // _userModel = UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
@@ -241,10 +259,11 @@ class AuthenticationProvider extends ChangeNotifier {
     // way 2
     DocumentSnapshot? documentSnapshot;
     try{
+      debugPrint(getUid.toString()+"getUserProfileData");
       documentSnapshot = await firebaseFirestore
         .collection(Constants.users)
         .doc(getUid) 
-        .get(const GetOptions( source: Source.serverAndCache)); 
+        .get( GetOptions( source: isFromServer? Source.server : Source.serverAndCache)); 
     }catch (e){
       onFail(e.toString()+"getUserProfileData");
       return false;
@@ -252,7 +271,7 @@ class AuthenticationProvider extends ChangeNotifier {
     if(documentSnapshot.exists && documentSnapshot.data() !=null ){
       // user exist 
       _userModel = UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
-
+      debugPrint("getUserProfileData" + "${documentSnapshot.data().toString()}");
     return true;
     }
     else{
@@ -299,7 +318,7 @@ class AuthenticationProvider extends ChangeNotifier {
     UserCredential? userCredential;
     try {
       userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     } catch (e) {
       if(onFail!=null){
         onFail(e.toString());

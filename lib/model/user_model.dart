@@ -11,6 +11,7 @@ class UserModel {
   String currentMessId;
   String fullAddress;
   String mealSessionId;
+  String? deviceId;
   Timestamp? createdAt;
 
   UserModel({
@@ -22,9 +23,9 @@ class UserModel {
     required this.sessionKey,
     required this.currentMessId,
     required this.fullAddress,
+    this.deviceId,
     required this.mealSessionId,
     this.createdAt,
-
   });
 
   Map<String, dynamic>toMap(){
@@ -37,6 +38,7 @@ class UserModel {
       Constants.sessionKey  : sessionKey,
       Constants.currentMessId  : currentMessId,
       Constants.fullAddress  : fullAddress,
+      Constants.deviceId: deviceId,
       Constants.mealSessionId: mealSessionId,
       Constants.createdAt: createdAt?? FieldValue.serverTimestamp()
     };
@@ -52,6 +54,7 @@ class UserModel {
       sessionKey: data[Constants.sessionKey]??"",
       currentMessId: data[Constants.currentMessId]??"",
       fullAddress: data[Constants.fullAddress]??"",
+      deviceId: data[Constants.deviceId],
       mealSessionId: data[Constants.mealSessionId]??"",
       createdAt: data[Constants.createdAt]?? Timestamp.now(), //Timestamp.fromDate(DateTime.now())==Timestamp.now(),
     );

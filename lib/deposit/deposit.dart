@@ -50,6 +50,12 @@ class _DepositScreenState extends State<DepositScreen>  with SingleTickerProvide
     // TODO: implement initState
     super.initState();
     _tabController = TabController(length: tabs.length, vsync: this);
+    _tabController!.addListener((){
+      if(_tabController!.indexIsChanging){
+
+      debugPrint("hello romjan ali");
+      }
+    });
   }
 
   @override

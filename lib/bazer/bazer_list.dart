@@ -57,7 +57,6 @@ class _BazerListScreenState extends State<BazerListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_){
       setData();
-
     });
   }
   
@@ -70,7 +69,8 @@ class _BazerListScreenState extends State<BazerListScreen> {
   final messProvider = context.read<MessProvider>();
 
   print(bazerProvider.currentDocs.length.toString() + "total docs");
-    return Expanded(
+    return 
+    Expanded(
       child: Column(
         children: [
           if(!widget.fromPreMember)StatefulBuilder(
@@ -114,7 +114,7 @@ class _BazerListScreenState extends State<BazerListScreen> {
                           return Text("Total Cost: ${getFormatedPrice(value: snapshot.data)}",);
                         }
                       );
-
+      
                     }
                   )
                   :
@@ -180,12 +180,12 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                         bazerModel.byWho[Constants.fname],
                                         style : getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
                                       ),
-                                      trailing: Row(
+                                      trailing:  Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(getFormatedPrice(value: bazerModel.amount.toString()), style: TextStyle(fontSize: 18),),// amount
                                           PopupMenuButton(
-                                            enabled: (amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)),
+                                            enabled: (amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)) &&  !bazerProvider.isLoading &&  !widget.fromPreMember,
                                             icon: Icon(Icons.more_vert),
                                             itemBuilder: (context) =>[
                                               PopupMenuItem(
@@ -321,17 +321,18 @@ class _BazerListScreenState extends State<BazerListScreen> {
                                    _scrollController.position.minScrollExtent,
                                 );
                               }
-                              });},
-                              child: Text(  "Next" )
-                            ),
+                            });},
+                            child: Text(  "Next" )
+                          ),
                         ],
                       ),
                     )
                   ],
                 ),
               ),
-              ),
+            ),
           ),
+      
           // :
           // Text("required menager/Act menager power"),
         ],

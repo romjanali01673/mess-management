@@ -1,13 +1,16 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:mess_management/constants.dart';
 import 'package:mess_management/helper/ui_helper.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/mess_provider.dart';
 import 'package:mess_management/services/asset_manager.dart';
+import 'package:mess_management/services/fmc_server_key.dart';
 import 'package:mess_management/services/notification_services.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -18,25 +21,11 @@ class LandingScreen extends StatefulWidget {
 
 class _LandingScreenState extends State<LandingScreen> {
 
-  NotificationServices notificationServices = NotificationServices();
-
   @override
   void initState() {
     // TODO: implement initState
     checkAuthenticationState();
     super.initState();
-    notificationServices.requestNotificationPermission();
-    notificationServices.getDeviceToken((errorMessage){
-      // SchedulerBinding.instance.addPostFrameCallback((_){
-      //   if(mounted)
-      //   showSnackber(context: context, content: errorMessage);
-      // });
-    
-    }).then(
-      (token){
-        debugPrint("DeviceToken: $token");
-      }
-    );
   }
 
   void checkAuthenticationState()async{
@@ -66,7 +55,7 @@ class _LandingScreenState extends State<LandingScreen> {
               //navigate to home screen
               // await Future.delayed(Duration(seconds: 5));
               print("ccccccccccccccccccccccccccccc");
-              print(authProvider.getUserModel!.email);
+              print(authProvider.getUserModel!.toMap());
               navigate(isSignedIn: true);
 
               await messProvider.getMessData(onFail: (_){}, messId: authProvider.getUserModel!.currentMessId);
@@ -75,7 +64,7 @@ class _LandingScreenState extends State<LandingScreen> {
               // perform an opration from here for clear cache 
 
               // Navigate to sigin screen
-              if(mounted) showSnackber(context: context, content: "session has closed by the user");
+              if(mounted) showSnackber(context: context, content: "Invalid Session");
               navigate(isSignedIn: false);
             }
           },

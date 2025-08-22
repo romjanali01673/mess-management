@@ -1,10 +1,15 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mess_management/constants.dart';
 import 'package:mess_management/model/notice_model.dart';
+import 'package:mess_management/model/user_model.dart';
+import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/firstScreen_provider.dart';
+import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/services/notification_services.dart';
 
 class NoticeProvider extends ChangeNotifier{
 
@@ -177,6 +182,29 @@ class NoticeProvider extends ChangeNotifier{
     setIsLoading(value: false);
   }
 
+  Future<void> sendNotification(
+    MessProvider messProvider,
+    {required String title, required String body ,Map<String, dynamic>? data})async{
+    NotificationServices notificationServices = NotificationServices.getInstance;
+    // List<String> memberDeviceIdList = [];
+
+    for(var x in messProvider.getMessModel!.messMemberList){
+      DocumentSnapshot snapshot = await firebaseFirestore.collection(Constants.users).doc(x[Constants.uId]).get();
+      if(snapshot.exists && snapshot.data() != null){
+        UserModel userModel = UserModel.fromMap(snapshot.data() as Map<String,dynamic>);
+        if((userModel.deviceId) != null){
+          debugPrint(userModel.deviceId!);
+          await notificationServices.sendMessage(
+            deviceToken: userModel.deviceId!, 
+            title:  title, 
+            body: body, 
+            data: data,
+          );
+        }
+      }
+    }
+  }
+
   Future<void> loadNext({required String messId}) async {
     
     print(_lastDoc.toString());
@@ -306,7 +334,7 @@ class NoticeProvider extends ChangeNotifier{
         SetOptions(merge: true),
       );
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
       first.setPindNoticeForHome(value: noticeModel); 
     } catch (e) {
       onFail(e.toString());

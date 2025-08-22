@@ -184,6 +184,12 @@ class _AddNoticeState extends State<AddNotice> {
                           },
                           onSuccess: (){
                             showSnackber(context: context, content: "Notice Added Successfully");
+                            noticeProvider.sendNotification(
+                              messProvider,
+                              title: "Menager Added a New Notice",
+                              body: titleController.text.toString().trim(),
+                              data: {},
+                            );
                             Navigator.pop(context);
                           }
                         );

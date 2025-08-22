@@ -5,6 +5,67 @@ In this app has managed user Privacy, security with Confidentiallity, Integrity,
 
 user can read and write online or offline.
 
+# Futures:
+
+    session management
+    SignUp
+    SignIn
+    logout
+    forget password
+    change password
+    set/change personal info 
+    
+    meal entry
+    meal edit
+    meal delete
+    sort (member wise, data wise).
+
+    meal Hisab Session
+
+    member add
+    member disable
+    member kick/remove
+    invite a member
+    accept Invaitation
+    see mess member Details 
+
+
+    Add deposit 
+    deposit list
+    delete A deposit
+    sort (member wise)
+
+    fund blance control 
+
+    add fund,
+    edit fund,
+    delete fund,
+    clear all fund transactions
+
+    add bazer cost
+    edit bazer cost
+    delete a bazer estmate
+
+    see meal rate,
+    total meal of member/mess
+    total bazer cost 
+    total deposit
+    total deposit for member/mess
+    remaining blance 
+    mess blance (deposit + fund - bazer cost)
+
+    notice and announcement
+
+    mess insite rule 
+    create mess 
+    delete mess
+    update mess info
+
+
+
+
+
+
 backend : firebase
 
 
@@ -15,7 +76,7 @@ backend : firebase
 # Authentication 
 
 Landing Screen
-![](ss/authentication/landing.png)
+![](ss/authentication/splash.png.png)
 
 
 Sign Up
@@ -27,8 +88,8 @@ Sign In
 
 
 Reset Password
-![](ss/authentication/reset_pass.png)
-![](ss/authentication/reset2.png)
+![](ss/authentication/rest1.png)
+![](ss/authentication/rest2.png)
 
 
 
@@ -48,38 +109,43 @@ Drawer
 # Mess
 
 About Mess
-![about_mess](ss/mess/about_mess.jpg)
+![about_mess](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.00.png)
+
+![about_mess](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.17.png)
 
 
 Add Mess Rule
-![add_rule](ss/mess/add_rule.png)
+![add_rule](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2021.32.10.png)
 
 
 Create A Mess
-![Create A Mess](ss/mess/create_mess.png)
+![Create A Mess](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.33.png)
 
 
 Delete Your Mess
-![Delete Your Mess](ss/mess/delete_mess.png)
-
-Mess Update
-![Mess Update](ss/mess/update_mess.png)
+![Delete Your Mess](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.31.png)
 
 
 Join or Leave
-![Join or Leave](ss/mess/join_leave.png)
+![Join or Leave](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.24.png)
+
+
+
+Mess Update
+![Mess Update](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.43.28.png)
 
 
 Transfer Ownership
-![Transfer Ownership](ss/mess/transfer_ownership.png)
-![Transfer Ownership](ss/mess/transfer_ownership1.png)
+![Transfer Ownership](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2021.27.35.png)
+![Transfer Ownership](ss/mess/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2021.27.39.png)
 
 
 
 # Notices 
 
 Notices
-![Notices](ss/notices.jpg)
+![add/update](ss/notice/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.39.27.png)
+![Notices](ss/notice/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.39.33.png)
 
 
 
@@ -99,67 +165,40 @@ Member List
 
 
 Add Deposit 
-![Add Deposit](ss/deposit/deposit_entry2.jpg)
-![Add Deposit](ss/deposit/deposit_entry.png)
+![Add Deposit](ss/deposit/myDeposit.png)
+![Add Deposit](ss/deposit/myDeposit2.png)
+![Add Deposit](ss/deposit/addDeposit1.png)
+![Add Deposit](ss/deposit/allDeposit.png)
+![Add Deposit](ss/deposit/depositMemberWise.png)
 
 
-
-My Deposit List
-![My Deposit List](ss/deposit/myDeposit.jpg)
-
-
-All Deposit History
-![All Deposit History](ss/deposit/AllDepositTnx.jpg)
-
-
-Depsoit History Member Wise
-![My Deposit List](ss/deposit/memberWise.jpg)
 
 
 # Meal 
 
 Add Meal
 ![add_meal](ss/meal/add_meal.png)
-![add_meal2](ss/meal/add_meal2.png)
-
-
-Group Meal List 
-![Group Meal List 
-](ss/meal/group_meal_list.png)
-
-
-My Meal List
-![My Meal List](ss/meal/my_meal_list.png)
-
-
-Member Meal List 
-![Member Meal List](ss/meal/member_meal_list.png)
+![add_meal](ss/meal/add_meal2.png)
+![add_meal](ss/meal/group_meal_list.png)
+![add_meal](ss/meal/member_meal_list.png)
+![add_meal](ss/meal/my_meal_list.png)
 
 
 
 # Fund 
 
 Add Fund
-![add_fund](ss/fund/add_fund.jpg)
-
-
-Add Fund
-![clear fund](ss/fund/clear_fund.jpg)
-
-
-
-Fund Transaction List
-![Fund Transaction List](ss/fund/fundTnxList.jpg)
+![add_fund](ss/fund/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.33.41.png)
+![add_fund](ss/fund/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.34.46.png)
+![add_fund](ss/fund/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.34.52.png)
 
 
 
 # Bazer 
 
 Bazer Entry
-![Bazer Entry](ss/bazer/bazer_entry.png)
-
-Bazer List
-![Bazer List](ss/bazer/bazer_list.png)
+![Bazer Entry](ss/bazer/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.41.18.png)
+![Bazer Entry](ss/bazer/Simulator%20Screenshot%20-%20iPhone%2016%20Plus%20-%202025-08-22%20at%2018.41.29.png)
 
 
 

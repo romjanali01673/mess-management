@@ -82,7 +82,7 @@ class DepositProvider extends ChangeNotifier{
       _totalDepositOfMess = depositOfmess;
       _totalDeposit =depositOfMember ;
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
     
     } catch (e) {
       onFail(e.toString());
@@ -114,7 +114,7 @@ class DepositProvider extends ChangeNotifier{
         }
       }
       
-      onSuccess!=null? onSuccess():(){};    
+      onSuccess?.call();    
     } catch (e) {
       onFail(e.toString());
       debugPrint("getDepositAmount");
@@ -139,7 +139,7 @@ class DepositProvider extends ChangeNotifier{
       if(snapshot.exists && snapshot.data() != null){
         amount = (snapshot.data() as Map<String, dynamic>)[Constants.blance];
       }
-      onSuccess!=null? onSuccess():(){};    
+      onSuccess?.call();    
     } catch (e) {
       onFail(e.toString());
       debugPrint("getDepositAmount");
@@ -197,7 +197,7 @@ class DepositProvider extends ChangeNotifier{
         }
       }
 
-      onSuccess!=null? onSuccess():(){};
+      onSuccess?.call();
       _isLoading = false;
       return list?.reversed.toList();
     

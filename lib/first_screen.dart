@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mess_management/constants.dart';
 import 'package:mess_management/helper/helper_method.dart';
@@ -10,6 +14,8 @@ import 'package:mess_management/model/notice_model.dart';
 import 'package:mess_management/providers/authantication_provider.dart';
 import 'package:mess_management/providers/firstScreen_provider.dart';
 import 'package:mess_management/providers/mess_provider.dart';
+import 'package:mess_management/services/fmc_server_key.dart';
+import 'package:mess_management/services/notification_services.dart';
 import 'package:provider/provider.dart';
 
 class FirstScreen extends StatefulWidget {
@@ -33,7 +39,7 @@ class FirstScreen extends StatefulWidget {
 
 
 class _FirstScreenState extends State<FirstScreen> {
-
+  NotificationServices notificationServices = NotificationServices.getInstance;
   bool seeMore = false;
 
 
@@ -42,6 +48,30 @@ class _FirstScreenState extends State<FirstScreen> {
     // TODO: implement initState
     super.initState();
     loadData();
+
+    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      // take permision to show notification
+      notificationServices.requestNotificationPermission();
+
+      // check device token/fcm token change or not if changed update it.
+      notificationServices.checkDeviceTockenHasChanged(authProvider);
+      
+      // store server key in Notification_Services Page/class
+      FmcServerKey().getServerTockenFCM().then((token){
+        notificationServices.fcmServerKey = token;
+        debugPrint("serverTokenStored : $token");
+      });
+
+      // if until i did not save user Device token upgrate/Save the device token.
+      if(authProvider.getUserModel!.deviceId==null){
+        notificationServices.getDeviceToken((_){},authProvider);
+      }
+
+      // notificationServices.sendMessage(deviceToken: authProvider.getUserModel!.deviceId??"",title:  "Test title-", body: "test Body", data: {"a":"A"});
+      
+    });
   }
 
   void loadData()async{
@@ -395,9 +425,12 @@ class _FirstScreenState extends State<FirstScreen> {
                       ],
                     ),
 
+
+
+
                     StatefulBuilder(
                       builder: (context, setLocalState) {
-                        return SizedBox(
+                        return !(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider)) ? SizedBox.shrink() : SizedBox(
                           height: seeMore?500: 200,
                           child: Container(
                             margin: EdgeInsets.only(bottom: 20, top: 10),

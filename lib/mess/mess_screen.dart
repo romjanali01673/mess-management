@@ -350,16 +350,18 @@ class _AboutMessState extends State<AboutMess> {
                 else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
                   return Center(child: Text('Nothing.'));
                 }
-                return StatefulBuilder(
-                  builder: (context, setLocalState) {
-                    return ListView.builder(
+                
+                return ListView.builder(
                       shrinkWrap: true, // ← This is the key
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context,index){
-                        
                         bool showDetails = false;
                         RuleModel ruleModel = snapshot.data![index];
+
+                        return StatefulBuilder(
+                          builder: (context, setLocalState) {
+                        
                         return Card(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,6 +370,7 @@ class _AboutMessState extends State<AboutMess> {
                                 onTap: (){
                                   setLocalState((){
                                     showDetails = !showDetails;
+                                    // debugPrint("sdf");
                                   });
                                 },
                                 leading: CircleAvatar(

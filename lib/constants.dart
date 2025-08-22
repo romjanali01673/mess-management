@@ -2,7 +2,7 @@ class Constants {
   // pages
   static const String LandingScreen = "/landingScreen";
   static const String HomeScreen = "/homeScreen";
-  // static const String HomeScreen = "/homeScreen";
+  static const String noticeScreen = "/noticeScreen";
   // static const String HomeScreen = "/homeScreen";
 
   // bazer
@@ -127,6 +127,7 @@ class Constants {
   //xyz
   static const String members = "members";
   static const String mealSessionList = "mealSessionList";
+  static const String deviceId = "deviceId";
   static const String mealSessionId = "mealSessionId";
   static const String joindAt = "joindAt";
   static const String remaining = "remaining";

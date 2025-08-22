@@ -40,6 +40,10 @@ class _SettingScreenState extends State<SettingScreen> {
 
 Future<void> logoutAndReset(BuildContext context) async {
   try {
+
+    AuthenticationProvider authProvider = context.read<AuthenticationProvider>();
+    await authProvider.setDeviceToken(null);
+
     // Firebase logout
     await FirebaseAuth.instance.signOut();
 

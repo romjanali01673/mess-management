@@ -971,7 +971,7 @@ class MessProvider extends ChangeNotifier {
   }
 
   // get getMessRules
-  Future<List<RuleModel>?> getMessRules({required String messId,required Function(String) onFail, Function()? onSuccess})async{
+  Future<List<RuleModel>?>  getMessRules({required String messId,required Function(String) onFail, Function()? onSuccess})async{
     debugPrint("get getMessRules called");
     List<RuleModel>? list ;
     try {

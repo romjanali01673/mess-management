@@ -157,38 +157,43 @@ class _MemberSummaryState extends State<MemberSummary>{
               ),
             ];
           },
-          body: selectedOption==""? Center(
-            child: Text("Select an options to see it's details"),
-          )
-          :
-          (selectedOption==optionList.first)? MyDeposit(
-            fromPreMember: true, 
-            messId: widget.memberSummaryModel.messId,
-            mealSessionId: widget.memberSummaryModel.mealSessionId,
-            uId: widget.memberSummaryModel.uId,
-          )
-          :
-          (selectedOption==optionList.elementAt(1))? BazerListScreen(
-            fromPreMember: true, 
-            messId: widget.memberSummaryModel.messId,
-            mealSessionId: widget.memberSummaryModel.mealSessionId,
-            fromDate:widget.memberSummaryModel.joindAt, 
-            toDate:widget.memberSummaryModel.closedAt, 
-          )
-          :
-          (selectedOption==optionList.elementAt(2))? MyMealList(
-            fromPreMember: true, 
-            messId: widget.memberSummaryModel.messId,
-            mealSessionId: widget.memberSummaryModel.mealSessionId,
-            uId: widget.memberSummaryModel.uId,
-          )
-          :
-          FundList(
-            fromPreMember: true, 
-            messId: widget.memberSummaryModel.messId,
-            fromDate:widget.memberSummaryModel.joindAt, 
-            toDate:widget.memberSummaryModel.closedAt, 
-            // toDate:Timestamp.fromDate(DateTime.now().add(const Duration(days: 90)))
+          
+          body:Column(
+            children: [
+              selectedOption==""? Center(
+                child: Text("Select an options to see it's details"),
+              )
+              :
+              (selectedOption==optionList.first)? MyDeposit(
+                fromPreMember: true, 
+                messId: widget.memberSummaryModel.messId,
+                mealSessionId: widget.memberSummaryModel.mealSessionId,
+                uId: widget.memberSummaryModel.uId,
+              )
+              :
+              (selectedOption==optionList.elementAt(1))? BazerListScreen(
+                fromPreMember: true, 
+                messId: widget.memberSummaryModel.messId,
+                mealSessionId: widget.memberSummaryModel.mealSessionId,
+                fromDate:widget.memberSummaryModel.joindAt, 
+                toDate:widget.memberSummaryModel.closedAt, 
+              )
+              :
+              (selectedOption==optionList.elementAt(2))? MyMealList(
+                fromPreMember: true, 
+                messId: widget.memberSummaryModel.messId,
+                mealSessionId: widget.memberSummaryModel.mealSessionId,
+                uId: widget.memberSummaryModel.uId,
+              )
+              :
+              FundList(
+                fromPreMember: true, 
+                messId: widget.memberSummaryModel.messId,
+                fromDate:widget.memberSummaryModel.joindAt, 
+                toDate:widget.memberSummaryModel.closedAt, 
+                // toDate:Timestamp.fromDate(DateTime.now().add(const Duration(days: 90)))
+              )
+            ],
           )
         )
         
