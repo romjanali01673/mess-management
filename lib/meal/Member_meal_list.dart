@@ -117,10 +117,10 @@ class _MemberMealListState extends State<MemberMealList> {
                     ),
                     autoValidateMode: AutovalidateMode.onUserInteraction,
                     validator: (value) {
-                      if(value==null) return "Fill!";
-                      if(value[Constants.status]==Constants.disable){
-                        return "The Member Are Disabled!";
-                      }
+                      // if(value==null) return "Fill!";
+                      // if(value[Constants.status]==Constants.disable){
+                      //   return "The Member Are Disabled!";
+                      // }
                       return null;
                     },
                     
@@ -145,12 +145,15 @@ class _MemberMealListState extends State<MemberMealList> {
                     popupProps: PopupProps.menu(  
                       showSearchBox: true,
                       disabledItemFn: (item) {
+                        return false;
+                        // because for check member meal details if we desable it we can't check there details.
                         return item[Constants.status]==Constants.disable;
                       },
                       
                       itemBuilder: (context, item, isSelected) {
                         if(isSelected) print("get silected");
-                        bool isDisabled = item[Constants.status] == Constants.disable;
+                        // bool isDisabled = item[Constants.status] == Constants.disable;
+                        bool isDisabled = false;
                         return ListTile(
                           title: Text(
                             item[Constants.fname],
@@ -179,6 +182,7 @@ class _MemberMealListState extends State<MemberMealList> {
                   ),
                 ),
               ),
+
               ElevatedButton(
                 onPressed: ()async{
                   if(!(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))){
