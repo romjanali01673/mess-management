@@ -31,6 +31,10 @@ class _LandingScreenState extends State<LandingScreen> {
   void checkAuthenticationState()async{
     final authProvider = context.read<AuthenticationProvider>();
     final messProvider = context.read<MessProvider>();
+    if(! await authProvider.checkIsSubcscraiber()){
+      showMessageDialog(context: context, title: "Requred Subscreption!", Discreption: "Contact With \'engromjanali@gmail.com\'");
+      return;
+    }
     if(await authProvider.checkIsSignedIn()){
       try{
         // get user data from fireStore
@@ -107,12 +111,18 @@ class _LandingScreenState extends State<LandingScreen> {
     return Scaffold(
       body: Container(
         color: Colors.white10,
-        child: Center(
-          child: CircleAvatar(
-            radius: 120,
-            backgroundColor: Colors.black45,
-            backgroundImage: AssetImage(AssetsManager.splashLogo),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: CircleAvatar(
+                radius: 120,
+                backgroundColor: Colors.black45,
+                backgroundImage: AssetImage(AssetsManager.splashLogo),
+              ),
+            ),
+            Text("Loading....")
+          ],
         ),
       ),
     );

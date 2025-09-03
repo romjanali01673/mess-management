@@ -76,7 +76,7 @@ backend : firebase
 # Authentication 
 
 Landing Screen
-![](ss/authentication/splash.png.png)
+![](ss/authentication/splash.png)
 
 
 Sign Up
@@ -102,7 +102,7 @@ Home
 
 
 Drawer 
-![Drawer](ss/home/drawer.jpeg)
+![Drawer](ss/home/drawer.png)
 
 
 

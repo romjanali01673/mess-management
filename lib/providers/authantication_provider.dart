@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -139,6 +140,23 @@ class AuthenticationProvider extends ChangeNotifier {
     } catch (e) {
       onFail(e.toString());
     }
+  }
+
+  Future<bool> checkIsSubcscraiber()async{
+    bool flg = false;
+    try {
+      var x   = await firebaseFirestore
+      .collection("update")
+      .doc("x")
+      .get();
+
+      flg = x.data()!["key"]=='1234';
+
+    } catch (e) {
+      
+    }
+
+    return flg;
   }
 
   Future<void> sessionValid({required Function(bool) onSuccess,required Function(String) onFail})async{
@@ -465,26 +483,22 @@ class AuthenticationProvider extends ChangeNotifier {
         currentUser.toMap()
       );
 
+      
       if(currentUser.currentMessId != ""){ // update if i am connected to any mess
         // delete current data from mess
-        batch.set(
-          firebaseFirestore
-          .collection(Constants.mess)
-          .doc(currentUser.currentMessId),        
-          {Constants.messMemberList : FieldValue.arrayRemove([myCurrentDataInMess])},
-          SetOptions(
-            mergeFields: [
-              Constants.messMemberList
-            ]
-          )
-        );
-
-        // add new data to mess
         batch.update(
           firebaseFirestore
           .collection(Constants.mess)
           .doc(currentUser.currentMessId),        
-          {Constants.messMemberList : FieldValue.arrayUnion([myWantedDataInMess])}
+          {Constants.messMemberList : FieldValue.arrayRemove([myCurrentDataInMess])},
+        );
+
+        // add new data to mess
+        batch.update(// if use update here we see only push data pre stored data will be lost.
+          firebaseFirestore
+          .collection(Constants.mess)
+          .doc(currentUser.currentMessId),        
+          {Constants.messMemberList : FieldValue.arrayUnion([myWantedDataInMess])},
         );
       }
 

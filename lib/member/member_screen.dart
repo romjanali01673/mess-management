@@ -117,40 +117,21 @@ class _MemberScreenState extends State<MemberScreen> {
 
   Widget getListOfMember(){
 
-    final messProvider = context.read<MessProvider>();
+    final messProvider = context.watch<MessProvider>();
     // final messProvider = context.watch<MessProvider>();
     final authProvider = context.read<AuthenticationProvider>();
     return Expanded(
-      child: FutureBuilder(
-        future:messProvider.getMessData(
-          onFail: (message) { 
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              showSnackber(context: context, content: message);
-            });
-          },
-          messId: authProvider.getUserModel!.currentMessId,
-          isDisposed: ()=> _isDisposed,
-          onSuccess: (){
-            debugPrint("get mess data success");
-          },
-        ),
-        builder:(context, AsyncSnapshot snapshot) { 
-          if (snapshot.connectionState != ConnectionState.done) { // we can use here snapshot.hasdata also. but it's save 
-            return Center(child: CircularProgressIndicator());
-          }
-          
-          else if (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty ) {
-            return Center(child: Text('No member found.'));
-          }
-          else{
-            List<Map<String,dynamic>> data = messProvider.getMessModel!.messMemberList;
-            return StatefulBuilder(
+      child: 
+          (messProvider.isLoading) ? Center(child: CircularProgressIndicator())
+          :
+          (messProvider.getMessModel==null ||messProvider.getMessModel!.messMemberList.isEmpty )? Center(child: Text('No member found.'))
+          :  StatefulBuilder(
               builder: (context, setLocalState) { 
 
               return ListView.builder(
-                itemCount: data.length,
+                itemCount: messProvider.getMessModel!.messMemberList.length,
                 itemBuilder: (context, index) {
-                  Map<String,dynamic> memberData = data[index];
+                  Map<String,dynamic> memberData = messProvider.getMessModel!.messMemberList[index];
                   String memberType = 
                     messProvider.getMessModel!.menagerId==memberData[Constants.uId]? 
                       Constants.menager
@@ -234,8 +215,6 @@ class _MemberScreenState extends State<MemberScreen> {
                                 if(a??false){
                                   // remove from mess
                                   await messProvider.kickMemberFromMess(member: memberData);
-                                  setState(() {
-                                  });
                                 }
                               },
                               child: Row(
@@ -265,9 +244,6 @@ class _MemberScreenState extends State<MemberScreen> {
                                 debugPrint(memberData.toString());
                                 debugPrint(newMemberData.toString());
                                 await messProvider.changeMemberStatus(preMemberData:  memberData, newMemberData: newMemberData);
-                                setState(() {
-                                  memberData = newMemberData;
-                                });
                               },
                             )
                         ];
@@ -278,10 +254,7 @@ class _MemberScreenState extends State<MemberScreen> {
                 },
                         );
                },
-            );
-          }
-        } 
-      ),
+          )
     );
   }
 }

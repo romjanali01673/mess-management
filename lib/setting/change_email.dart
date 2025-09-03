@@ -149,7 +149,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                                 keyboardType: TextInputType.text,
                                                 textInputAction: TextInputAction.next,
                                                 decoration: InputDecoration(
-                                                  label: Text("Email"),
+                                                  label: Text("New Email"),
                                                   border: InputBorder.none,
                                     
                                                 ),
