@@ -29,7 +29,7 @@ class FirstScreenProvider extends ChangeNotifier{
 
   bool   get getIsLoading=> _isLoading;
   double get gettotalBlance => (_totalDepositOfMess - _totalBazerCost + _remainingFundBlance);
-  double get getmealBlance => (_totalDepositOfMess - _totalBazerCost + _remainingFundBlance);
+  double get getmealBlance => (_totalDepositOfMess - _totalBazerCost);
 
   double get getMealRate{
     if(_totalMealOfMess==0){
