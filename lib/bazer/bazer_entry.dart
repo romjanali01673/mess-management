@@ -244,7 +244,7 @@ class _BazerEntryScreenState extends State<BazerEntryScreen> {
               // color: Colors.,
               child: ListTile(
                 minTileHeight: 40,
-                title: Text("Total Cost : $totalAmount TK", style: TextStyle(fontSize: 20),),
+                title: Text("Total Cost \$ $totalAmount TK", style: TextStyle(fontSize: 20),),
               ),
             ),
 

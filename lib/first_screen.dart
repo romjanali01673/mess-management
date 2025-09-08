@@ -149,8 +149,11 @@ class _FirstScreenState extends State<FirstScreen> {
                       crossAxisSpacing: 0,
                       children: [
                         // menager see
+                        Text("Mess Section:"),
                         if(amIAdmin(messProvider: messProvider, authProvider: authProvider) || amIactmenager(messProvider: messProvider, authProvider: authProvider))
                         ...[
+
+                            // total blance (deposit - bazer + fund)
                             SizedBox(
                               height: 150,
                               child: Card(
@@ -162,11 +165,11 @@ class _FirstScreenState extends State<FirstScreen> {
                                     children: [
                                       FaIcon(FontAwesomeIcons.bangladeshiTakaSign , size: 15,),
                                       FittedBox( 
-                                        child: Text(getFormatedPrice(value: firstScreenProvider.getBlance), style: getTextStyleForTitleM()),
+                                        child: Text(getFormatedPrice(value: firstScreenProvider.gettotalBlance), style: getTextStyleForTitleM()),
                                                 
                                       ),
                                       AutoSizeText(
-                                        "Blance",
+                                        "Total Blance",
                                         maxLines: 2,
                                         textAlign: TextAlign.center,
                                         style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
@@ -178,6 +181,37 @@ class _FirstScreenState extends State<FirstScreen> {
                                 ),
                               ),
                             ),
+
+                            // meal blance (deposit - bazer)
+                            SizedBox(
+                              height: 150,
+                              child: Card(
+                                color: Colors.white70,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      FaIcon(FontAwesomeIcons.bangladeshiTakaSign , size: 15,),
+                                      FittedBox( 
+                                        child: Text(getFormatedPrice(value: firstScreenProvider.getmealBlance), style: getTextStyleForTitleM()),
+                                                
+                                      ),
+                                      AutoSizeText(
+                                        "Meal Blance",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: getTextStyleForSubTitleM().copyWith(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: 10,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+
                             SizedBox(
                             height: 150,
                             child: Card(
@@ -207,7 +241,9 @@ class _FirstScreenState extends State<FirstScreen> {
                             ),
                           ),
                         ],
-              
+
+                        Text("My Section"),
+                        
                         SizedBox(
                           height: 150,
                           child: GestureDetector(
