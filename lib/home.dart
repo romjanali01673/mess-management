@@ -21,7 +21,6 @@ import 'package:mess_management/providers/mess_provider.dart';
 import 'package:mess_management/providers/notice_provider.dart';
 import 'package:mess_management/services/notification_services.dart';
 import 'package:mess_management/setting/setting_secrren.dart';
-import 'package:mess_management/optimize_nexted_listview_with_sliverList.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {

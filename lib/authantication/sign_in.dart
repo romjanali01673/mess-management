@@ -23,8 +23,6 @@ class _SignInScreenState extends State<SignInScreen> {
   String pass = "";
   String email = "";
 
-  
-
   void signIn()async{
     
     if(FormKey.currentState!.validate()){
@@ -81,6 +79,7 @@ class _SignInScreenState extends State<SignInScreen> {
         if(isSuccess){
         // get user data, 
           isSuccess = await authProvider.saveUserDataToSharedPref();
+          isSuccess = await authProvider.saveUserAuthUidToSharedPref();
         }
 
         if(isSuccess){

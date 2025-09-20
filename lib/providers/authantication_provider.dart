@@ -129,18 +129,26 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<void> getUidFromFiretore ({ required Function(String) onFail})async{
     try {
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      final x  = sharedPreferences.getString(Constants.uId);
+
       // after successfully login we can access "firebaseAuth.currentUser!.uid"
-      DocumentSnapshot snapshot = await firebaseFirestore
-        .collection(Constants.uId)
-        .doc(firebaseAuth.currentUser!.uid)//"firebaseAuth.currentUser" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout.
-        .get();
-      setUid(uId: snapshot[Constants.uId]);
-      debugPrint(snapshot[Constants.uId].toString()+ "get uid from firestore");
-      notifyListeners();
+      if(firebaseAuth.currentUser!=null){
+        DocumentSnapshot snapshot = await firebaseFirestore
+          .collection(Constants.uId)
+          .doc(firebaseAuth.currentUser?.uid ?? x) //"firebaseAuth.currentUser" it's stored local memory (in rom). so we can access it untill cashed was not cleared or logout. for few spacific device we get "currentuser.uid==null" that's why we are using shared preference.
+          .get();
+        setUid(uId: snapshot[Constants.uId]);
+        debugPrint(snapshot[Constants.uId].toString()+ "get uid from firestore");
+      }
+      else{
+      }
     } catch (e) {
       onFail(e.toString());
     }
+    notifyListeners();
   }
+
 
   Future<bool> checkIsSubcscraiber()async{
     bool flg = false;
@@ -220,7 +228,20 @@ class AuthenticationProvider extends ChangeNotifier {
       Map<String,dynamic> mp = getUserModel!.toMap(); 
       mp[Constants.createdAt] = getUserModel!.createdAt!.toDate().toIso8601String();
       await sharedPreferences.setString(Constants.userModel, jsonEncode(mp));
+      
+
     debugPrint("2");
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> saveUserAuthUidToSharedPref()async{
+    try {
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      await sharedPreferences.setString(Constants.uId, firebaseAuth.currentUser!.uid);;
     } catch (e) {
       debugPrint(e.toString());
       return false;
@@ -537,10 +558,12 @@ class AuthenticationProvider extends ChangeNotifier {
     final batch = firebaseFirestore.batch();
     // create a user account in authentication
     setLoading(val:true);
-    String preAuthToken = firebaseAuth.currentUser!.uid;
 
     UserCredential? userCredential;
-    userCredential = await signInWithEmailAndPassword(email: getUserModel!.email, password: password, onFail:onFail);
+    String preAuthToken = firebaseAuth.currentUser?.uid ??"";
+    try{
+      userCredential = await signInWithEmailAndPassword(email: getUserModel!.email, password: password, onFail:onFail);
+    }catch (e){}
     if(userCredential!=null && userCredential.user !=null){
       userCredential = null;
       try {

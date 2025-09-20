@@ -39,8 +39,9 @@ class _LandingScreenState extends State<LandingScreen> {
       try{
         // get user data from fireStore
         print("Aaaaaaaaaaaaaaaaaaaaaaa");
-        await authProvider.getUidFromFiretore(onFail: (message){
-          if(mounted) showSnackber(context: context, content: "somthing Wrong\n uid fatch error");
+        await authProvider.getUidFromFiretore(
+          onFail: (message){
+          if(mounted) showSnackber(context: context, content: "somthing Wrong\n uid fatch error\n$message");
           navigate(isSignedIn: false);
         });
         debugPrint("getUserProfileData");
